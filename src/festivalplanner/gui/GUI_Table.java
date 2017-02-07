@@ -25,6 +25,7 @@ public class GUI_Table extends JPanel {
 
     public GUI_Table(Database database) {
         JTable table = new JTable();
+        setName("Table");
 		this.database = database;
 		index = 0;
         filterPerformances();

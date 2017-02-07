@@ -24,7 +24,7 @@ public class GUIFrame extends JFrame {
 
 		GUI_Table panelTable = new GUI_Table(database);
 
-		tabs.add("Panel 2D", panel2d);
+		tabs.add(panel2d);
 		tabs.add(panelTable);
 
 

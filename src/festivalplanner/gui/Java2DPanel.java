@@ -20,7 +20,7 @@ public class Java2DPanel extends JPanel {
     private JButton addPerformance;
 
     Java2DPanel(Database database) {
-
+        setName("2D Table");
 
         //add's a button from wich you can add perfromance's
         addPerformance = new JButton();

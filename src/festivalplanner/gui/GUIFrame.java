@@ -2,12 +2,8 @@ package festivalplanner.gui;
 
 import festivalplanner.Main;
 import festivalplanner.data.Database;
-import festivalplanner.data.Performance;
-import festivalplanner.data.Stage;
 
 import javax.swing.*;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * The main GUI handler.
@@ -30,6 +26,9 @@ public class GUIFrame extends JFrame {
 
 		tabs.add("Panel 2D", panel2d);
 		tabs.add(panelTable.getMainScreen());
+
+
+
 
 		try {
 			UIManager.setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName());

@@ -2,25 +2,36 @@ package festivalplanner.gui;
 
 import festivalplanner.data.Database;
 import festivalplanner.data.Performance;
-import festivalplanner.data.Stage;
 
 import javax.swing.*;
 import java.awt.*;
 import java.util.ArrayList;
-import java.util.List;
 
 public class Java2DPanel extends JPanel {
-    private int heightTable;
-    private int heightColum;
+    private int tableheight;
+    private int columHeigth;
     private int beginTableX;
     private int beginTableY;
     private int widthTimeColum;
     private int hour;
-    private int widthTable;
+    private int TableWidth;
     private ArrayList<JButton> buttons;
     private Database database;
+    private JButton addPerformance;
 
     Java2DPanel(Database database) {
+
+
+        //add's a button from wich you can add perfromance's
+        addPerformance = new JButton();
+        addPerformance.addActionListener(e -> {
+            new addPerformanceGui();
+        });
+
+        add(addPerformance);
+
+
+        //sets the variable begin coords of the agenda
         this.database = database;
         beginTableX = 10;
         beginTableY = 30;
@@ -29,6 +40,7 @@ public class Java2DPanel extends JPanel {
         setLayout(null);
         buttons = new ArrayList<>();
 
+        //adds a a arrayList of buttons with the size of the amount of performances.
         for (int i = 0; i < database.getPerformances().size(); i++) {
             JButton button = new JButton();
             final int index = i;
@@ -44,18 +56,21 @@ public class Java2DPanel extends JPanel {
         super.paintComponent(g);
         Graphics2D g2d = (Graphics2D) g;
 
-        heightTable = getHeight() - 140;
-        heightColum = heightTable + 10;
-        widthTable = getWidth() - 20;
 
-        int heightRow = (int) Math.floor(heightTable / hour);
+        tableheight = getHeight() - 140;
+        columHeigth = tableheight + 10;
+        TableWidth = getWidth() - beginTableX;
+
+
+        /*makes the background of the agenda excluding the border*/
+        int heightRow = (int) Math.floor(tableheight / hour);
         int currentYRow = beginTableY;
         for (int i = 0; i < hour; i++) {
 
             if (i % 2 == 0) {
                 g2d.setColor(Color.GRAY);
             } else g2d.setColor(Color.LIGHT_GRAY);
-            g2d.fillRect(beginTableX, currentYRow, widthTable, heightRow);
+            g2d.fillRect(beginTableX, currentYRow, TableWidth - beginTableX - 1, heightRow);
 
             String timeString;
             if (i >= 10) {
@@ -73,58 +88,68 @@ public class Java2DPanel extends JPanel {
             currentYRow += heightRow;
         }
 
+        /*draws the border of the background*/
         g2d.setColor(Color.black);
-        g2d.drawRect(beginTableX, beginTableY, widthTable, heightRow * hour);
+        g2d.drawRect(beginTableX, beginTableY, TableWidth - beginTableX - 1, heightRow * hour);
+        //draws the line next to the time collum
         g2d.drawLine(widthTimeColum, beginTableY, widthTimeColum, heightRow * hour + 10);
 
+        /*draws the line above the agenda*/
         g2d.setColor(Color.darkGray);
-        g2d.fillRect(10, 10, widthTable + 1, beginTableY - 10);
+        g2d.fillRect(10, 10, TableWidth - beginTableX, beginTableY - 10);
 
+        /*writes time above the time collum*/
         g2d.setColor(Color.white);
         g2d.setFont(new Font(Font.SERIF, Font.BOLD, 16));
         g2d.drawString("Time", 10, 30);
 
+        /*write's the stagename above collum and puts a line between collums*/
         if (getWidth() / 55 >= 20) {
             g2d.setFont(new Font(Font.SERIF, Font.BOLD, 20));
         } else g2d.setFont(new Font(Font.SERIF, Font.BOLD, getWidth() / 60));
-
-        int amountOfStagesMin1 = database.getStages().size();
-        for (int i = 0; i < amountOfStagesMin1; i++) {
+        int amountOfStages = database.getStages().size();
+        for (int i = 0; i < amountOfStages; i++) {
 
             g2d.setColor(Color.WHITE);
-            g2d.drawString(database.getStages().get(i).getName(),//performances.get(i).getStage().getName(),
-					widthTimeColum + ((widthTable - widthTimeColum) / amountOfStagesMin1) * i,
+            g2d.drawString(database.getStages().get(i).getName(),
+                    widthTimeColum + ((TableWidth - widthTimeColum) / amountOfStages) * i,
                     beginTableY - 2);
             g2d.setColor(Color.black);
-            g2d.drawLine(widthTimeColum + ((widthTable - widthTimeColum) / amountOfStagesMin1) * i, beginTableY, widthTimeColum +
-                            ((widthTable - widthTimeColum) / amountOfStagesMin1) * i,
+            g2d.drawLine(widthTimeColum + ((TableWidth - widthTimeColum) / amountOfStages) * i, beginTableY, widthTimeColum +
+                            ((TableWidth - widthTimeColum) / amountOfStages) * i,
                     heightRow * hour + beginTableY);
         }
 
-        for (int i = 0; i < database.getPerformances().size()/*performances.size()*/; i++) {
+        //sets the button on the right place of a performances
+        for (int i = 0; i < database.getPerformances().size(); i++) {
             JButton button = buttons.get(i);
             button.setForeground(Color.white);
 
-            //new
-			Performance perf = database.getPerformances().get(i);
-			button.setText(perf.getArtists().get(0).getName());
-            //button.setText("Artist naam");
 
-            //new
+            Performance perf = database.getPerformances().get(i);
+            button.setText(perf.getArtists().get(0).getName());
+
+
             int colIndex = database.getStages().indexOf(perf.getStage());
 
-            button.setBackground(Color.black);
-            button.setBounds(widthTimeColum + (widthTable-widthTimeColum)/amountOfStagesMin1*colIndex,
-					//((widthTable - widthTimeColum) / amountOfStagesMin1) * 0,
+            Performance performance = database.getPerformances().get(i);
+
+            button.setBackground(Color.DARK_GRAY);
+            button.setBounds(widthTimeColum + (TableWidth -widthTimeColum)/amountOfStages*colIndex,
                     heightRow *
-                            10 + beginTableY,
-                    ((widthTable - widthTimeColum) / amountOfStagesMin1), heightRow *
-                            (12 -
-                                    10));
+                            performance.getStartTime().getHour() + beginTableY,
+                    ((TableWidth - widthTimeColum) / amountOfStages), heightRow *
+                            (performance.getEndTime().getHour() -
+                                    performance.getStartTime().getHour()));
 
         }
 
 
+        //set the place of the addPerformance button
+        addPerformance.setBounds(beginTableX,getHeight() - 100, 85,85);
+
+
+        //repaint();
     }
 
 }

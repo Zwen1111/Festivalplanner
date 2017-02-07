@@ -17,21 +17,13 @@ public class Java2DPanel extends JPanel {
     private int tableWidth;
     private ArrayList<JButton> buttons;
     private Database database;
-    private JButton addPerformance;
+    private AddButton addPerformance;
 
     Java2DPanel(Database database) {
         setName("2D Table");
 
         //add's a button from wich you can add perfromance's
-        addPerformance = new JButton();
-        addPerformance.setOpaque(false);
-        addPerformance.setContentAreaFilled(false);
-        addPerformance.setBorderPainted(false);
-        addPerformance.setIcon(new ImageIcon("Assets\\icon's\\addIcon.png"));
-        addPerformance.addActionListener(e -> {
-            new addPerformanceGui();
-        });
-
+        addPerformance = new AddButton();
         add(addPerformance);
 
 

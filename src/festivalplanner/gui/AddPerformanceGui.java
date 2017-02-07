@@ -5,8 +5,8 @@ import javax.swing.*;
 /**
  * Created by Maarten on 07/02/2017.
  */
-public class addPerformanceGui extends  JFrame{
-    public addPerformanceGui() {
+public class AddPerformanceGui extends  JFrame{
+    public AddPerformanceGui() {
         setSize(800,600);
         setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 

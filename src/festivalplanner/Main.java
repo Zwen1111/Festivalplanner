@@ -6,6 +6,7 @@ import festivalplanner.data.Performance;
 import festivalplanner.data.Stage;
 import festivalplanner.gui.GUIFrame;
 
+import javax.swing.*;
 import java.time.LocalTime;
 
 /**
@@ -14,6 +15,12 @@ import java.time.LocalTime;
 public class Main {
 
 	public static void main(String[] args) {
+		try {
+			UIManager.setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName());
+		} catch (Exception e) {
+			System.err.println("Could not find cross-platform UI.");
+			e.printStackTrace();
+		}
 		new GUIFrame();
 	}
 

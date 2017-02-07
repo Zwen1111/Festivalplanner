@@ -24,6 +24,7 @@ public class GUI_Table extends JPanel {
     private int maxIndex;
 
     public GUI_Table(Database database) {
+        AddButton addButton = new AddButton();
         JTable table = new JTable();
         setName("Table");
 		this.database = database;
@@ -128,7 +129,7 @@ public class GUI_Table extends JPanel {
         });
 
         stageLabel.setText(indexToStage());
-
+        bottemScreen.add(addButton);
         bottemScreen.add(back);
         bottemScreen.add(stageLabel);
         bottemScreen.add(next);

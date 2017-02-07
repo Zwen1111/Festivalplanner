@@ -12,7 +12,12 @@ public class AddButton extends JButton{
         setOpaque(false);
         setContentAreaFilled(false);
         setBorderPainted(false);
-        setIcon(new ImageIcon("Assets\\icon's\\addIcon.png"));
+        if (System.getProperty("os.name").contains("Windows")) {
+            setIcon(new ImageIcon("Assets\\icon's\\addIcon.png"));
+        }else if (System.getProperty("os.name").contains("Mac")) {
+            setIcon(new ImageIcon("Assets/icon's/addIcon.png"));
+        }
+
         addActionListener(e -> {
             new AddPerformanceGui();
         });

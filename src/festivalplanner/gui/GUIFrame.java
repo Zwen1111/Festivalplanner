@@ -30,12 +30,7 @@ public class GUIFrame extends JFrame {
 
 
 
-		try {
-			UIManager.setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName());
-		} catch (Exception e) {
-			System.err.println("Could not find cross-platform UI.");
-			e.printStackTrace();
-		}
+
 		setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 		setContentPane(tabs);
 		setSize(800, 600);

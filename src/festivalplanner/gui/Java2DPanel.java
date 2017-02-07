@@ -125,6 +125,17 @@ public class Java2DPanel extends JPanel {
 
         //sets the button on the right place of a performances
         for (int i = 0; i < database.getPerformances().size(); i++) {
+            if(database.getPerformances().size() > buttons.size())
+            {
+                JButton button = new JButton();
+                final int index = i;
+                button.addActionListener(e -> {
+                    new ArtisGui(index);
+
+                });
+                add(button);
+                buttons.add(button);
+            }
             JButton button = buttons.get(i);
             button.setForeground(Color.white);
 

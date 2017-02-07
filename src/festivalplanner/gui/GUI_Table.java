@@ -24,7 +24,7 @@ public class GUI_Table extends JPanel {
     private int maxIndex;
 
     public GUI_Table(Database database) {
-        AddButton addButton = new AddButton();
+        AddButton addButton = new AddButton(database);
         JTable table = new JTable();
         setName("Table");
 		this.database = database;

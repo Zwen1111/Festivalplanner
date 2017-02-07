@@ -166,7 +166,7 @@ public class GUI_Table extends JPanel {
     public Performance performanceTimeCheck(LocalTime timeTable) {
         try {
             for(Performance p : performancesSorted) {
-                if (timeTable.compareTo(p.getStartTime()) >= 0 && timeTable.compareTo(p.getEndTime()) == 1) {
+                if (timeTable.compareTo(p.getStartTime()) >= 0 && timeTable.compareTo(p.getEndTime()) < 0) {
                     return p;
                 }
             }

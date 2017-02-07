@@ -24,6 +24,10 @@ public class Java2DPanel extends JPanel {
 
         //add's a button from wich you can add perfromance's
         addPerformance = new JButton();
+        addPerformance.setOpaque(false);
+        addPerformance.setContentAreaFilled(false);
+        addPerformance.setBorderPainted(false);
+        addPerformance.setIcon(new ImageIcon("Assets\\icon's\\addIcon.png"));
         addPerformance.addActionListener(e -> {
             new addPerformanceGui();
         });
@@ -147,6 +151,7 @@ public class Java2DPanel extends JPanel {
 
         //set the place of the addPerformance button
         addPerformance.setBounds(beginTableX,getHeight() - 100, 85,85);
+
 
 
         //repaint();

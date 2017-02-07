@@ -65,10 +65,9 @@ public class Stage {
 	@Override
 	public boolean equals(Object o) {
 		if (this == o) return true;
-		if (o == null || getClass() != o.getClass()) return false;
-
-		Stage stage = (Stage) o;
-
-		return name != null ? name.equals(stage.name) : stage.name == null;
+		if (o instanceof Stage) {
+			Stage stage = (Stage) o;
+			return name != null ? name.equals(stage.name) : stage.name == null;
+		} else return false;
 	}
 }

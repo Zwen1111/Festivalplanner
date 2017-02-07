@@ -13,7 +13,7 @@ import java.time.LocalTime;
 import java.util.*;
 import java.util.List;
 
-public class GUI_Table extends JTable {
+public class GUI_Table extends JPanel {
 
     private AbstractTableModel model;
     private ArrayList<Performance> performancesSorted;
@@ -21,13 +21,16 @@ public class GUI_Table extends JTable {
     private Database database;
     private JPanel mainScreen;
     private int index;
+    private int maxIndex;
 
     public GUI_Table(Database database) {
+        JTable table = new JTable();
 		this.database = database;
-        sortPerformances();
+		index = 0;
+        filterPerformances();
 
         LocalTime timeTable = LocalTime.of(0,0);
-        this.setModel(model = new AbstractTableModel()
+        table.setModel(model = new AbstractTableModel()
         {
             @Override
             public int getRowCount () {
@@ -79,8 +82,6 @@ public class GUI_Table extends JTable {
 
 
         });
-    //    JFrame frame = new JFrame("tabel");
-    //    frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 
         index = 0;
         mainScreen = new JPanel(new BorderLayout());
@@ -105,23 +106,23 @@ public class GUI_Table extends JTable {
         next.addActionListener((ActionEvent e) ->
         {
             index++;
-            if (index > 3) {
+            if (index > maxIndex) {
                 index = 0;
             }
-            sortPerformances();
+            filterPerformances();
             stageLabel.setText(indexToStage());
-            mainScreen.repaint();
+            this.repaint();
         });
         JButton back = new JButton("back");
         back.addActionListener(e ->
         {
             index--;
             if (index < 0) {
-                index = 3;
+                index = maxIndex;
             }
-            sortPerformances();
+            filterPerformances();
             stageLabel.setText(indexToStage());
-            mainScreen.repaint();
+            this.repaint();
 
         });
 
@@ -132,79 +133,45 @@ public class GUI_Table extends JTable {
         bottemScreen.add(next);
         mainScreen.add(bottemScreen, BorderLayout.SOUTH);
 
-//        frame.setContentPane(mainScreen);
-//        frame.setSize(600, 800);
-//        frame.setVisible(true);
-
-
+        this.add(mainScreen);
     }
 
-    public void findByStage(Stage stage) {
+    public void filterByStage(Stage stage) {
         performancesSorted = new ArrayList<>();
         for (Performance p : database.getPerformances()) {
-            if (p.getStage().equals(stage)) {
+            if (p.getStage().getName().equals(stage.getName())) {
                 performancesSorted.add(p);
             }
         }
     }
 
-    public void sortPerformances() {
+    public void filterPerformances() {
     	List<Stage> stages = database.getStages();
-    	stages.forEach(this::findByStage);
-        switch (index) {
-            case 0:
-                //findByStage("MainStage");
-                break;
-            case 1:
-                //findByStage("LittleGirlStage");
-                break;
-            case 2:
-                //findByStage("CodeStage");
-                break;
-            case 3:
-                //findByStage("TeenageStage");
-                break;
-            default:
-                break;
-        }
+    	filterByStage(stages.get(index));
+        maxIndex = stages.size() - 1;
     }
 
     public String indexToStage() {
         String text = "";
-        switch (index) {
-            case 0:
-                text = "Mainstage";
-                break;
-            case 1:
-                text = "LittleGirlStage";
-                break;
-            case 2:
-                text = "CodeStage";
-                break;
-            case 3:
-                text = "TeenageStage";
-                break;
-            default:
-                break;
-        }
+        List<Stage> stages = database.getStages();
+
+
+        text = stages.get(index).getName();
 
         return text;
     }
 
     public Performance performanceTimeCheck(LocalTime timeTable) {
         try {
-            for(Performance p : performancesSorted)
-                if(timeTable.compareTo(p.getStartTime()) >= 0 && timeTable.compareTo(p.getEndTime()) <= 0) {
+            for(Performance p : performancesSorted) {
+                if (timeTable.compareTo(p.getStartTime()) >= 0 && timeTable.compareTo(p.getEndTime()) == 1) {
                     return p;
                 }
+            }
         } catch (IndexOutOfBoundsException ex) {
             return null;
         }
         return null;
-    }
-
-    public JPanel getMainScreen() {
-        return mainScreen;
     }
 
 }

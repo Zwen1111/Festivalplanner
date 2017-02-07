@@ -3,7 +3,7 @@ package festivalplanner.gui;
 import javax.swing.*;
 
 /**
- * Created by Maarten on 06/02/2017.
+ * @author Maarten Nieuwenhuize
  */
 public class ArtisGui extends JFrame {
 

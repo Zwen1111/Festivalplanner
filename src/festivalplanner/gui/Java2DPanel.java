@@ -8,13 +8,13 @@ import java.awt.*;
 import java.util.ArrayList;
 
 public class Java2DPanel extends JPanel {
-    private int tableheight;
+    private int tableHeight;
     private int columHeigth;
     private int beginTableX;
     private int beginTableY;
     private int widthTimeColum;
     private int hour;
-    private int TableWidth;
+    private int tableWidth;
     private ArrayList<JButton> buttons;
     private Database database;
     private JButton addPerformance;
@@ -24,6 +24,10 @@ public class Java2DPanel extends JPanel {
 
         //add's a button from wich you can add perfromance's
         addPerformance = new JButton();
+        addPerformance.setOpaque(false);
+        addPerformance.setContentAreaFilled(false);
+        addPerformance.setBorderPainted(false);
+        addPerformance.setIcon(new ImageIcon("Assets\\icon's\\addIcon.png"));
         addPerformance.addActionListener(e -> {
             new addPerformanceGui();
         });
@@ -57,20 +61,20 @@ public class Java2DPanel extends JPanel {
         Graphics2D g2d = (Graphics2D) g;
 
 
-        tableheight = getHeight() - 140;
-        columHeigth = tableheight + 10;
-        TableWidth = getWidth() - beginTableX;
+        tableHeight = getHeight() - 140;
+        columHeigth = tableHeight + 10;
+        tableWidth = getWidth() - beginTableX;
 
 
         /*makes the background of the agenda excluding the border*/
-        int heightRow = (int) Math.floor(tableheight / hour);
+        int heightRow = (int) Math.floor(tableHeight / hour);
         int currentYRow = beginTableY;
         for (int i = 0; i < hour; i++) {
 
             if (i % 2 == 0) {
                 g2d.setColor(Color.GRAY);
             } else g2d.setColor(Color.LIGHT_GRAY);
-            g2d.fillRect(beginTableX, currentYRow, TableWidth - beginTableX - 1, heightRow);
+            g2d.fillRect(beginTableX, currentYRow, tableWidth - beginTableX - 1, heightRow);
 
             String timeString;
             if (i >= 10) {
@@ -90,13 +94,13 @@ public class Java2DPanel extends JPanel {
 
         /*draws the border of the background*/
         g2d.setColor(Color.black);
-        g2d.drawRect(beginTableX, beginTableY, TableWidth - beginTableX - 1, heightRow * hour);
+        g2d.drawRect(beginTableX, beginTableY, tableWidth - beginTableX - 1, heightRow * hour);
         //draws the line next to the time collum
         g2d.drawLine(widthTimeColum, beginTableY, widthTimeColum, heightRow * hour + 10);
 
         /*draws the line above the agenda*/
         g2d.setColor(Color.darkGray);
-        g2d.fillRect(10, 10, TableWidth - beginTableX, beginTableY - 10);
+        g2d.fillRect(10, 10, tableWidth - beginTableX, beginTableY - 10);
 
         /*writes time above the time collum*/
         g2d.setColor(Color.white);
@@ -112,11 +116,11 @@ public class Java2DPanel extends JPanel {
 
             g2d.setColor(Color.WHITE);
             g2d.drawString(database.getStages().get(i).getName(),
-                    widthTimeColum + ((TableWidth - widthTimeColum) / amountOfStages) * i,
+                    widthTimeColum + ((tableWidth - widthTimeColum) / amountOfStages) * i,
                     beginTableY - 2);
             g2d.setColor(Color.black);
-            g2d.drawLine(widthTimeColum + ((TableWidth - widthTimeColum) / amountOfStages) * i, beginTableY, widthTimeColum +
-                            ((TableWidth - widthTimeColum) / amountOfStages) * i,
+            g2d.drawLine(widthTimeColum + ((tableWidth - widthTimeColum) / amountOfStages) * i, beginTableY, widthTimeColum +
+                            ((tableWidth - widthTimeColum) / amountOfStages) * i,
                     heightRow * hour + beginTableY);
         }
 
@@ -127,7 +131,7 @@ public class Java2DPanel extends JPanel {
 
 
             Performance perf = database.getPerformances().get(i);
-            button.setText(perf.getArtists().get(0).getName());
+            button.setText(perf.getArtistNames());
 
 
             int colIndex = database.getStages().indexOf(perf.getStage());
@@ -135,10 +139,10 @@ public class Java2DPanel extends JPanel {
             Performance performance = database.getPerformances().get(i);
 
             button.setBackground(Color.DARK_GRAY);
-            button.setBounds(widthTimeColum + (TableWidth -widthTimeColum)/amountOfStages*colIndex,
+            button.setBounds(widthTimeColum + (tableWidth -widthTimeColum)/amountOfStages*colIndex,
                     heightRow *
                             performance.getStartTime().getHour() + beginTableY,
-                    ((TableWidth - widthTimeColum) / amountOfStages), heightRow *
+                    ((tableWidth - widthTimeColum) / amountOfStages), heightRow *
                             (performance.getEndTime().getHour() -
                                     performance.getStartTime().getHour()));
 
@@ -147,6 +151,7 @@ public class Java2DPanel extends JPanel {
 
         //set the place of the addPerformance button
         addPerformance.setBounds(beginTableX,getHeight() - 100, 85,85);
+
 
 
         //repaint();

@@ -19,7 +19,7 @@ public class Database {
 	}
 
 	public List<Stage> getStages() {
-		Collection<Stage> stages = new HashSet<>();
+		Collection<Stage> stages = new ArrayList<>();
 		performances.forEach(perf -> {
 			if (!stages.contains(perf.getStage())) stages.add(perf.getStage());
 		});

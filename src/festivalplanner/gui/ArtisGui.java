@@ -18,4 +18,5 @@ public class ArtisGui extends JFrame {
         setVisible(true);
 
     }
+
 }

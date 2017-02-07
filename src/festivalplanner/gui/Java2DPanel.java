@@ -22,9 +22,7 @@ public class Java2DPanel extends JPanel {
     Java2DPanel(Database database) {
 
 
-        //add's a button from wich you can add perfromance's
-        addPerformance = new AddButton();
-        add(addPerformance);
+
 
 
         //sets the variable begin coords of the agenda
@@ -42,13 +40,22 @@ public class Java2DPanel extends JPanel {
             final int index = i;
             button.addActionListener(e -> {
                 new ArtisGui(index);
+
             });
             add(button);
             buttons.add(button);
         }
+
+        //add's a button from wich you can add perfromance's
+        addPerformance = new AddButton(database,buttons,this);
+
+        add(addPerformance);
     }
 
     public void paintComponent(Graphics g) {
+        for (JButton button : buttons) {
+            add(button);
+        }
         super.paintComponent(g);
         Graphics2D g2d = (Graphics2D) g;
 
@@ -131,7 +138,7 @@ public class Java2DPanel extends JPanel {
             Performance performance = database.getPerformances().get(i);
 
             button.setBackground(Color.DARK_GRAY);
-            button.setBounds(widthTimeColum + (tableWidth -widthTimeColum)/amountOfStages*colIndex,
+            button.setBounds(widthTimeColum + (tableWidth - widthTimeColum) / amountOfStages * colIndex,
                     heightRow *
                             performance.getStartTime().getHour() + beginTableY,
                     ((tableWidth - widthTimeColum) / amountOfStages), heightRow *
@@ -142,11 +149,12 @@ public class Java2DPanel extends JPanel {
 
 
         //set the place of the addPerformance button
-        addPerformance.setBounds(beginTableX,getHeight() - 100, 85,85);
-
+        addPerformance.setBounds(beginTableX, getHeight() - 100, 85, 85);
 
 
         //repaint();
+
     }
+
 
 }

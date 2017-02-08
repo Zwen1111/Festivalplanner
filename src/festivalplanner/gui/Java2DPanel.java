@@ -47,15 +47,12 @@ public class Java2DPanel extends JPanel {
         }
 
         //add's a button from wich you can add perfromance's
-        addPerformance = new AddButton(database,buttons,this);
+        addPerformance = new AddButton(database,this);
 
         add(addPerformance);
     }
 
     public void paintComponent(Graphics g) {
-        for (JButton button : buttons) {
-            add(button);
-        }
         super.paintComponent(g);
         Graphics2D g2d = (Graphics2D) g;
 

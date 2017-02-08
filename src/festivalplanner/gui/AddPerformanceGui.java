@@ -7,24 +7,16 @@ import festivalplanner.data.Stage;
 
 import javax.swing.*;
 import java.time.LocalTime;
-import java.util.ArrayList;
 
 /**
  * Created by Maarten on 07/02/2017.
  */
 public class AddPerformanceGui extends  JFrame {
     private Database database;
-    public AddPerformanceGui(Database database, ArrayList<JButton> buttons, JComponent component) {
+    public AddPerformanceGui(Database database, JComponent component) {
         this.database = database;
         init();
 
-
-
-        JButton button = new JButton();
-        button.addActionListener(e -> {
-            new ArtisGui(buttons.size());
-        });
-        buttons.add(button);
         component.repaint();
     }
 
@@ -39,11 +31,12 @@ public class AddPerformanceGui extends  JFrame {
         setContentPane(mainPanel);
         database.getPerformances().add(new Performance(
                 new Stage("PaulStage"),
-                LocalTime.of(20, 0),
+                LocalTime.of(20, 00),
                 LocalTime.of(22, 0),
                 new Artist("Paul l", null, 5),
                 new Artist("Paul de m", null, 6)));
         setVisible(true);
+
     }
 
     public AddPerformanceGui(Database database)

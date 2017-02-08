@@ -4,6 +4,7 @@ import festivalplanner.Main;
 import festivalplanner.data.Database;
 import festivalplanner.data.Performance;
 import festivalplanner.data.Stage;
+import festivalplanner.gui.guibuttons.AddButton;
 
 import javax.swing.*;
 import javax.swing.table.AbstractTableModel;

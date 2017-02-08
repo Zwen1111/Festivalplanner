@@ -1,6 +1,7 @@
-package festivalplanner.gui;
+package festivalplanner.gui.guibuttons;
 
 import festivalplanner.data.Database;
+import festivalplanner.gui.AddPerformanceGui;
 
 import javax.swing.*;
 
@@ -8,7 +9,8 @@ import javax.swing.*;
  * Created by Maarten on 07/02/2017.
  */
 public class AddButton extends JButton {
-    AddButton(Database database, JComponent component) {
+
+    public AddButton(Database database, JComponent component) {
 
         setOpaque(false);
         setContentAreaFilled(false);
@@ -26,7 +28,7 @@ public class AddButton extends JButton {
 
     }
 
-    AddButton(Database database) {
+    public AddButton(Database database) {
         setOpaque(false);
         setContentAreaFilled(false);
         setBorderPainted(false);

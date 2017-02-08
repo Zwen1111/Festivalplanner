@@ -2,6 +2,8 @@ package festivalplanner.gui;
 
 import festivalplanner.data.Database;
 import festivalplanner.data.Performance;
+import festivalplanner.gui.guibuttons.AddButton;
+import festivalplanner.gui.guibuttons.CheckPerformanceButton;
 
 import javax.swing.*;
 import java.awt.*;
@@ -15,7 +17,7 @@ public class Java2DPanel extends JPanel {
     private int widthTimeColum;
     private int hour;
     private int tableWidth;
-    private ArrayList<JButton> buttons;
+    private ArrayList<CheckPerformanceButton> buttons;
     private Database database;
     private AddButton addPerformance;
 
@@ -36,12 +38,7 @@ public class Java2DPanel extends JPanel {
 
         //adds a a arrayList of buttons with the size of the amount of performances.
         for (int i = 0; i < database.getPerformances().size(); i++) {
-            JButton button = new JButton();
-            final int index = i;
-            button.addActionListener(e -> {
-                new ArtisGui(index);
-
-            });
+            CheckPerformanceButton button = new CheckPerformanceButton(i);
             add(button);
             buttons.add(button);
         }
@@ -124,12 +121,7 @@ public class Java2DPanel extends JPanel {
         for (int i = 0; i < database.getPerformances().size(); i++) {
             if(database.getPerformances().size() > buttons.size())
             {
-                JButton button = new JButton();
-                final int index = i;
-                button.addActionListener(e -> {
-                    new ArtisGui(index);
-
-                });
+                CheckPerformanceButton button = new CheckPerformanceButton(i);
                 add(button);
                 buttons.add(button);
             }

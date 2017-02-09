@@ -26,9 +26,6 @@ public class CalendarTable2D extends JPanel {
     public CalendarTable2D(Database database) {
         setName("2D Table");
 
-
-
-
         //sets the variable begin coords of the agenda
         this.database = database;
         beginTableX = 10;
@@ -40,7 +37,7 @@ public class CalendarTable2D extends JPanel {
 
         //adds a a arrayList of buttons with the size of the amount of performances.
         for (int i = 0; i < database.getPerformances().size(); i++) {
-            CheckPerformanceButton button = new CheckPerformanceButton(database.getPerformances().get(i));
+            CheckPerformanceButton button = new CheckPerformanceButton(database.getPerformances().get(i), hour);
             add(button);
             buttons.add(button);
         }
@@ -126,7 +123,7 @@ public class CalendarTable2D extends JPanel {
         for (int i = 0; i < database.getPerformances().size(); i++) {
             if(database.getPerformances().size() > buttons.size())
             {
-                CheckPerformanceButton button = new CheckPerformanceButton(database.getPerformances().get(i));
+                CheckPerformanceButton button = new CheckPerformanceButton(database.getPerformances().get(i), hour);
                 add(button);
                 buttons.add(button);
             }
@@ -161,5 +158,4 @@ public class CalendarTable2D extends JPanel {
         //repaint();
 
     }
-
 }

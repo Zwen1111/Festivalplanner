@@ -1,10 +1,12 @@
 package festivalplanner.gui.guiUtil;
 
 import festivalplanner.data.Database;
+import festivalplanner.data.Performance;
 
 import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import java.io.*;
+import java.util.ArrayList;
 
 /**
  * Created by Maarten on 09/02/2017.
@@ -48,7 +50,7 @@ public class FileSystem {
 
             }
             try(ObjectOutputStream output = new ObjectOutputStream(new FileOutputStream(betterFile))) {
-                output.writeObject(database);
+                output.writeObject(database.getPerformances());
             }
             catch (Exception e){
                 e.printStackTrace();
@@ -57,7 +59,7 @@ public class FileSystem {
 
     }
 
-    public Database open()
+    public void open()
     {
         JFileChooser fc = new JFileChooser();
         fc.setFileFilter(new FileNameExtensionFilter("Database of the agenda .fd ", "fd"));
@@ -68,14 +70,13 @@ public class FileSystem {
             this.file = fc.getSelectedFile();
             try(ObjectInputStream input = new ObjectInputStream(new FileInputStream(fc.getSelectedFile())))
             {
-                this.database = (Database) input.readObject();
+                database.setPerformances((ArrayList<Performance>) input.readObject());
             }
             catch (Exception e)
             {
                 e.printStackTrace();
             }
         }
-        return  database;
     }
 
 

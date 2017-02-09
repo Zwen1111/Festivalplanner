@@ -3,7 +3,6 @@ package festivalplanner.gui.table2d;
 import festivalplanner.data.Database;
 import festivalplanner.data.Performance;
 import festivalplanner.gui.AddPerformanceButton;
-import festivalplanner.gui.guiUtil.DatabaseUpdateAble;
 
 import javax.swing.*;
 import java.awt.*;
@@ -12,7 +11,7 @@ import java.util.ArrayList;
 /**
  * @author Maarten Nieuwehuize
  */
-public class CalendarTable2D extends JPanel implements DatabaseUpdateAble{
+public class CalendarTable2D extends JPanel{
     private int tableHeight;
     private int columHeigth;
     private int beginTableX;
@@ -163,9 +162,4 @@ public class CalendarTable2D extends JPanel implements DatabaseUpdateAble{
 
     }
 
-    @Override
-    public void updateDatabase(Database database) {
-        this.database = database;
-        repaint();
-    }
 }

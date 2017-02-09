@@ -2,14 +2,12 @@ package festivalplanner.gui;
 
 import festivalplanner.Main;
 import festivalplanner.data.Database;
-import festivalplanner.gui.guiUtil.DatabaseUpdateAble;
 import festivalplanner.gui.guiUtil.FileSystem;
 import festivalplanner.gui.table.CalendarTable;
 import festivalplanner.gui.table2d.CalendarTable2D;
 
 import javax.swing.*;
 import java.awt.*;
-import java.util.ArrayList;
 
 /**
  * The main GUI handler.
@@ -20,12 +18,10 @@ public class GUIFrame extends JFrame {
 
 	private Database database;
 	private FileSystem fileSystem;
-	private ArrayList<DatabaseUpdateAble> databaseUpdateAbles;
 
 	public GUIFrame() {
 		database = new Database();
 		fileSystem = new FileSystem(database);
-		databaseUpdateAbles = new ArrayList<>();
 
 		Main.test(database);
 		JTabbedPane tabs = new JTabbedPane(JTabbedPane.SCROLL_TAB_LAYOUT);
@@ -38,8 +34,6 @@ public class GUIFrame extends JFrame {
 
 		CalendarTable panelTable = new CalendarTable(database);
 
-		databaseUpdateAbles.add(panel2d);
-		databaseUpdateAbles.add(panelTable);
 
 		mainPanel.add(tabs,BorderLayout.CENTER);
 
@@ -53,10 +47,8 @@ public class GUIFrame extends JFrame {
 
 		JMenuItem open = new JMenuItem("Open");
 		open.addActionListener(e -> {
-			this.database = fileSystem.open();
-			for (DatabaseUpdateAble databaseUpdateAble : databaseUpdateAbles) {
-				databaseUpdateAble.updateDatabase(database);
-			}
+			 fileSystem.open();
+			 repaint();
 		});
 		fileMenu.add(open);
 

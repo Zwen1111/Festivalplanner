@@ -39,4 +39,8 @@ public class Database implements Serializable{
 		});
 		return nextTime;
 	}
+
+	public void setPerformances(List<Performance> performances) {
+		this.performances = performances;
+	}
 }

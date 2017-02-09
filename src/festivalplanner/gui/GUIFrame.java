@@ -41,6 +41,12 @@ public class GUIFrame extends JFrame {
 		JMenu fileMenu = new JMenu("File");
 		menuBar.add(fileMenu);
 
+		JMenuItem save = new JMenuItem("Save");
+		save.addActionListener(e -> {
+			fileSystem.save();
+		});
+		fileMenu.add(save);
+
 		JMenuItem saveas = new JMenuItem("Save as");
 		saveas.addActionListener(e ->  fileSystem.saveAs());
 		fileMenu.add(saveas);
@@ -52,13 +58,12 @@ public class GUIFrame extends JFrame {
 		});
 		fileMenu.add(open);
 
+
+
 		mainPanel.add(menuBar,BorderLayout.NORTH);
 
 		tabs.add(panel2d);
 		tabs.add(panelTable);
-
-
-
 
 
 		setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);

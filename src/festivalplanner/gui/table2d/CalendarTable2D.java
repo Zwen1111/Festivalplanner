@@ -41,7 +41,7 @@ public class CalendarTable2D extends JPanel implements DatabaseUpdateAble{
 
         //adds a a arrayList of buttons with the size of the amount of performances.
         for (int i = 0; i < database.getPerformances().size(); i++) {
-            CheckPerformanceButton button = new CheckPerformanceButton(i);
+            CheckPerformanceButton button = new CheckPerformanceButton(database.getPerformances().get(i));
             add(button);
             buttons.add(button);
         }
@@ -127,7 +127,7 @@ public class CalendarTable2D extends JPanel implements DatabaseUpdateAble{
         for (int i = 0; i < database.getPerformances().size(); i++) {
             if(database.getPerformances().size() > buttons.size())
             {
-                CheckPerformanceButton button = new CheckPerformanceButton(i);
+                CheckPerformanceButton button = new CheckPerformanceButton(database.getPerformances().get(i));
                 add(button);
                 buttons.add(button);
             }

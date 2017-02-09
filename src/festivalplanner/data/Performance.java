@@ -1,8 +1,12 @@
 package festivalplanner.data;
 
+import java.io.Serializable;
 import java.time.Duration;
 import java.time.LocalTime;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
 
 /**
  * Dataholder for a singel performance featuring one or more Artists
@@ -10,7 +14,7 @@ import java.util.*;
  *
  * @author Coen Boelhouwers, Björn Taks
  */
-public class Performance {
+public class Performance implements Serializable {
 
 	private Stage stage;
 	private List<Artist> artists;

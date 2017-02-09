@@ -36,7 +36,7 @@ public class Main {
 
 		database.getPerformances().add(new Performance(
 				stage1,
-				LocalTime.of(20,0),
+				LocalTime.of(20,30),
 				LocalTime.of(22,0),
 				afro, ellie));
 		database.getPerformances().add(new Performance(

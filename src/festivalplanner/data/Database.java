@@ -1,14 +1,16 @@
 package festivalplanner.data;
 
+import java.io.Serializable;
 import java.time.Duration;
 import java.time.LocalTime;
-import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
 /**
  * @author Coen Boelhouwers
  */
-public class Database {
+public class Database implements Serializable{
 
 	private List<Performance> performances;
 	private LocalTime nextTime;

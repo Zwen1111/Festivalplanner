@@ -3,6 +3,7 @@ package festivalplanner.gui.table2d;
 import festivalplanner.data.Database;
 import festivalplanner.data.Performance;
 import festivalplanner.gui.AddPerformanceButton;
+import festivalplanner.gui.guiUtil.DatabaseUpdateAble;
 
 import javax.swing.*;
 import java.awt.*;
@@ -11,7 +12,7 @@ import java.util.ArrayList;
 /**
  * @author Maarten Nieuwehuize
  */
-public class CalendarTable2D extends JPanel {
+public class CalendarTable2D extends JPanel implements DatabaseUpdateAble{
     private int tableHeight;
     private int columHeigth;
     private int beginTableX;
@@ -143,12 +144,13 @@ public class CalendarTable2D extends JPanel {
             Performance performance = database.getPerformances().get(i);
 
             button.setBackground(Color.DARK_GRAY);
+
+            int startYOfPerformance = (int) Math.floor(heightRow * (performance.getStartTime().getHour() + ((float) performance.getStartTime().getMinute() / 60)));
+            int endWithOfPerformance = (int) Math.floor(heightRow * ((performance.getEndTime().getHour() + ((float) performance.getEndTime().getMinute() / 60)) - (performance.getStartTime().getHour() + ((float) performance.getStartTime().getMinute() / 60))));
+
             button.setBounds(widthTimeColum + (tableWidth - widthTimeColum) / amountOfStages * colIndex,
-                    heightRow *
-                            performance.getStartTime().getHour() + beginTableY,
-                    ((tableWidth - widthTimeColum) / amountOfStages), heightRow *
-                            (performance.getEndTime().getHour() -
-                                    performance.getStartTime().getHour()));
+                    startYOfPerformance + beginTableY,
+                    ((tableWidth - widthTimeColum) / amountOfStages), endWithOfPerformance);
 
         }
 
@@ -161,5 +163,9 @@ public class CalendarTable2D extends JPanel {
 
     }
 
-
+    @Override
+    public void updateDatabase(Database database) {
+        this.database = database;
+        repaint();
+    }
 }

@@ -69,7 +69,6 @@ public class FileSystem {
             try(ObjectInputStream input = new ObjectInputStream(new FileInputStream(fc.getSelectedFile())))
             {
                 this.database = (Database) input.readObject();
-                System.out.println(false);
             }
             catch (Exception e)
             {

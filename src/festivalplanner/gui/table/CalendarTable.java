@@ -5,6 +5,7 @@ import festivalplanner.data.Database;
 import festivalplanner.data.Performance;
 import festivalplanner.data.Stage;
 import festivalplanner.gui.AddPerformanceButton;
+import festivalplanner.gui.guiUtil.DatabaseUpdateAble;
 
 import javax.swing.*;
 import javax.swing.table.AbstractTableModel;
@@ -14,7 +15,7 @@ import java.time.LocalTime;
 import java.util.*;
 import java.util.List;
 
-public class CalendarTable extends JPanel {
+public class CalendarTable extends JPanel implements DatabaseUpdateAble{
 
     private AbstractTableModel model;
     private ArrayList<Performance> performancesSorted;
@@ -181,4 +182,8 @@ public class CalendarTable extends JPanel {
         return null;
     }
 
+    @Override
+    public void updateDatabase(Database database) {
+        this.database = database;
+    }
 }

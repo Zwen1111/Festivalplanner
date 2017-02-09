@@ -2,6 +2,8 @@ package festivalplanner.gui;
 
 import festivalplanner.Main;
 import festivalplanner.data.Database;
+import festivalplanner.gui.table.CalendarTable;
+import festivalplanner.gui.table2d.CalendarTable2D;
 
 import javax.swing.*;
 
@@ -20,9 +22,9 @@ public class GUIFrame extends JFrame {
 		Main.test(database);
 		JTabbedPane tabs = new JTabbedPane(JTabbedPane.SCROLL_TAB_LAYOUT);
 
-		Java2DPanel panel2d = new Java2DPanel(database);
+		CalendarTable2D panel2d = new CalendarTable2D(database);
 
-		GUI_Table panelTable = new GUI_Table(database);
+		CalendarTable panelTable = new CalendarTable(database);
 
 		tabs.add(panel2d);
 		tabs.add(panelTable);

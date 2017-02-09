@@ -1,5 +1,7 @@
 package festivalplanner.data;
 
+import java.time.Duration;
+import java.time.LocalTime;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -9,6 +11,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class Database {
 
 	private List<Performance> performances;
+	private LocalTime nextTime;
 
 	public Database() {
 		performances = new ArrayList<>();
@@ -24,5 +27,14 @@ public class Database {
 			if (!stages.contains(perf.getStage())) stages.add(perf.getStage());
 		});
 		return new ArrayList<>(stages);
+	}
+
+	public LocalTime findNextEmptyStageTime(Stage stage, Duration duration) {
+		nextTime = LocalTime.MIDNIGHT;
+		performances.stream().filter(perf -> perf.getStage().equals(stage)).forEach(perf -> {
+			if (perf.getStartTime().isBefore(nextTime.plus(duration)))
+				nextTime = perf.getEndTime();
+		});
+		return nextTime;
 	}
 }

@@ -6,42 +6,39 @@ import festivalplanner.data.Performance;
 import festivalplanner.data.Stage;
 
 import javax.swing.*;
+import java.time.Duration;
 import java.time.LocalTime;
 
 /**
- * Created by Maarten on 07/02/2017.
+ * @author Maarten Nieuwenhuize, Coen Boelhouwers
  */
 public class AddPerformanceGui extends  JFrame {
-    private Database database;
-    public AddPerformanceGui(Database database, JComponent component) {
+
+	private Database database;
+	private OnPerformanceCreatedListener listener;
+
+    public AddPerformanceGui(Database database, OnPerformanceCreatedListener l) {
+        listener = l;
         this.database = database;
         init();
-
-        component.repaint();
     }
 
-    public void init()
-    {
+    private void init() {
         setSize(800, 600);
         setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 
-
-
         JPanel mainPanel = new JPanel();
         setContentPane(mainPanel);
-        database.getPerformances().add(new Performance(
-                new Stage("PaulStage"),
-                LocalTime.of(20, 00),
-                LocalTime.of(22, 0),
+        /*database.getPerformances().add(new Performance(*/
+        Stage paul = new Stage("PaulStage");
+        LocalTime paulTime = database.findNextEmptyStageTime(paul, Duration.ofMinutes(135));
+        if (listener != null) listener.performanceCreated(new Performance(
+                paul,
+                paulTime == null ? LocalTime.of(20, 0) : paulTime,
+                Duration.ofMinutes(135),
                 new Artist("Paul l", null, 5),
                 new Artist("Paul de m", null, 6)));
         setVisible(true);
 
-    }
-
-    public AddPerformanceGui(Database database)
-    {
-        this.database = database;
-        init();
     }
 }

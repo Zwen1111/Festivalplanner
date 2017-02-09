@@ -1,4 +1,4 @@
-package festivalplanner.gui;
+package festivalplanner.gui.table2d;
 
 import javax.swing.*;
 

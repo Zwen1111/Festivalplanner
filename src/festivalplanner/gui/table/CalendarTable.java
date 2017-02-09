@@ -25,10 +25,12 @@ public class CalendarTable extends JPanel {
     private int maxIndex;
 
     public CalendarTable(Database database) {
-        AddPerformanceButton addButton = new AddPerformanceButton(database, performance -> {
+		JTable table = new JTable();
+		AddPerformanceButton addButton = new AddPerformanceButton(database, performance -> {
             database.getPerformances().add(performance);
+            filterPerformances();
+			model.fireTableDataChanged();
         });
-        JTable table = new JTable();
         setName("Table");
 		this.database = database;
 		index = 0;

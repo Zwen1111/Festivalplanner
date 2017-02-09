@@ -7,7 +7,7 @@ import java.io.Serializable;
  *
  * @author Coen Boelhouwers, Björn Taks
  */
-public class Artist implements Serializable{
+public class Artist implements Serializable {
 	private String name;
 	private String genre;
 	private int popularity;

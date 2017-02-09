@@ -2,6 +2,8 @@ package festivalplanner.gui.table2d;
 
 import festivalplanner.data.Performance;
 
+import javax.swing.*;
+
 /**
  * @author Maarten Nieuwenhuize
  */

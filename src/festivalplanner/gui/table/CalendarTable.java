@@ -14,7 +14,7 @@ import java.time.LocalTime;
 import java.util.*;
 import java.util.List;
 
-public class CalendarTable extends JPanel{
+public class CalendarTable extends JPanel {
 
     private AbstractTableModel model;
     private ArrayList<Performance> performancesSorted;

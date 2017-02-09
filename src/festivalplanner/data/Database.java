@@ -13,7 +13,7 @@ import java.util.List;
  *
  * @author Coen Boelhouwers
  */
-public class Database implements Serializable{
+public class Database implements Serializable {
 
 	private List<Performance> performances;
 	private LocalTime nextTime;

@@ -11,7 +11,7 @@ import java.util.ArrayList;
 /**
  * @author Maarten Nieuwehuize
  */
-public class CalendarTable2D extends JPanel{
+public class CalendarTable2D extends JPanel {
     private int tableHeight;
     private int columHeigth;
     private int beginTableX;

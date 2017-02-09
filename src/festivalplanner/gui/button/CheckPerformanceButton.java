@@ -1,4 +1,4 @@
-package festivalplanner.gui.guibuttons;
+package festivalplanner.gui.button;
 
 import festivalplanner.gui.ArtisGui;
 

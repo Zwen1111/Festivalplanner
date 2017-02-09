@@ -2,8 +2,8 @@ package festivalplanner.gui;
 
 import festivalplanner.data.Database;
 import festivalplanner.data.Performance;
-import festivalplanner.gui.guibuttons.AddButton;
-import festivalplanner.gui.guibuttons.CheckPerformanceButton;
+import festivalplanner.gui.button.AddButton;
+import festivalplanner.gui.button.CheckPerformanceButton;
 
 import javax.swing.*;
 import java.awt.*;

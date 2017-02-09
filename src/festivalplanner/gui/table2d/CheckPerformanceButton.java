@@ -1,12 +1,14 @@
 package festivalplanner.gui.table2d;
 
+import festivalplanner.data.Performance;
+
 import javax.swing.*;
 
 /**
  * @author Maarten Nieuwenhuize
  */
 public class CheckPerformanceButton extends JButton {
-    public CheckPerformanceButton(int index) {
-        addActionListener(e -> new ArtisGui(index));
+    public CheckPerformanceButton(Performance performance) {
+        addActionListener(e -> new ArtisGui(performance));
     }
 }

@@ -11,7 +11,7 @@ import java.util.ArrayList;
 /**
  * @author Maarten Nieuwehuize
  */
-public class CalendarTable2D extends JPanel {
+public class CalendarTable2D extends JPanel{
     private int tableHeight;
     private int columHeigth;
     private int beginTableX;
@@ -40,7 +40,7 @@ public class CalendarTable2D extends JPanel {
 
         //adds a a arrayList of buttons with the size of the amount of performances.
         for (int i = 0; i < database.getPerformances().size(); i++) {
-            CheckPerformanceButton button = new CheckPerformanceButton(i);
+            CheckPerformanceButton button = new CheckPerformanceButton(database.getPerformances().get(i));
             add(button);
             buttons.add(button);
         }
@@ -126,7 +126,7 @@ public class CalendarTable2D extends JPanel {
         for (int i = 0; i < database.getPerformances().size(); i++) {
             if(database.getPerformances().size() > buttons.size())
             {
-                CheckPerformanceButton button = new CheckPerformanceButton(i);
+                CheckPerformanceButton button = new CheckPerformanceButton(database.getPerformances().get(i));
                 add(button);
                 buttons.add(button);
             }
@@ -143,12 +143,13 @@ public class CalendarTable2D extends JPanel {
             Performance performance = database.getPerformances().get(i);
 
             button.setBackground(Color.DARK_GRAY);
+
+            int startYOfPerformance = (int) Math.floor(heightRow * (performance.getStartTime().getHour() + ((float) performance.getStartTime().getMinute() / 60)));
+            int endWithOfPerformance = (int) Math.floor(heightRow * ((performance.getEndTime().getHour() + ((float) performance.getEndTime().getMinute() / 60)) - (performance.getStartTime().getHour() + ((float) performance.getStartTime().getMinute() / 60))));
+
             button.setBounds(widthTimeColum + (tableWidth - widthTimeColum) / amountOfStages * colIndex,
-                    heightRow *
-                            performance.getStartTime().getHour() + beginTableY,
-                    ((tableWidth - widthTimeColum) / amountOfStages), heightRow *
-                            (performance.getEndTime().getHour() -
-                                    performance.getStartTime().getHour()));
+                    startYOfPerformance + beginTableY,
+                    ((tableWidth - widthTimeColum) / amountOfStages), endWithOfPerformance);
 
         }
 
@@ -160,6 +161,5 @@ public class CalendarTable2D extends JPanel {
         //repaint();
 
     }
-
 
 }

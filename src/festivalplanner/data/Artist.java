@@ -1,11 +1,13 @@
 package festivalplanner.data;
 
+import java.io.Serializable;
+
 /**
  * Dataholder for a single artist that can perform on stages.
  *
  * @author Coen Boelhouwers, Björn Taks
  */
-public class Artist {
+public class Artist implements Serializable{
 	private String name;
 	private String genre;
 	private int popularity;

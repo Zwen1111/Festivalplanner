@@ -1,5 +1,6 @@
 package festivalplanner.data;
 
+import java.io.Serializable;
 import java.time.Duration;
 import java.time.LocalTime;
 import java.util.ArrayList;
@@ -12,7 +13,7 @@ import java.util.List;
  *
  * @author Coen Boelhouwers
  */
-public class Database {
+public class Database implements Serializable{
 
 	private List<Performance> performances;
 	private LocalTime nextTime;
@@ -59,5 +60,9 @@ public class Database {
 				nextTime = perf.getEndTime();
 		});
 		return nextTime;
+	}
+
+	public void setPerformances(List<Performance> performances) {
+		this.performances = performances;
 	}
 }

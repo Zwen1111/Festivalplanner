@@ -8,7 +8,7 @@ import javax.swing.*;
 public class ArtisGui extends JFrame {
 
     public ArtisGui(int i)  {
-        setSize(800,600);
+        setSize(300,400);
         setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 
         JPanel mainPanel = new JPanel();

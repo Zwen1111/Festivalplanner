@@ -24,7 +24,7 @@ public class AddPerformanceGui extends  JFrame {
     }
 
     private void init() {
-        setSize(800, 600);
+        setSize(300, 400);
         setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 
         JPanel mainPanel = new JPanel();

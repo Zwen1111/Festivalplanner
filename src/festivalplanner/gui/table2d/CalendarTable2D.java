@@ -1,16 +1,17 @@
-package festivalplanner.gui;
+package festivalplanner.gui.table2d;
 
 import festivalplanner.data.Database;
 import festivalplanner.data.Performance;
-import festivalplanner.gui.guiUtil.DatabaseUpdateAble;
-import festivalplanner.gui.guibuttons.AddButton;
-import festivalplanner.gui.guibuttons.CheckPerformanceButton;
+import festivalplanner.gui.AddPerformanceButton;
 
 import javax.swing.*;
 import java.awt.*;
 import java.util.ArrayList;
 
-public class Java2DPanel extends JPanel implements DatabaseUpdateAble{
+/**
+ * @author Maarten Nieuwehuize
+ */
+public class CalendarTable2D extends JPanel {
     private int tableHeight;
     private int columHeigth;
     private int beginTableX;
@@ -20,9 +21,9 @@ public class Java2DPanel extends JPanel implements DatabaseUpdateAble{
     private int tableWidth;
     private ArrayList<CheckPerformanceButton> buttons;
     private Database database;
-    private AddButton addPerformance;
+    private AddPerformanceButton addPerformance;
 
-    Java2DPanel(Database database) {
+    public CalendarTable2D(Database database) {
         setName("2D Table");
 
 
@@ -45,7 +46,10 @@ public class Java2DPanel extends JPanel implements DatabaseUpdateAble{
         }
 
         //add's a button from wich you can add perfromance's
-        addPerformance = new AddButton(database,this);
+        addPerformance = new AddPerformanceButton(database, performance -> {
+        	database.getPerformances().add(performance);
+        	repaint();
+		});
 
         add(addPerformance);
     }
@@ -156,9 +160,6 @@ public class Java2DPanel extends JPanel implements DatabaseUpdateAble{
         //repaint();
 
     }
-public void updateDatabase(Database database)
-{
-    this.database = database;
-}
+
 
 }

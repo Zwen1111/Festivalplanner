@@ -1,6 +1,6 @@
 package festivalplanner.data;
 
-import java.io.Serializable;
+import java.time.Duration;
 import java.time.LocalTime;
 import java.util.*;
 
@@ -10,7 +10,7 @@ import java.util.*;
  *
  * @author Coen Boelhouwers, Björn Taks
  */
-public class Performance implements Serializable{
+public class Performance {
 
 	private Stage stage;
 	private List<Artist> artists;
@@ -28,6 +28,19 @@ public class Performance implements Serializable{
 	public Performance(Stage stage, LocalTime startTime, LocalTime endTime,
 					   Artist... artists) {
 		this(stage, startTime, endTime, Arrays.asList(artists));
+	}
+
+	/**
+	 * Constructs a new performance featuring the specified artist(s).
+	 *
+	 * @param stage the Stage on which this performance takes place.
+	 * @param startTime the Time at which the performance starts.
+	 * @param duration the duration of the performance.
+	 * @param artists the Artist(s) who will be performing.
+	 */
+	public Performance(Stage stage, LocalTime startTime, Duration duration,
+					   Artist... artists) {
+		this(stage, startTime, startTime.plus(duration), Arrays.asList(artists));
 	}
 
 	/**

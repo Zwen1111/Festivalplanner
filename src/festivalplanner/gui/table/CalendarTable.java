@@ -1,11 +1,10 @@
-package festivalplanner.gui;
+package festivalplanner.gui.table;
 
 import festivalplanner.Main;
 import festivalplanner.data.Database;
 import festivalplanner.data.Performance;
 import festivalplanner.data.Stage;
-import festivalplanner.gui.guiUtil.DatabaseUpdateAble;
-import festivalplanner.gui.guibuttons.AddButton;
+import festivalplanner.gui.AddPerformanceButton;
 
 import javax.swing.*;
 import javax.swing.table.AbstractTableModel;
@@ -15,7 +14,7 @@ import java.time.LocalTime;
 import java.util.*;
 import java.util.List;
 
-public class GUI_Table extends JPanel implements DatabaseUpdateAble{
+public class CalendarTable extends JPanel {
 
     private AbstractTableModel model;
     private ArrayList<Performance> performancesSorted;
@@ -25,9 +24,13 @@ public class GUI_Table extends JPanel implements DatabaseUpdateAble{
     private int index;
     private int maxIndex;
 
-    public GUI_Table(Database database) {
-        AddButton addButton = new AddButton(database);
-        JTable table = new JTable();
+    public CalendarTable(Database database) {
+		JTable table = new JTable();
+		AddPerformanceButton addButton = new AddPerformanceButton(database, performance -> {
+            database.getPerformances().add(performance);
+            filterPerformances();
+			model.fireTableDataChanged();
+        });
         setName("Table");
 		this.database = database;
 		index = 0;
@@ -178,8 +181,4 @@ public class GUI_Table extends JPanel implements DatabaseUpdateAble{
         return null;
     }
 
-    @Override
-    public void updateDatabase(Database database) {
-        this.database = database;
-    }
 }

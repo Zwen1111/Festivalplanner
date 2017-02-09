@@ -1,16 +1,17 @@
 package festivalplanner.data;
 
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
+import java.time.Duration;
+import java.time.LocalTime;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * @author Coen Boelhouwers
  */
-public class Database implements Serializable {
+public class Database {
 
 	private List<Performance> performances;
+	private LocalTime nextTime;
 
 	public Database() {
 		performances = new ArrayList<>();
@@ -26,5 +27,14 @@ public class Database implements Serializable {
 			if (!stages.contains(perf.getStage())) stages.add(perf.getStage());
 		});
 		return new ArrayList<>(stages);
+	}
+
+	public LocalTime findNextEmptyStageTime(Stage stage, Duration duration) {
+		nextTime = LocalTime.MIDNIGHT;
+		performances.stream().filter(perf -> perf.getStage().equals(stage)).forEach(perf -> {
+			if (perf.getStartTime().isBefore(nextTime.plus(duration)))
+				nextTime = perf.getEndTime();
+		});
+		return nextTime;
 	}
 }

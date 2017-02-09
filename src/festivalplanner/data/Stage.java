@@ -1,11 +1,13 @@
 package festivalplanner.data;
 
+import java.io.Serializable;
+
 /**
  * Dataholder for a single performance-stage.
  *
  * @author Björn Taks
  */
-public class Stage {
+public class Stage implements Serializable{
 	private String name;
 	private int capacity;
 

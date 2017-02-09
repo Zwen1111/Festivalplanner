@@ -4,6 +4,7 @@ import festivalplanner.Main;
 import festivalplanner.data.Database;
 import festivalplanner.data.Performance;
 import festivalplanner.data.Stage;
+import festivalplanner.gui.guiUtil.DatabaseUpdateAble;
 import festivalplanner.gui.guibuttons.AddButton;
 
 import javax.swing.*;
@@ -14,7 +15,7 @@ import java.time.LocalTime;
 import java.util.*;
 import java.util.List;
 
-public class GUI_Table extends JPanel {
+public class GUI_Table extends JPanel implements DatabaseUpdateAble{
 
     private AbstractTableModel model;
     private ArrayList<Performance> performancesSorted;
@@ -177,4 +178,8 @@ public class GUI_Table extends JPanel {
         return null;
     }
 
+    @Override
+    public void updateDatabase(Database database) {
+        this.database = database;
+    }
 }

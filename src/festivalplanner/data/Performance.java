@@ -1,5 +1,6 @@
 package festivalplanner.data;
 
+import java.io.Serializable;
 import java.time.LocalTime;
 import java.util.*;
 
@@ -9,7 +10,7 @@ import java.util.*;
  *
  * @author Coen Boelhouwers, Björn Taks
  */
-public class Performance {
+public class Performance implements Serializable{
 
 	private Stage stage;
 	private List<Artist> artists;

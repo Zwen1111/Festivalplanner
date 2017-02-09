@@ -2,6 +2,7 @@ package festivalplanner.gui;
 
 import festivalplanner.data.Database;
 import festivalplanner.data.Performance;
+import festivalplanner.gui.guiUtil.DatabaseUpdateAble;
 import festivalplanner.gui.guibuttons.AddButton;
 import festivalplanner.gui.guibuttons.CheckPerformanceButton;
 
@@ -9,7 +10,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.util.ArrayList;
 
-public class Java2DPanel extends JPanel {
+public class Java2DPanel extends JPanel implements DatabaseUpdateAble{
     private int tableHeight;
     private int columHeigth;
     private int beginTableX;
@@ -155,6 +156,9 @@ public class Java2DPanel extends JPanel {
         //repaint();
 
     }
-
+public void updateDatabase(Database database)
+{
+    this.database = database;
+}
 
 }

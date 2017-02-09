@@ -1,12 +1,14 @@
 package festivalplanner.data;
 
-import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
 /**
  * @author Coen Boelhouwers
  */
-public class Database {
+public class Database implements Serializable {
 
 	private List<Performance> performances;
 

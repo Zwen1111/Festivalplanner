@@ -130,6 +130,7 @@ public class ArtisGui extends JFrame {
 				ZoneId.systemDefault()).toLocalTime());
 		performance.getArtists().clear();
 		performance.getArtists().addAll(artistJList.getSelectedValuesList());
+		database.notifyDataChanged();
         dispose();
     }
 

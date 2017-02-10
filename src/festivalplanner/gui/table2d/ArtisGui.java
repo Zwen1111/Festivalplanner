@@ -6,6 +6,7 @@ import festivalplanner.data.Performance;
 import festivalplanner.data.Stage;
 
 import javax.swing.*;
+import javax.swing.event.ListDataListener;
 import java.awt.*;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
@@ -58,7 +59,7 @@ public class ArtisGui extends JFrame {
         JPanel artistTextPanel = new JPanel(new GridLayout(2,1));
         //JPanel buttonPanel = new JPanel(new FlowLayout());
 
-
+		JList<Artist> artistJList = setupArtistsList(database);
 
         Date date = new Date();
         time = new SimpleDateFormat("HH:mm");
@@ -157,13 +158,13 @@ public class ArtisGui extends JFrame {
         //labelPanel.add(artistLabel);
 
         //Add components on textPanel
-        textPanel.add(stageComboBox);
-        textPanel.add(startTimeJSpinner);
-        textPanel.add(endTimeJSpinner);
+        //textPanel.add(stageComboBox);
+        //textPanel.add(startTimeJSpinner);
+        //textPanel.add(endTimeJSpinner);
         //if(performance.getArtists().size() > 1){
-            textPanel.add(artistComboBox);
-            genreText.setText(genreValues.get(artistComboBox.getSelectedIndex()));
-            popularityText.setText(Integer.toString(performance.getArtists().get(artistComboBox.getSelectedIndex()).getPopularity()));
+        //    textPanel.add(artistComboBox);
+        //    genreText.setText(genreValues.get(artistComboBox.getSelectedIndex()));
+        //    popularityText.setText(Integer.toString(performance.getArtists().get(artistComboBox.getSelectedIndex()).getPopularity()));
         //}
         //else {
         //    textPanel.add(artistText);
@@ -172,39 +173,41 @@ public class ArtisGui extends JFrame {
         //}
 
         //Add components on artistLabelPanel
-        artistLabelPanel.add(genreLabel);
-        artistLabelPanel.add(popularityLabel);
+        //artistLabelPanel.add(genreLabel);
+        //artistLabelPanel.add(popularityLabel);
 
         //Add components on artistTextPanel
-        artistTextPanel.add(genreText);
-        artistTextPanel.add(popularityText);
+        //artistTextPanel.add(genreText);
+        //artistTextPanel.add(popularityText);
 
         // Position those widgets
         //buttonPanel.add(saveButton);
         //buttonPanel.add(closeButton);
 
-        artistPanel.add(artistLabelPanel);
-        artistPanel.add(artistTextPanel);
-        mainPanel.add(artistPanel, BorderLayout.CENTER);
-        infoPanel.add(labelPanel);
-        infoPanel.add(textPanel);
-        mainPanel.add(infoPanel, BorderLayout.NORTH);
+        //artistPanel.add(artistLabelPanel);
+        //artistPanel.add(artistTextPanel);
+        //mainPanel.add(artistPanel, BorderLayout.CENTER);
+        //infoPanel.add(labelPanel);
+        //infoPanel.add(textPanel);
+        //mainPanel.add(infoPanel, BorderLayout.NORTH);
 
 
 
-		JPanel centerPanel = new JPanel(new GridLayout(6, 2));
-		centerPanel.add(new JLabel("Stage:"));
-		centerPanel.add(stageComboBox);
-		centerPanel.add(new JLabel("Start time:"));
-		centerPanel.add(startTimeComboBox);
-		centerPanel.add(new JLabel("End time:"));
-		centerPanel.add(endTimeComboBox);
-		centerPanel.add(new JLabel("Artists:"));
-		centerPanel.add(new JTextField(performance.getArtistNames()));
-		centerPanel.add(new JLabel("Genres:"));
-		centerPanel.add(new DisabledTextField(performance.getArtistGenres()));
-		centerPanel.add(new JLabel("Popularity:"));
-		centerPanel.add(new DisabledTextField(String.valueOf(performance.generatePopularity())));
+
+		JPanel centerPanel = new JPanel(new GridBagLayout());
+		centerPanel.add(new JLabel("Stage:"), constraints(0, 0, 0.4, 0));
+		centerPanel.add(stageComboBox, constraints(1, 0, 0.6, 0));
+		centerPanel.add(new JLabel("Start time:"), constraints(0, 1, 0.4, 0));
+		centerPanel.add(startTimeJSpinner, constraints(1, 1, 0.6, 0));
+		centerPanel.add(new JLabel("End time:"), constraints(0, 2, 0.4, 0));
+		centerPanel.add(endTimeJSpinner, constraints(1, 2, 0.6, 0));
+		centerPanel.add(new JLabel("Artists:"), constraints(0, 3, 0.4, 0));
+		centerPanel.add(new JScrollPane(artistJList), constraints(1, 3, 0.6, 60));
+		centerPanel.add(new JLabel("Genres:"), constraints(0, 4, 0.4, 0));
+		centerPanel.add(new DisabledTextField(performance.getArtistGenres()), constraints(1, 4, 0.6, 0));
+		centerPanel.add(new JLabel("Popularity:"), constraints(0, 5, 0.4, 0));
+		centerPanel.add(new DisabledTextField(String.valueOf(performance.generatePopularity())),
+				constraints(1, 5, 0.6, 0));
 
         JPanel bottomPanel = new JPanel();
         bottomPanel.add(saveButton);
@@ -217,6 +220,34 @@ public class ArtisGui extends JFrame {
         setContentPane(mainPanel);
         setVisible(true);
     }
+
+    private static GridBagConstraints constraints(int x, int y, double weight, int pad) {
+    	GridBagConstraints leftColumn = new GridBagConstraints();
+		leftColumn.weightx = 0.4;
+		leftColumn.gridx = x;
+		leftColumn.gridy = y;
+		leftColumn.ipady = pad;
+		leftColumn.fill = GridBagConstraints.HORIZONTAL;
+		leftColumn.insets = new Insets(2,2,2,2);
+		return leftColumn;
+	}
+
+    private JList<Artist> setupArtistsList(Database database) {
+    	JList<Artist> list = new JList<>();
+		ListModel<Artist> model = new DefaultListModel<Artist>() {
+			@Override
+			public int getSize() {
+				return database.getArtists().size();
+			}
+
+			@Override
+			public Artist getElementAt(int index) {
+				return database.getArtists().get(index);
+			}
+		};
+		list.setModel(model);
+		return list;
+	}
 
     public void artistInformation(Artist artist){
         //Saves the values in genreText and popularityText

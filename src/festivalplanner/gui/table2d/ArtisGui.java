@@ -21,6 +21,10 @@ import java.util.List;
  * @author Maarten Nieuwenhuize, Zwen van Erkelens, Coen Boelhouwers
  */
 public class ArtisGui extends JFrame {
+
+	private static final double WEIGHT_LEFT = 0.1;
+	private static final double WEIGHT_RIGHT = 0.9;
+
     private JLabel artistLabel;
     private JComboBox stageComboBox;
     private JComboBox artistComboBox;
@@ -45,7 +49,7 @@ public class ArtisGui extends JFrame {
     private JTextField popularityText = new JTextField("");
 
     public ArtisGui(Performance performance, Database database) {
-        setSize(220,250);
+        setSize(350,300);
         setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 		this.database = database;
 
@@ -195,19 +199,19 @@ public class ArtisGui extends JFrame {
 
 
 		JPanel centerPanel = new JPanel(new GridBagLayout());
-		centerPanel.add(new JLabel("Stage:"), constraints(0, 0, 0.4, 0));
-		centerPanel.add(stageComboBox, constraints(1, 0, 0.6, 0));
-		centerPanel.add(new JLabel("Start time:"), constraints(0, 1, 0.4, 0));
-		centerPanel.add(startTimeJSpinner, constraints(1, 1, 0.6, 0));
-		centerPanel.add(new JLabel("End time:"), constraints(0, 2, 0.4, 0));
-		centerPanel.add(endTimeJSpinner, constraints(1, 2, 0.6, 0));
-		centerPanel.add(new JLabel("Artists:"), constraints(0, 3, 0.4, 0));
-		centerPanel.add(new JScrollPane(artistJList), constraints(1, 3, 0.6, 60));
-		centerPanel.add(new JLabel("Genres:"), constraints(0, 4, 0.4, 0));
-		centerPanel.add(new DisabledTextField(performance.getArtistGenres()), constraints(1, 4, 0.6, 0));
-		centerPanel.add(new JLabel("Popularity:"), constraints(0, 5, 0.4, 0));
+		centerPanel.add(new JLabel("Stage:"), constraints(0, 0, WEIGHT_LEFT, 0));
+		centerPanel.add(stageComboBox, constraints(1, 0, WEIGHT_RIGHT, 0));
+		centerPanel.add(new JLabel("Start time:"), constraints(0, 1, WEIGHT_LEFT, 0));
+		centerPanel.add(startTimeJSpinner, constraints(1, 1, WEIGHT_RIGHT, 0));
+		centerPanel.add(new JLabel("End time:"), constraints(0, 2, WEIGHT_LEFT, 0));
+		centerPanel.add(endTimeJSpinner, constraints(1, 2, WEIGHT_RIGHT, 0));
+		centerPanel.add(new JLabel("Artists:"), constraints(0, 3, WEIGHT_LEFT, 0));
+		centerPanel.add(new JScrollPane(artistJList), constraints(1, 3, WEIGHT_RIGHT, 60));
+		centerPanel.add(new JLabel("Genres:"), constraints(0, 4, WEIGHT_LEFT, 0));
+		centerPanel.add(new DisabledTextField(performance.getArtistGenres()), constraints(1, 4, WEIGHT_RIGHT, 0));
+		centerPanel.add(new JLabel("Popularity:"), constraints(0, 5, WEIGHT_LEFT, 0));
 		centerPanel.add(new DisabledTextField(String.valueOf(performance.generatePopularity())),
-				constraints(1, 5, 0.6, 0));
+				constraints(1, 5, WEIGHT_RIGHT, 0));
 
         JPanel bottomPanel = new JPanel();
         bottomPanel.add(saveButton);
@@ -223,7 +227,7 @@ public class ArtisGui extends JFrame {
 
     private static GridBagConstraints constraints(int x, int y, double weight, int pad) {
     	GridBagConstraints leftColumn = new GridBagConstraints();
-		leftColumn.weightx = 0.4;
+		leftColumn.weightx = weight;
 		leftColumn.gridx = x;
 		leftColumn.gridy = y;
 		leftColumn.ipady = pad;

@@ -4,6 +4,8 @@ import festivalplanner.data.Artist;
 import festivalplanner.data.Database;
 
 import javax.swing.*;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import java.awt.*;
 
 /**
@@ -46,7 +48,7 @@ public class AddArtist extends JFrame {
         popularityLabel.setFont(new Font(Font.SERIF,Font.PLAIN,25));
         add(popularityLabel);
         popularityLabel.setBounds(20,220,100,100);
-        JTextField popularity = new JTextField("");
+        JSpinner popularity = new JSpinner(new SpinnerNumberModel(0, 0, 10, 1));
         popularity.setFont(new Font(Font.SERIF,Font.PLAIN,25));
         add(popularity);
         popularity.setBounds(130,245,150,50);
@@ -54,12 +56,10 @@ public class AddArtist extends JFrame {
         JButton confirm = new JButton("Confirm");
         confirm.setBounds(30,getHeight() - 100, 100,50);
         confirm.addActionListener(e -> {
-            database.addArtist(new Artist(naam.getText(),genre.getText(),Integer.parseInt(popularity.getText())));
+            database.addArtist(new Artist(naam.getText(),genre.getText(), (int) popularity.getValue()));
             dispose();
         });
         add(confirm);
-
-
 
         JButton cancel = new JButton("Cancel");
         cancel.setBounds(getWidth() - 130,getHeight() - 100, 100,50);
@@ -67,8 +67,5 @@ public class AddArtist extends JFrame {
             dispose();
         });
         add(cancel);
-
-
-
     }
 }

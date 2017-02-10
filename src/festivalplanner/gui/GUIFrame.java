@@ -2,14 +2,14 @@ package festivalplanner.gui;
 
 import festivalplanner.Main;
 import festivalplanner.data.Database;
-import festivalplanner.data.Stage;
+import festivalplanner.gui.addMenu.AddArtist;
+import festivalplanner.gui.addMenu.AddStage;
 import festivalplanner.gui.guiUtil.FileSystem;
 import festivalplanner.gui.table.CalendarTable;
 import festivalplanner.gui.table2d.CalendarTable2D;
 
 import javax.swing.*;
 import java.awt.*;
-import java.util.ArrayList;
 
 /**
  * The main GUI handler.
@@ -60,6 +60,19 @@ public class GUIFrame extends JFrame {
 		});
 		fileMenu.add(open);
 
+		JMenu addMenu = new JMenu("Add");
+		menuBar.add(addMenu);
+
+		JMenuItem stageMenuItem = new JMenuItem("Stage");
+		stageMenuItem.addActionListener(e -> {
+			new AddStage(database);
+		});
+		JMenuItem artistMenuItem = new JMenuItem("Artist");
+		artistMenuItem.addActionListener(e -> {
+			new AddArtist(database);
+		});
+		addMenu.add(stageMenuItem);
+		addMenu.add(artistMenuItem);
 
 
 		mainPanel.add(menuBar,BorderLayout.NORTH);

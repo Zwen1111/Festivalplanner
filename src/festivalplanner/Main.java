@@ -8,7 +8,6 @@ import festivalplanner.gui.GUIFrame;
 
 import javax.swing.*;
 import java.time.LocalTime;
-import java.util.ArrayList;
 
 /**
  * @author Coen Boelhouwers

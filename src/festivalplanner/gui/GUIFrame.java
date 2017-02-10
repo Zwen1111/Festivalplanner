@@ -16,14 +16,21 @@ import java.awt.*;
  *
  * @author Coen Boelhouwers, Björn Taks
  */
-public class GUIFrame extends JFrame {
+public class GUIFrame extends JFrame implements Database.OnDataChangedListener{
 
 	private Database database;
 	private FileSystem fileSystem;
 
+	@Override
+	public void onDataChanged() {
+		repaint();
+	}
+
 	public GUIFrame() {
 		database = new Database();
+		database.addOnDataChangedListener(this);
 		fileSystem = new FileSystem(database);
+
 
 		Main.test(database);
 		JTabbedPane tabs = new JTabbedPane(JTabbedPane.SCROLL_TAB_LAYOUT);
@@ -85,5 +92,7 @@ public class GUIFrame extends JFrame {
 		setContentPane(mainPanel);
 		setSize(800, 600);
 		setVisible(true);
+
+
 	}
 }

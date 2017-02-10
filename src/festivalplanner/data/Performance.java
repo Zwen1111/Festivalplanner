@@ -153,4 +153,16 @@ public class Performance implements Serializable {
 	public LocalTime getStartTime() {
 		return startTime;
 	}
+
+	public void setStage(Stage stage){
+		this.stage = stage;
+	}
+
+	public void setStartTime(LocalTime time){
+		this.startTime = time;
+	}
+
+	public void setEndTime(LocalTime time){
+		this.endTime = time;
+	}
 }

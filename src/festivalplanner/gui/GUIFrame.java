@@ -28,7 +28,7 @@ public class GUIFrame extends JFrame implements Database.OnDataChangedListener{
 
 	public GUIFrame() {
 		database = new Database();
-		database.addOnDataChangedListener(this);
+
 		fileSystem = new FileSystem(database);
 
 
@@ -43,6 +43,8 @@ public class GUIFrame extends JFrame implements Database.OnDataChangedListener{
 
 		CalendarTable panelTable = new CalendarTable(database);
 
+		database.addOnDataChangedListener(this);
+		database.addOnDataChangedListener(panel2d);
 
 		mainPanel.add(tabs,BorderLayout.CENTER);
 
@@ -63,7 +65,6 @@ public class GUIFrame extends JFrame implements Database.OnDataChangedListener{
 		JMenuItem open = new JMenuItem("Open");
 		open.addActionListener(e -> {
 			 fileSystem.open();
-			 panel2d.resetCheckPerformanceButtons();
 			 repaint();
 		});
 		fileMenu.add(open);

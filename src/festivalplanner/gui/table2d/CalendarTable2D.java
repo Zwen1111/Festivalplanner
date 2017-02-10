@@ -11,7 +11,7 @@ import java.util.ArrayList;
 /**
  * @author Maarten Nieuwehuize
  */
-public class CalendarTable2D extends JPanel {
+public class CalendarTable2D extends JPanel implements Database.OnDataChangedListener{
     private int tableHeight;
     private int columHeigth;
     private int beginTableX;
@@ -116,6 +116,7 @@ public class CalendarTable2D extends JPanel {
                     heightRow * hour + beginTableY);
         }
 
+
         while (database.getPerformances().size() > buttons.size())
         {
             CheckPerformanceButton button = new CheckPerformanceButton(database.getPerformances().get(buttons.size()), database);
@@ -156,8 +157,9 @@ public class CalendarTable2D extends JPanel {
         //repaint();
 
     }
-    public void resetCheckPerformanceButtons()
-    {
+
+    @Override
+    public void onDataChanged() {
         for (CheckPerformanceButton button : buttons) {
             remove(button);
         }

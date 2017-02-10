@@ -148,7 +148,7 @@ public class ArtisGui extends JFrame {
         int stageNumber = -1;
 
         for (int i = 0; i < database.getStages().size(); i++) {
-            if (database.getStages().get(i) == stage){
+            if (database.getStages().get(i).equals(stage)){
                 stageNumber = i;
             }
         }

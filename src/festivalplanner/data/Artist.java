@@ -68,4 +68,8 @@ public class Artist implements Serializable {
 	public int getPopularity() {
 		return popularity;
 	}
+
+	public void setGenre(String genre){
+		this.genre = genre;
+	}
 }

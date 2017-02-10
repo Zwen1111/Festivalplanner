@@ -6,11 +6,19 @@ import festivalplanner.data.Database;
 import festivalplanner.data.Performance;
 import festivalplanner.data.Stage;
 import festivalplanner.gui.table.CalendarTable;
+import javafx.scene.control.Spinner;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
+import java.lang.reflect.Array;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.time.LocalTime;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -19,24 +27,28 @@ import java.util.List;
 public class ArtisGui extends JFrame {
     private JLabel artistLabel;
     private JComboBox stageComboBox;
-    private JComboBox startTimeComboBox;
-    private JComboBox endTimeComboBox;
     private JComboBox artistComboBox;
     private JTextField artistText;
 
-    private ArrayList<String> stageNamesOld;
-    private ArrayList<LocalTime> hours;
-    private ArrayList<String> hoursString;
+    private JSpinner startTimeComboBox;
+    private JSpinner endTimeComboBox;
+
+    private List<String> stageNamesOld;
+    private List<LocalTime> hours;
+    private List<String> hoursString;
+    private List<String> genreValues;
+    private List<Integer> popularityValues;
 
     private List<String> artists;
     private int i = 0;
+    private int previousIndex;
 
     private Database database;
 
     private JTextField genreText = new JTextField("");
     private JTextField popularityText = new JTextField("");
 
-    public ArtisGui(Performance performance) {
+    public ArtisGui(Performance performance, Database database) {
         setSize(220,250);
         setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 
@@ -49,20 +61,13 @@ public class ArtisGui extends JFrame {
         JPanel artistTextPanel = new JPanel(new GridLayout(2,1));
         JPanel buttonPanel = new JPanel(new FlowLayout());
 
-        int hour = CalendarTable2D.getHour();
-        this.database = CalendarTable2D.getDatabase();
+        this.database = database;
 
-        //Create ArrayList with hours
-        hours = new ArrayList<>();
-        for (int i = 0; i < hour; i++) {
-            for (int minutes = 0; minutes < 60; minutes+=15) {
-                hours.add(LocalTime.of(i,minutes));
-            }
-        }
-        hoursString = new ArrayList<>();
-        for (int i = 0; i < hours.size(); i++) {
-            hoursString.add(hours.get(i).toString());
-        }
+        Date date = new Date();
+
+        genreValues = new ArrayList<>();
+        popularityValues = new ArrayList<>();
+        previousIndex = -1;
 
         //Create labels
         JLabel stageLabel = new JLabel("Stage:");
@@ -84,16 +89,23 @@ public class ArtisGui extends JFrame {
             stageComboBox.setSelectedIndex(getRightStage(performance.getStage()));
 
             //Start time ComboBox
-            String[] startTime = new String[hoursString.size()];
-            startTime = hoursString.toArray(startTime);
-            startTimeComboBox = new JComboBox(startTime);
-            startTimeComboBox.setSelectedIndex(getRightTime(performance.getStartTime()));
+            SpinnerDateModel st = new SpinnerDateModel(date, null, null, Calendar.MINUTE);
+            startTimeComboBox = new JSpinner(st);
+            JSpinner.DateEditor stde = new JSpinner.DateEditor(startTimeComboBox, "HH:mm");
+            startTimeComboBox.setEditor(stde);
+            SimpleDateFormat time = new SimpleDateFormat("HH:mm");
+            try {
+                startTimeComboBox.setValue(time.parseObject(performance.getStartTime().toString()));
+            } catch (ParseException e) {
+                e.printStackTrace();
+                ((JSpinner.DateEditor) startTimeComboBox.getEditor()).getTextField().setForeground(Color.RED);
+            }
 
         //End time ComboBox
-        String[] endTime = new String[hoursString.size()];
-        endTime = hoursString.toArray(endTime);
-        endTimeComboBox = new JComboBox(endTime);
-        endTimeComboBox.setSelectedIndex(getRightTime(performance.getEndTime()));
+            SpinnerDateModel et = new SpinnerDateModel(date, null, null, Calendar.MINUTE);
+            endTimeComboBox = new JSpinner(et);
+            JSpinner.DateEditor etde = new JSpinner.DateEditor(endTimeComboBox, "HH:mm");
+            endTimeComboBox.setEditor(etde);
 
             //Artist ComboBox
             if(performance.getArtists().size() > 1) {
@@ -107,6 +119,22 @@ public class ArtisGui extends JFrame {
                 artistLabel = new JLabel("Artists:");
                 artistComboBox.addActionListener(e-> {
                     artistInformation(performance.getArtists().get(artistComboBox.getSelectedIndex()));
+                });
+                for (Artist artist : performance.getArtists()) {
+                    genreValues.add(artist.getGenre());
+                    popularityValues.add(artist.getPopularity());
+                }
+                artistComboBox.addItemListener(new ItemListener() {
+                    @Override
+                    public void itemStateChanged(ItemEvent e) {
+                        if(e.getStateChange() == ItemEvent.DESELECTED){
+                            for (int i = 0; i < artists.size(); i++) {
+                                if(artists.get(i).equals(e.getItem())){
+                                    previousIndex = i;
+                                }
+                            }
+                        }
+                    }
                 });
             }
             else {
@@ -133,12 +161,12 @@ public class ArtisGui extends JFrame {
         textPanel.add(endTimeComboBox);
         if(performance.getArtists().size() > 1){
             textPanel.add(artistComboBox);
-            genreText.setText(performance.getArtists().get(artistComboBox.getSelectedIndex()).getGenre());
+            genreText.setText(genreValues.get(artistComboBox.getSelectedIndex()));
             popularityText.setText(Integer.toString(performance.getArtists().get(artistComboBox.getSelectedIndex()).getPopularity()));
         }
         else {
             textPanel.add(artistText);
-            genreText.setText(performance.getArtists().get(0).getGenre());
+            genreText.setText(genreValues.get(artistComboBox.getSelectedIndex()));
             popularityText.setText(Integer.toString(performance.getArtists().get(0).getPopularity()));
         }
 
@@ -166,14 +194,25 @@ public class ArtisGui extends JFrame {
     }
 
     public void artistInformation(Artist artist){
-        genreText.setText(artist.getGenre());
-        popularityText.setText(Integer.toString(artist.getPopularity()));
+        //Saves the values in genreText and popularityText
+        if(genreValues.get(previousIndex).equals(genreText.getText())){}else{
+            genreValues.set(previousIndex, genreText.getText());
+        }
+        if(popularityValues.get(previousIndex).equals(popularityText.getText())){}else{
+            popularityValues.set(previousIndex, Integer.parseInt(popularityText.getText()));
+        }
+
+        genreText.setText(genreValues.get(artistComboBox.getSelectedIndex()));
+        popularityText.setText(Integer.toString(popularityValues.get(artistComboBox.getSelectedIndex())));
     }
 
     public void saveButton(Performance performance){
         performance.setStage(database.getStages().get(stageComboBox.getSelectedIndex()));
-        performance.setStartTime(hours.get(startTimeComboBox.getSelectedIndex()));
-        performance.setEndTime(hours.get(endTimeComboBox.getSelectedIndex()));
+
+        for (int i = 0; i < performance.getArtists().size(); i++) {
+            performance.getArtists().get(i).setGenre(genreValues.get(i));
+        }
+        dispose();
     }
 
     public void closeButton(){
@@ -188,7 +227,6 @@ public class ArtisGui extends JFrame {
                 stageNumber = i;
             }
         }
-
         return stageNumber;
     }
 

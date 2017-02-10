@@ -8,7 +8,6 @@ import festivalplanner.gui.GUIFrame;
 
 import javax.swing.*;
 import java.time.LocalTime;
-import java.util.ArrayList;
 
 /**
  * @author Coen Boelhouwers
@@ -35,17 +34,17 @@ public class Main {
 		Artist bobine = new Artist("Bobine", null, 6);
 		Artist lone = new Artist("Lone ranger", null, 5);
 
-		database.getPerformances().add(new Performance(
+		database.addPerformance(new Performance(
 				stage1,
 				LocalTime.of(20,30),
 				LocalTime.of(22,0),
 				afro, ellie));
-		database.getPerformances().add(new Performance(
+		database.addPerformance(new Performance(
                 stage1,
 				LocalTime.of(12,0),
 				LocalTime.of(14,0),
 				bob, bobine));
-		database.getPerformances().add(new Performance(
+		database.addPerformance(new Performance(
                 stage2,
 				LocalTime.of(19,0),
 				LocalTime.of(22,0),

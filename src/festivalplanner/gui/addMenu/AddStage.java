@@ -1,6 +1,7 @@
 package festivalplanner.gui.addMenu;
 
 import festivalplanner.data.Database;
+import festivalplanner.data.Stage;
 
 import javax.swing.*;
 import java.awt.*;
@@ -34,7 +35,7 @@ public class AddStage extends JFrame {
         JButton confirm = new JButton("Confirm");
         confirm.setBounds(30,getHeight() - 100, 100,50);
         confirm.addActionListener(e -> {
-            //Hier moet je alles opslaan
+            database.addStage(new Stage(naam.getText()));
             dispose();
         });
         add(confirm);

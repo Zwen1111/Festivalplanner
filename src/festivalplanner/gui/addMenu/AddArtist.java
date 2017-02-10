@@ -1,5 +1,6 @@
 package festivalplanner.gui.addMenu;
 
+import festivalplanner.data.Artist;
 import festivalplanner.data.Database;
 
 import javax.swing.*;
@@ -32,7 +33,7 @@ public class AddArtist extends JFrame {
         naam.setBounds(130,25,150,50);
 
 
-        JLabel genreLabel = new JLabel("Genre0.:");
+        JLabel genreLabel = new JLabel("Genre:");
         genreLabel.setFont(new Font(Font.SERIF,Font.PLAIN,25));
         add(genreLabel);
         genreLabel.setBounds(20,120,100,100);
@@ -41,13 +42,24 @@ public class AddArtist extends JFrame {
         add(genre);
         genre.setBounds(130,145,150,50);
 
+        JLabel popularityLabel = new JLabel("Popularity:");
+        popularityLabel.setFont(new Font(Font.SERIF,Font.PLAIN,25));
+        add(popularityLabel);
+        popularityLabel.setBounds(20,220,100,100);
+        JTextField popularity = new JTextField("");
+        popularity.setFont(new Font(Font.SERIF,Font.PLAIN,25));
+        add(popularity);
+        popularity.setBounds(130,245,150,50);
+
         JButton confirm = new JButton("Confirm");
         confirm.setBounds(30,getHeight() - 100, 100,50);
         confirm.addActionListener(e -> {
-            //Hier moet je alles opslaan
+            database.addArtist(new Artist(naam.getText(),genre.getText(),Integer.parseInt(popularity.getText())));
             dispose();
         });
         add(confirm);
+
+
 
         JButton cancel = new JButton("Cancel");
         cancel.setBounds(getWidth() - 130,getHeight() - 100, 100,50);

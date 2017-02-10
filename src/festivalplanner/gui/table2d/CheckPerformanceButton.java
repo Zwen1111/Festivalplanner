@@ -1,6 +1,7 @@
 package festivalplanner.gui.table2d;
 
 import festivalplanner.data.Performance;
+import festivalplanner.data.Database;
 
 import javax.swing.*;
 
@@ -8,7 +9,7 @@ import javax.swing.*;
  * @author Maarten Nieuwenhuize
  */
 public class CheckPerformanceButton extends JButton {
-    public CheckPerformanceButton(Performance performance, int hour) {
-        addActionListener(e -> new ArtisGui(performance, hour));
+    public CheckPerformanceButton(Performance performance, Database database) {
+        addActionListener(e -> new ArtisGui(performance, database));
     }
 }

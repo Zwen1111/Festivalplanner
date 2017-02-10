@@ -30,7 +30,7 @@ public class AddPerformanceGui extends  JFrame {
 
         JPanel mainPanel = new JPanel();
         setContentPane(mainPanel);
-        /*database.getPerformances().add(new Performance(*/
+
         Stage paul = new Stage("PaulStage");
         LocalTime paulTime = database.findNextEmptyStageTime(paul, Duration.ofMinutes(135));
         if (listener != null) listener.performanceCreated(new Performance(

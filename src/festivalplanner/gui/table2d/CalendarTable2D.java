@@ -44,7 +44,7 @@ public class CalendarTable2D extends JPanel {
 
         //add's a button from wich you can add perfromance's
         addPerformance = new AddPerformanceButton(database, performance -> {
-        	database.getPerformances().add(performance);
+        	database.addPerformance(performance);
         	repaint();
 		});
 

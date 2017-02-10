@@ -6,10 +6,11 @@ import festivalplanner.data.Performance;
 import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import java.io.*;
-import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
 /**
- * Created by Maarten on 09/02/2017.
+ * @author Maarten Nieuwenhuize
  */
 public class FileSystem {
     private File file;
@@ -80,7 +81,7 @@ public class FileSystem {
             try(ObjectInputStream input = new ObjectInputStream(new FileInputStream(fc.getSelectedFile())))
             {
                 database.clear();
-                database.addPerformances((ArrayList<Performance>) input.readObject());
+                database.addPerformances((Collection<Performance>) input.readObject());
             }
             catch (Exception e)
             {

@@ -1,18 +1,14 @@
 package festivalplanner.gui.table2d;
 
-import festivalplanner.Main;
 import festivalplanner.data.Artist;
 import festivalplanner.data.Database;
 import festivalplanner.data.Performance;
 import festivalplanner.data.Stage;
-import festivalplanner.gui.table.CalendarTable;
-import javafx.scene.control.Spinner;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
-import java.lang.reflect.Array;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalTime;

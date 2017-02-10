@@ -12,9 +12,8 @@ import java.awt.event.ItemListener;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalTime;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
+import java.time.format.DateTimeFormatter;
+import java.util.*;
 import java.util.List;
 
 /**
@@ -26,20 +25,20 @@ public class ArtisGui extends JFrame {
     private JComboBox artistComboBox;
     private JTextField artistText;
 
-    private JSpinner startTimeComboBox;
-    private JSpinner endTimeComboBox;
+    private JSpinner startTimeJSpinner;
+    private JSpinner endTimeJSpinner;
 
     private List<String> stageNamesOld;
-    private List<LocalTime> hours;
-    private List<String> hoursString;
     private List<String> genreValues;
     private List<Integer> popularityValues;
 
+    private LocalTime localTime;
+
     private List<String> artists;
-    private int i = 0;
     private int previousIndex;
 
     private Database database;
+    private SimpleDateFormat time;
 
     private JTextField genreText = new JTextField("");
     private JTextField popularityText = new JTextField("");
@@ -62,6 +61,7 @@ public class ArtisGui extends JFrame {
 
 
         Date date = new Date();
+        time = new SimpleDateFormat("HH:mm");
 
         genreValues = new ArrayList<>();
         popularityValues = new ArrayList<>();
@@ -88,22 +88,25 @@ public class ArtisGui extends JFrame {
 
             //Start time ComboBox
             SpinnerDateModel st = new SpinnerDateModel(date, null, null, Calendar.MINUTE);
-            startTimeComboBox = new JSpinner(st);
-            JSpinner.DateEditor stde = new JSpinner.DateEditor(startTimeComboBox, "HH:mm");
-            startTimeComboBox.setEditor(stde);
-            SimpleDateFormat time = new SimpleDateFormat("HH:mm");
+            startTimeJSpinner = new JSpinner(st);
+            JSpinner.DateEditor stde = new JSpinner.DateEditor(startTimeJSpinner, "HH:mm");
+            startTimeJSpinner.setEditor(stde);
             try {
-                startTimeComboBox.setValue(time.parseObject(performance.getStartTime().toString()));
+                startTimeJSpinner.setValue(time.parseObject(performance.getStartTime().toString()));
             } catch (ParseException e) {
                 e.printStackTrace();
-                ((JSpinner.DateEditor) startTimeComboBox.getEditor()).getTextField().setForeground(Color.RED);
             }
 
-        //End time ComboBox
+            //End time ComboBox
             SpinnerDateModel et = new SpinnerDateModel(date, null, null, Calendar.MINUTE);
-            endTimeComboBox = new JSpinner(et);
-            JSpinner.DateEditor etde = new JSpinner.DateEditor(endTimeComboBox, "HH:mm");
-            endTimeComboBox.setEditor(etde);
+            endTimeJSpinner = new JSpinner(et);
+            JSpinner.DateEditor etde = new JSpinner.DateEditor(endTimeJSpinner, "HH:mm");
+            endTimeJSpinner.setEditor(etde);
+            try {
+                endTimeJSpinner.setValue(time.parseObject(performance.getEndTime().toString()));
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
 
             //Artist ComboBox
             if(performance.getArtists().size() > 1) {
@@ -155,8 +158,8 @@ public class ArtisGui extends JFrame {
 
         //Add components on textPanel
         textPanel.add(stageComboBox);
-        textPanel.add(startTimeComboBox);
-        textPanel.add(endTimeComboBox);
+        textPanel.add(startTimeJSpinner);
+        textPanel.add(endTimeJSpinner);
         //if(performance.getArtists().size() > 1){
             textPanel.add(artistComboBox);
             genreText.setText(genreValues.get(artistComboBox.getSelectedIndex()));
@@ -229,10 +232,23 @@ public class ArtisGui extends JFrame {
     }
 
     public void saveButton(Performance performance){
+        //Save stage
         performance.setStage(database.getStages().get(stageComboBox.getSelectedIndex()));
 
+        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("HH:mm");
+
+        //Save start time
+        localTime = LocalTime.parse(time.format(startTimeJSpinner.getValue()), dtf);
+        performance.setStartTime(localTime);
+
+        //Save end time
+        localTime = LocalTime.parse(time.format(endTimeJSpinner.getValue()), dtf);
+        performance.setEndTime(localTime);
+
+        //Save genre & popularity
         for (int i = 0; i < performance.getArtists().size(); i++) {
             performance.getArtists().get(i).setGenre(genreValues.get(i));
+            performance.getArtists().get(i).setPopularity(popularityValues.get(i));
         }
         dispose();
     }
@@ -252,22 +268,11 @@ public class ArtisGui extends JFrame {
         return stageNumber;
     }
 
-    public int getRightTime(LocalTime time){
-        int TimeNumber = -1;
+	private static class DisabledTextField extends JTextField {
 
-        for (int i = 0; i < hours.size(); i++) {
-            if (hours.get(i).equals(time)){
-                TimeNumber = i;
-            }
-        }
-        return TimeNumber;
-    }
-
-    private static class DisabledTextField extends JTextField {
-
-    	public DisabledTextField(String text) {
-    		super(text);
-    		setEnabled(false);
+		public DisabledTextField(String text) {
+			super(text);
+			setEnabled(false);
 		}
 	}
 }

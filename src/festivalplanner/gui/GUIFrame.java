@@ -63,6 +63,7 @@ public class GUIFrame extends JFrame implements Database.OnDataChangedListener{
 		JMenuItem open = new JMenuItem("Open");
 		open.addActionListener(e -> {
 			 fileSystem.open();
+			 panel2d.resetCheckPerformanceButtons();
 			 repaint();
 		});
 		fileMenu.add(open);

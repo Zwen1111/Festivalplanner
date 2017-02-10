@@ -1,6 +1,5 @@
 package festivalplanner.gui;
 
-import festivalplanner.Main;
 import festivalplanner.data.Artist;
 import festivalplanner.data.Database;
 import festivalplanner.data.Performance;
@@ -16,10 +15,10 @@ import java.time.LocalTime;
 public class AddPerformanceGui extends  JFrame {
 
 	private Database database;
-	private OnPerformanceCreatedListener listener;
 
-    public AddPerformanceGui(Database database, OnPerformanceCreatedListener l) {
-        listener = l;
+
+    public AddPerformanceGui(Database database) {
+
         this.database = database;
         init();
     }
@@ -33,7 +32,7 @@ public class AddPerformanceGui extends  JFrame {
 
         Stage paul = new Stage("PaulStage");
         LocalTime paulTime = database.findNextEmptyStageTime(paul, Duration.ofMinutes(135));
-        if (listener != null) listener.performanceCreated(new Performance(
+        database.addPerformance(new Performance(
                 paul,
                 paulTime == null ? LocalTime.of(20, 0) : paulTime,
                 Duration.ofMinutes(135),

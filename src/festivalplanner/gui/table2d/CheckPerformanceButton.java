@@ -10,6 +10,7 @@ import javax.swing.*;
  */
 public class CheckPerformanceButton extends JButton {
     public CheckPerformanceButton(Performance performance, Database database) {
-        addActionListener(e -> new ArtisGui(performance, database));
+
+        addActionListener(e -> new ArtisGui(performance, database,getBounds()));
     }
 }

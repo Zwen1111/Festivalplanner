@@ -106,7 +106,7 @@ public class ArtisGui extends JFrame {
             //Artist ComboBox
             if(performance.getArtists().size() > 1) {
                 artists = new ArrayList<>();
-                for (Artist artist: performance.getArtists()) {
+                for (Artist artist: database.getArtists()) {
                     artists.add(artist.getName());
                 }
                 String[] artistNames = new String[artists.size()];
@@ -114,9 +114,9 @@ public class ArtisGui extends JFrame {
                 artistComboBox = new JComboBox(artistNames);
                 artistLabel = new JLabel("Artists:");
                 artistComboBox.addActionListener(e-> {
-                    artistInformation(performance.getArtists().get(artistComboBox.getSelectedIndex()));
+                    artistInformation(database.getArtists().get(artistComboBox.getSelectedIndex()));
                 });
-                for (Artist artist : performance.getArtists()) {
+                for (Artist artist : database.getArtists()) {
                     genreValues.add(artist.getGenre());
                     popularityValues.add(artist.getPopularity());
                 }

@@ -63,7 +63,7 @@ public class AddArtist extends JFrame {
 
         JButton cancel = new JButton("Cancel");
         cancel.setBounds(getWidth() - 130,getHeight() - 100, 100,50);
-        confirm.addActionListener(e -> {
+        cancel.addActionListener(e -> {
             dispose();
         });
         add(cancel);

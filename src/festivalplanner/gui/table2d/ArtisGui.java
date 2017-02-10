@@ -31,9 +31,10 @@ public class ArtisGui extends JFrame {
 
     private Database database;
 
-    public ArtisGui(Performance performance, Database database) {
+    public ArtisGui(Performance performance, Database database,Rectangle rectangle) {
 		setSize(350, 300);
 		setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+		setLocation(rectangle.getLocation());
 		this.database = database;
 
 		artistJList = setupArtistsList(database);

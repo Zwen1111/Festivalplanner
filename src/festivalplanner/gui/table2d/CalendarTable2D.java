@@ -17,10 +17,10 @@ public class CalendarTable2D extends JPanel {
     private int beginTableX;
     private int beginTableY;
     private int widthTimeColum;
-    private int hour;
+    private static int hour;
     private int tableWidth;
     private ArrayList<CheckPerformanceButton> buttons;
-    private Database database;
+    private static Database database;
     private AddPerformanceButton addPerformance;
 
     public CalendarTable2D(Database database) {
@@ -37,7 +37,7 @@ public class CalendarTable2D extends JPanel {
 
         //adds a a arrayList of buttons with the size of the amount of performances.
         for (int i = 0; i < database.getPerformances().size(); i++) {
-            CheckPerformanceButton button = new CheckPerformanceButton(database.getPerformances().get(i), hour);
+            CheckPerformanceButton button = new CheckPerformanceButton(database.getPerformances().get(i));
             add(button);
             buttons.add(button);
         }
@@ -123,7 +123,7 @@ public class CalendarTable2D extends JPanel {
         for (int i = 0; i < database.getPerformances().size(); i++) {
             if(database.getPerformances().size() > buttons.size())
             {
-                CheckPerformanceButton button = new CheckPerformanceButton(database.getPerformances().get(i), hour);
+                CheckPerformanceButton button = new CheckPerformanceButton(database.getPerformances().get(i));
                 add(button);
                 buttons.add(button);
             }
@@ -157,5 +157,13 @@ public class CalendarTable2D extends JPanel {
 
         //repaint();
 
+    }
+
+    public static int getHour() {
+        return hour;
+    }
+
+    public static Database getDatabase(){
+        return database;
     }
 }

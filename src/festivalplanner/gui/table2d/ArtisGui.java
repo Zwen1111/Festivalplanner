@@ -2,8 +2,10 @@ package festivalplanner.gui.table2d;
 
 import festivalplanner.Main;
 import festivalplanner.data.Artist;
+import festivalplanner.data.Database;
 import festivalplanner.data.Performance;
 import festivalplanner.data.Stage;
+import festivalplanner.gui.table.CalendarTable;
 
 import javax.swing.*;
 import java.awt.*;
@@ -29,11 +31,13 @@ public class ArtisGui extends JFrame {
     private List<String> artists;
     private int i = 0;
 
+    private Database database;
+
     private JTextField genreText = new JTextField("");
     private JTextField popularityText = new JTextField("");
 
-    public ArtisGui(Performance performance, int hour) {
-        setSize(220,230);
+    public ArtisGui(Performance performance) {
+        setSize(220,250);
         setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 
         JPanel mainPanel = new JPanel(new BorderLayout());
@@ -45,10 +49,13 @@ public class ArtisGui extends JFrame {
         JPanel artistTextPanel = new JPanel(new GridLayout(2,1));
         JPanel buttonPanel = new JPanel(new FlowLayout());
 
+        int hour = CalendarTable2D.getHour();
+        this.database = CalendarTable2D.getDatabase();
+
         //Create ArrayList with hours
         hours = new ArrayList<>();
         for (int i = 0; i < hour; i++) {
-            for (int minutes = 0; minutes < 60; minutes++) {
+            for (int minutes = 0; minutes < 60; minutes+=15) {
                 hours.add(LocalTime.of(i,minutes));
             }
         }
@@ -68,7 +75,7 @@ public class ArtisGui extends JFrame {
 
             //Stage ComboBox
             stageNamesOld = new ArrayList<>();
-            for (Stage stage : Main.getStageArray()) {
+            for (Stage stage : database.getStages()) {
                 stageNamesOld.add(stage.getName());
             }
             String[] stageNames = new String[stageNamesOld.size()];
@@ -164,7 +171,7 @@ public class ArtisGui extends JFrame {
     }
 
     public void saveButton(Performance performance){
-        performance.setStage(Main.getStageArray().get(stageComboBox.getSelectedIndex()));
+        performance.setStage(database.getStages().get(stageComboBox.getSelectedIndex()));
         performance.setStartTime(hours.get(startTimeComboBox.getSelectedIndex()));
         performance.setEndTime(hours.get(endTimeComboBox.getSelectedIndex()));
     }
@@ -176,8 +183,8 @@ public class ArtisGui extends JFrame {
     public int getRightStage(Stage stage){
         int stageNumber = -1;
 
-        for (int i = 0; i < Main.getStageArray().size(); i++) {
-            if (Main.getStageArray().get(i) == stage){
+        for (int i = 0; i < database.getStages().size(); i++) {
+            if (database.getStages().get(i) == stage){
                 stageNumber = i;
             }
         }

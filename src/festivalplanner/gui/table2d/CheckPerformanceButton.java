@@ -8,7 +8,7 @@ import javax.swing.*;
  * @author Maarten Nieuwenhuize
  */
 public class CheckPerformanceButton extends JButton {
-    public CheckPerformanceButton(Performance performance, int hour) {
-        addActionListener(e -> new ArtisGui(performance, hour));
+    public CheckPerformanceButton(Performance performance) {
+        addActionListener(e -> new ArtisGui(performance));
     }
 }

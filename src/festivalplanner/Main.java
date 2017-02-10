@@ -15,8 +15,6 @@ import java.util.ArrayList;
  */
 public class Main {
 
-    private static ArrayList<Stage> stages = new ArrayList<>();
-
 	public static void main(String[] args) {
 		try {
 			UIManager.setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName());
@@ -28,8 +26,8 @@ public class Main {
 	}
 
 	public static void test(Database database) {
-        stages.add(new Stage("Main-stage"));
-        stages.add(new Stage("Garbage-stage"));
+        Stage stage1 = new Stage("Main-stage");
+        Stage stage2 = new Stage("Garbage-stage");
 
 	    Artist ellie = new Artist("Ellie Goulding", "Pop", 7);
 		Artist afro = new Artist("Afrojack", "Hardstyle", 8);
@@ -38,30 +36,19 @@ public class Main {
 		Artist lone = new Artist("Lone ranger", null, 5);
 
 		database.getPerformances().add(new Performance(
-				getStage(0),
+				stage1,
 				LocalTime.of(20,30),
 				LocalTime.of(22,0),
 				afro, ellie));
 		database.getPerformances().add(new Performance(
-                getStage(0),
+                stage1,
 				LocalTime.of(12,0),
 				LocalTime.of(14,0),
 				bob, bobine));
 		database.getPerformances().add(new Performance(
-                getStage(1),
+                stage2,
 				LocalTime.of(19,0),
 				LocalTime.of(22,0),
 				lone, bobine));
 	}
-    public static Stage getStage(int i){
-        return stages.get(i);
-    }
-
-    public static void addStage(Stage stage){
-        stages.add(stage);
-    }
-
-    public static ArrayList<Stage> getStageArray(){
-        return stages;
-    }
 }

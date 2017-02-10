@@ -35,8 +35,8 @@ public class Artist implements Serializable {
 	 * @param popularity the popularity [0-10] of this artist.
 	 */
 	public Artist(String name, String genre, int popularity) {
-		this.name = name == null ? "Unnamed Artist" : name;
-		this.genre = genre == null ? "Unknown Genre" : genre;
+		this.name = name == null || name.isEmpty() ? "Unnamed Artist" : name;
+		this.genre = genre == null || genre.isEmpty() ? "Unknown Genre" : genre;
 		if (popularity < 0 || popularity > 10)
 			throw new IllegalArgumentException("Popularity (" + popularity + ") should be a value between 0 and 10");
 		this.popularity = popularity;

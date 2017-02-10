@@ -15,7 +15,7 @@ public class ArtisGui extends JFrame {
 
         JPanel mainPanel = new JPanel();
         setContentPane(mainPanel);
-        JTextField textField = new JTextField(performance.toString());
+        JTextField textField = new JTextField(performance.getArtistNames());
         mainPanel.add(textField);
 
         setVisible(true);

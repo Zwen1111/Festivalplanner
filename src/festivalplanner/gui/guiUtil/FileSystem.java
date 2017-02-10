@@ -21,7 +21,16 @@ public class FileSystem {
 
     public void save()
     {
-
+        if(file == null)
+        {
+            saveAs();
+        }else {
+            try (ObjectOutputStream output = new ObjectOutputStream(new FileOutputStream(this.file))) {
+                output.writeObject(database.getPerformances());
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     public void saveAs()

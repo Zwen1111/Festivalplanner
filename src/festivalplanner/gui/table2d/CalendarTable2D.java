@@ -122,14 +122,17 @@ public class CalendarTable2D extends JPanel {
                     heightRow * hour + beginTableY);
         }
 
+        if(database.getPerformances().size() > buttons.size())
+        {
+            CheckPerformanceButton button = new CheckPerformanceButton(database.getPerformances().get(buttons.size()));
+            add(button);
+            buttons.add(button);
+        }
+
         //sets the button on the right place of a performances
         for (int i = 0; i < database.getPerformances().size(); i++) {
-            if(database.getPerformances().size() > buttons.size())
-            {
-                CheckPerformanceButton button = new CheckPerformanceButton(database.getPerformances().get(i));
-                add(button);
-                buttons.add(button);
-            }
+
+
             JButton button = buttons.get(i);
             button.setForeground(Color.white);
 

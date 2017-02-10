@@ -5,6 +5,7 @@ import java.time.Duration;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -16,6 +17,9 @@ import java.util.List;
 public class Database implements Serializable {
 
 	private List<Performance> performances;
+	private List<Artist> artists;
+	private List<Stage> stages;
+	private List<OnDataChangedListener> listeners;
 	private LocalTime nextTime;
 
 	/**
@@ -23,25 +27,68 @@ public class Database implements Serializable {
 	 */
 	public Database() {
 		performances = new ArrayList<>();
+		artists = new ArrayList<>();
+		stages = new ArrayList<>();
+		listeners = new ArrayList<>();
+	}
+
+	public void addArtist(Artist artist) {
+		if (!artists.contains(artist)) {
+			artists.add(artist);
+			notifyDataChanged();
+		}
+	}
+
+	public void addArtists(Collection<Artist> artists) {
+		artists.forEach(this::addArtist);
+	}
+
+	public void addOnDataChangedListener(OnDataChangedListener l) {
+		listeners.add(l);
+	}
+
+	public void addPerformance(Performance performance) {
+		performances.add(performance);
+		addArtists(performance.getArtists());
+		addStage(performance.getStage());
+		notifyDataChanged();
+	}
+
+	public void addPerformances(Collection<Performance> performances) {
+		performances.forEach(this::addPerformance);
+	}
+
+	public void addStage(Stage stage) {
+		if (!stages.contains(stage)) {
+			stages.add(stage);
+			notifyDataChanged();
+		}
+	}
+
+	public void addStages(Collection<Stage> stages) {
+		stages.forEach(this::addStage);
+	}
+
+	public void clear() {
+		performances.clear();
+		stages.clear();
+		artists.clear();
+	}
+
+	public List<Artist> getArtists() {
+		return Collections.unmodifiableList(artists);
 	}
 
 	public List<Performance> getPerformances() {
-		return performances;
+		return Collections.unmodifiableList(performances);
 	}
 
 	/**
-	 * Filters out all unique stages on which performances take place.
-	 * This method has to search trough all performances, so users are
-	 * asked to limit the amount of calls and keep a copy where appropriate.
 	 *
 	 * @return a list of all stages.
 	 */
 	public List<Stage> getStages() {
-		Collection<Stage> stages = new ArrayList<>();
-		performances.forEach(perf -> {
-			if (!stages.contains(perf.getStage())) stages.add(perf.getStage());
-		});
-		return new ArrayList<>(stages);
+		return Collections.unmodifiableList(stages);
 	}
 
 	/**
@@ -62,7 +109,18 @@ public class Database implements Serializable {
 		return nextTime;
 	}
 
-	public void setPerformances(List<Performance> performances) {
-		this.performances = performances;
+	/**
+	 * Notify all listeners that data in the database has changed.
+	 */
+	public void notifyDataChanged() {
+		listeners.forEach(OnDataChangedListener::onDataChanged);
+	}
+
+	@FunctionalInterface
+	public interface OnDataChangedListener {
+		/**
+		 * Called when something changed in the data. The type of change is unknown.
+		 */
+		void onDataChanged();
 	}
 }

@@ -79,7 +79,8 @@ public class FileSystem {
             this.file = fc.getSelectedFile();
             try(ObjectInputStream input = new ObjectInputStream(new FileInputStream(fc.getSelectedFile())))
             {
-                database.setPerformances((ArrayList<Performance>) input.readObject());
+                database.clear();
+                database.addPerformances((ArrayList<Performance>) input.readObject());
             }
             catch (Exception e)
             {

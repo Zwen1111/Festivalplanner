@@ -37,6 +37,11 @@ public class ArtisGui extends JFrame {
 		this.database = database;
 
 		artistJList = setupArtistsList(database);
+		// Select the current performing artist(s) in the list.
+		performance.getArtists().forEach(artist -> {
+			int index = database.getArtists().indexOf(artist);
+			artistJList.addSelectionInterval(index, index);
+		});
 
 		stageComboBox = new JComboBox<>();
 		database.getStages().forEach(stage -> stageComboBox.addItem(stage.getName()));

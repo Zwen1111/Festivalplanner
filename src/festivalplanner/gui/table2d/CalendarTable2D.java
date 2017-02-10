@@ -43,10 +43,7 @@ public class CalendarTable2D extends JPanel {
         }
 
         //add's a button from wich you can add perfromance's
-        addPerformance = new AddPerformanceButton(database, performance -> {
-        	database.addPerformance(performance);
-        	repaint();
-		});
+        addPerformance = new AddPerformanceButton(database);
 
         add(addPerformance);
     }
@@ -118,7 +115,8 @@ public class CalendarTable2D extends JPanel {
                             ((tableWidth - widthTimeColum) / amountOfStages) * i,
                     heightRow * hour + beginTableY);
         }
-        if(database.getPerformances().size() > buttons.size())
+
+        while (database.getPerformances().size() > buttons.size())
         {
             CheckPerformanceButton button = new CheckPerformanceButton(database.getPerformances().get(buttons.size()), database);
             add(button);
@@ -157,5 +155,13 @@ public class CalendarTable2D extends JPanel {
 
         //repaint();
 
+    }
+    public void resetCheckPerformanceButtons()
+    {
+        for (CheckPerformanceButton button : buttons) {
+            remove(button);
+        }
+        buttons = new ArrayList<>();
+        repaint();
     }
 }

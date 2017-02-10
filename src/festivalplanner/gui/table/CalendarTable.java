@@ -26,11 +26,7 @@ public class CalendarTable extends JPanel {
 
     public CalendarTable(Database database) {
 		JTable table = new JTable();
-		AddPerformanceButton addButton = new AddPerformanceButton(database, performance -> {
-            database.getPerformances().add(performance);
-            filterPerformances();
-			model.fireTableDataChanged();
-        });
+		AddPerformanceButton addButton = new AddPerformanceButton(database);
         setName("Table");
 		this.database = database;
 		index = 0;

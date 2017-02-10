@@ -18,7 +18,7 @@ import java.util.Date;
 import java.util.List;
 
 /**
- * @author Maarten Nieuwenhuize & Zwen van Erkelens
+ * @author Maarten Nieuwenhuize, Zwen van Erkelens, Coen Boelhouwers
  */
 public class ArtisGui extends JFrame {
     private JLabel artistLabel;
@@ -47,17 +47,19 @@ public class ArtisGui extends JFrame {
     public ArtisGui(Performance performance, Database database) {
         setSize(220,250);
         setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+		this.database = database;
 
-        JPanel mainPanel = new JPanel(new BorderLayout());
-        JPanel infoPanel = new JPanel(new FlowLayout());
-        JPanel labelPanel = new JPanel(new GridLayout(4,1));
-        JPanel textPanel = new JPanel(new GridLayout(4,1));
+
+        //JPanel mainPanel = new JPanel(new BorderLayout());
+        //JPanel infoPanel = new JPanel();
+        //JPanel labelPanel = new JPanel(new GridLayout(4,1));
+        //JPanel textPanel = new JPanel(new GridLayout(4,1));
         JPanel artistPanel = new JPanel(new FlowLayout());
         JPanel artistLabelPanel = new JPanel(new GridLayout(2,1));
         JPanel artistTextPanel = new JPanel(new GridLayout(2,1));
-        JPanel buttonPanel = new JPanel(new FlowLayout());
+        //JPanel buttonPanel = new JPanel(new FlowLayout());
 
-        this.database = database;
+
 
         Date date = new Date();
 
@@ -66,11 +68,11 @@ public class ArtisGui extends JFrame {
         previousIndex = -1;
 
         //Create labels
-        JLabel stageLabel = new JLabel("Stage:");
-        JLabel startTimeLabel = new JLabel("Start time:");
-        JLabel endTimeLabel = new JLabel("End time:");
-        JLabel genreLabel = new JLabel("Genre:");
-        JLabel popularityLabel = new JLabel("Popularity:");
+
+        //JLabel startTimeLabel = new JLabel("Start time:");
+        //JLabel endTimeLabel = new JLabel("End time:");
+        //JLabel genreLabel = new JLabel("Genre:");
+        //JLabel popularityLabel = new JLabel("Popularity:");
 
         //Create combobox and the list
 
@@ -146,25 +148,25 @@ public class ArtisGui extends JFrame {
         closeButton.addActionListener(e-> closeButton());
 
         //Add components on labelPanel
-        labelPanel.add(stageLabel);
-        labelPanel.add(startTimeLabel);
-        labelPanel.add(endTimeLabel);
-        labelPanel.add(artistLabel);
+        //labelPanel.add(stageLabel);
+        //labelPanel.add(startTimeLabel);
+        //labelPanel.add(endTimeLabel);
+        //labelPanel.add(artistLabel);
 
         //Add components on textPanel
         textPanel.add(stageComboBox);
         textPanel.add(startTimeComboBox);
         textPanel.add(endTimeComboBox);
-        if(performance.getArtists().size() > 1){
+        //if(performance.getArtists().size() > 1){
             textPanel.add(artistComboBox);
             genreText.setText(genreValues.get(artistComboBox.getSelectedIndex()));
             popularityText.setText(Integer.toString(performance.getArtists().get(artistComboBox.getSelectedIndex()).getPopularity()));
-        }
-        else {
-            textPanel.add(artistText);
-            genreText.setText(genreValues.get(artistComboBox.getSelectedIndex()));
-            popularityText.setText(Integer.toString(performance.getArtists().get(0).getPopularity()));
-        }
+        //}
+        //else {
+        //    textPanel.add(artistText);
+        //    genreText.setText(genreValues.get(artistComboBox.getSelectedIndex()));
+        //    popularityText.setText(Integer.toString(performance.getArtists().get(0).getPopularity()));
+        //}
 
         //Add components on artistLabelPanel
         artistLabelPanel.add(genreLabel);
@@ -174,16 +176,40 @@ public class ArtisGui extends JFrame {
         artistTextPanel.add(genreText);
         artistTextPanel.add(popularityText);
 
-        //Add panels on panels
-        buttonPanel.add(saveButton);
-        buttonPanel.add(closeButton);
-        mainPanel.add(buttonPanel, BorderLayout.SOUTH);
+        // Position those widgets
+        //buttonPanel.add(saveButton);
+        //buttonPanel.add(closeButton);
+
         artistPanel.add(artistLabelPanel);
         artistPanel.add(artistTextPanel);
         mainPanel.add(artistPanel, BorderLayout.CENTER);
         infoPanel.add(labelPanel);
         infoPanel.add(textPanel);
         mainPanel.add(infoPanel, BorderLayout.NORTH);
+
+
+
+		JPanel centerPanel = new JPanel(new GridLayout(6, 2));
+		centerPanel.add(new JLabel("Stage:"));
+		centerPanel.add(stageComboBox);
+		centerPanel.add(new JLabel("Start time:"));
+		centerPanel.add(startTimeComboBox);
+		centerPanel.add(new JLabel("End time:"));
+		centerPanel.add(endTimeComboBox);
+		centerPanel.add(new JLabel("Artists:"));
+		centerPanel.add(new JTextField(performance.getArtistNames()));
+		centerPanel.add(new JLabel("Genres:"));
+		centerPanel.add(new DisabledTextField(performance.getArtistGenres()));
+		centerPanel.add(new JLabel("Popularity:"));
+		centerPanel.add(new DisabledTextField(String.valueOf(performance.generatePopularity())));
+
+        JPanel bottomPanel = new JPanel();
+        bottomPanel.add(saveButton);
+        bottomPanel.add(closeButton);
+
+		JPanel mainPanel = new JPanel(new BorderLayout());
+		mainPanel.add(centerPanel, BorderLayout.CENTER);
+        mainPanel.add(bottomPanel, BorderLayout.SOUTH);
 
         setContentPane(mainPanel);
         setVisible(true);
@@ -236,4 +262,12 @@ public class ArtisGui extends JFrame {
         }
         return TimeNumber;
     }
+
+    private static class DisabledTextField extends JTextField {
+
+    	public DisabledTextField(String text) {
+    		super(text);
+    		setEnabled(false);
+		}
+	}
 }

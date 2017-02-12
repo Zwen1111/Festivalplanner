@@ -109,6 +109,22 @@ public class Database implements Serializable {
 		return nextTime;
 	}
 
+	/**
+	 * Removes the performance from the list of performances
+	 *
+	 * @param performance the performance that needs to be removed
+	 * @return returns true if the performance is removed else it wil return false
+	 */
+	public boolean removePerformance(Performance performance) {
+		int numerOfPerformance =performances.indexOf(performance);
+		if(performances.get(numerOfPerformance).equals(performance)) {
+			performances.remove(numerOfPerformance);
+			notifyDataChanged();
+			return true;
+		}else return false;
+	}
+
+
 
 	/**
 	 * Notify all listeners that data in the database has changed.

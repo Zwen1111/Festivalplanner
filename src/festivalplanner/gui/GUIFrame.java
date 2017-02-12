@@ -23,6 +23,7 @@ public class GUIFrame extends JFrame implements Database.OnDataChangedListener{
 
 	@Override
 	public void onDataChanged() {
+		setTitle(fileSystem.getNameFile());
 		repaint();
 	}
 
@@ -30,7 +31,7 @@ public class GUIFrame extends JFrame implements Database.OnDataChangedListener{
 		database = new Database();
 
 		fileSystem = new FileSystem(database);
-
+		setTitle(fileSystem.getNameFile());
 
 		Main.test(database);
 		JTabbedPane tabs = new JTabbedPane(JTabbedPane.SCROLL_TAB_LAYOUT);
@@ -52,6 +53,21 @@ public class GUIFrame extends JFrame implements Database.OnDataChangedListener{
 		JMenu fileMenu = new JMenu("File");
 		menuBar.add(fileMenu);
 
+		JMenuItem newAgenda = new JMenuItem("New");
+		newAgenda.addActionListener(e -> {
+			database.notifyDataChanged();
+			fileSystem.newAgenda();
+			repaint();
+		});
+		fileMenu.add(newAgenda);
+
+		JMenuItem open = new JMenuItem("Open");
+		open.addActionListener(e -> {
+			fileSystem.open();
+			repaint();
+		});
+		fileMenu.add(open);
+
 		JMenuItem save = new JMenuItem("Save");
 		save.addActionListener(e -> {
 			fileSystem.save();
@@ -62,12 +78,7 @@ public class GUIFrame extends JFrame implements Database.OnDataChangedListener{
 		saveas.addActionListener(e ->  fileSystem.saveAs());
 		fileMenu.add(saveas);
 
-		JMenuItem open = new JMenuItem("Open");
-		open.addActionListener(e -> {
-			 fileSystem.open();
-			 repaint();
-		});
-		fileMenu.add(open);
+
 
 		JMenu addMenu = new JMenu("Add");
 		menuBar.add(addMenu);

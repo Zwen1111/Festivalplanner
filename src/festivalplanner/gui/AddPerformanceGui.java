@@ -89,8 +89,15 @@ public class AddPerformanceGui extends JFrame {
         centerPanel.add(new JLabel("Genres:"), constraints(0, 4, WEIGHT_LEFT, 0));
         DisabledTextField genreTextField = new DisabledTextField(getGenreArtists(artistJList.getSelectedValuesList()));
         centerPanel.add(genreTextField, constraints(1, 4, WEIGHT_RIGHT, 0));
-        centerPanel.add(new JLabel("Popularity:"), constraints(0, 5, WEIGHT_LEFT, 0));
-        DisabledTextField popularityTextField = new DisabledTextField(String.valueOf(database.getPerformances().get(0).generatePopularity()));
+
+        int popularityTotalBegin = 0;
+        for (Artist artist : artistJList.getSelectedValuesList()) {
+            popularityTotalBegin += artist.getPopularity();
+        }
+        int popularityBegin = popularityTotalBegin / artistJList.getSelectedValuesList().size();
+
+        centerPanel.add(new JLabel("Popularity:"), constraints(0, 5, WEIGHT_LEFT, popularityBegin));
+        DisabledTextField popularityTextField = new DisabledTextField(popularityBegin + "");
         centerPanel.add(popularityTextField,
                 constraints(1, 5, WEIGHT_RIGHT, 0));
 

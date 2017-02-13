@@ -22,6 +22,7 @@ public class CalendarTable extends JPanel implements Database.OnDataChangedListe
     private JPanel mainScreen;
     private int index;
     private JComboBox stageComboBox;
+    private ArrayList<String> comboBoxItems;
 
     public CalendarTable(Database database) {
         JTable table = new JTable();
@@ -30,8 +31,9 @@ public class CalendarTable extends JPanel implements Database.OnDataChangedListe
         setName("Table");
 		this.database = database;
 		index = 0;
+		comboBoxItems = new ArrayList<>();
 
-		if (database.getPerformances().size() != 0) {filterPerformances();}
+        filterPerformances();
 
         LocalTime timeTable = LocalTime.of(0,0);
         table.setModel(model = new AbstractTableModel()
@@ -92,7 +94,7 @@ public class CalendarTable extends JPanel implements Database.OnDataChangedListe
 
         stageComboBox.addActionListener(e -> {
             index = stageComboBox.getSelectedIndex();
-            if (database.getPerformances().size() != 0) {filterPerformances();}
+            filterPerformances();
             this.repaint();
         });
 
@@ -123,7 +125,10 @@ public class CalendarTable extends JPanel implements Database.OnDataChangedListe
 
     public void fillComboBox(){
         for (Stage stage:database.getStages()) {
-            stageComboBox.addItem(stage.getName());
+            if (!comboBoxItems.contains(stage.getName())) {
+                comboBoxItems.add(stage.getName());
+                stageComboBox.addItem(stage.getName());
+            }
         }
     }
 
@@ -138,7 +143,8 @@ public class CalendarTable extends JPanel implements Database.OnDataChangedListe
 
     public void filterPerformances() {
     	List<Stage> stages = database.getStages();
-    	filterByStage(stages.get(index));
+    	if (stages.size() > 0) {filterByStage(stages.get(index));}
+
     }
 
     public Performance performanceTimeCheck(LocalTime timeTable) {
@@ -164,7 +170,11 @@ public class CalendarTable extends JPanel implements Database.OnDataChangedListe
      if(database.getStages().size() == 0)
      {
       stageComboBox.removeAllItems();
+      comboBoxItems.clear();
+     }else {
+         fillComboBox();
      }
+
      model.fireTableDataChanged();
      repaint();
 

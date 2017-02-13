@@ -10,6 +10,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.time.LocalTime;
 import java.time.format.DateTimeParseException;
+import java.time.temporal.ChronoUnit;
 
 /**
  * @author Coen Boelhouwers
@@ -69,6 +70,7 @@ public class PerformanceOverview extends JFrame implements Database.OnDataChange
 				return startTimeValid;
 			}
 		});
+		startTimeField.setText(startTime.truncatedTo(ChronoUnit.MINUTES).toString());
 
 		endTimeField = new JTextField();
 		endTimeField.setInputVerifier(new InputVerifier() {
@@ -86,6 +88,7 @@ public class PerformanceOverview extends JFrame implements Database.OnDataChange
 				return endTimeValid;
 			}
 		});
+		endTimeField.setText(endTime.truncatedTo(ChronoUnit.MINUTES).plusHours(1).toString());
 
 		genreTextField = new DisabledTextField("");
 		popularityTextField = new DisabledTextField("");
@@ -153,9 +156,6 @@ public class PerformanceOverview extends JFrame implements Database.OnDataChange
 			endTimeField.setText(endTime.toString());
 			startTimeValid = true;
 			endTimeValid = true;
-		} else {
-			startTimeField.setText(startTime.toString());
-			endTimeField.setText(endTime.toString());
 		}
 		updateFields();
 		return this;

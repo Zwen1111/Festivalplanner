@@ -23,7 +23,7 @@ public class AddStage extends JFrame {
         setVisible(true);
         setLayout(null);
 
-        JLabel naamLabel = new JLabel("Naam:");
+        JLabel naamLabel = new JLabel("Name:");
         naamLabel.setFont(new Font(Font.SERIF,Font.PLAIN,25));
         add(naamLabel);
         naamLabel.setBounds(20,0,100,100);
@@ -35,7 +35,14 @@ public class AddStage extends JFrame {
         JButton confirm = new JButton("Confirm");
         confirm.setBounds(30,getHeight() - 100, 100,50);
         confirm.addActionListener(e -> {
-            database.addStage(new Stage(naam.getText()));
+            Stage newStage = new Stage(naam.getText());
+            for (Stage stage : database.getStages()) {
+                if(newStage.equals(stage)) {
+                    JOptionPane.showMessageDialog(null,"This stage already exists");
+                    return;
+                }
+            }
+            database.addStage(newStage);
             dispose();
         });
         add(confirm);

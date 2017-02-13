@@ -46,6 +46,7 @@ public class GUIFrame extends JFrame implements Database.OnDataChangedListener{
 
 		database.addOnDataChangedListener(this);
 		database.addOnDataChangedListener(panel2d);
+		database.addOnDataChangedListener(fileSystem);
 
 		mainPanel.add(tabs,BorderLayout.CENTER);
 
@@ -104,6 +105,7 @@ public class GUIFrame extends JFrame implements Database.OnDataChangedListener{
 		setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 		setContentPane(mainPanel);
 		setSize(800, 600);
+		setMinimumSize(new Dimension(600,650));
 		setVisible(true);
 
 

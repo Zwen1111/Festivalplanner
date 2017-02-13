@@ -11,41 +11,40 @@ import java.util.Collection;
 /**
  * @author Maarten Nieuwenhuize
  */
-public class FileSystem {
+public class FileSystem implements Database.OnDataChangedListener{
     private File file;
     private Database database;
-    private Database databaseOld;
+    private Boolean hasDataChanged;
 
     public FileSystem(Database database) {
+        hasDataChanged = false;
         this.database = database;
     }
 
     public void newAgenda() {
         if(askForSaving() == true) {
+            file = null;
             database.clear();
             database.notifyDataChanged();
         }
     }
 
 
-    public void save() {
+    public Boolean save() {
         if (file == null) {
-            try (ObjectOutputStream output = new ObjectOutputStream(new FileOutputStream(new File("Festival_planner_1")))) {
-                output.writeObject(database.getPerformances());
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+            return saveAs();
         } else {
             try (ObjectOutputStream output = new ObjectOutputStream(new FileOutputStream(this.file))) {
                 output.writeObject(database.getPerformances());
-                databaseOld = database;
+                return true;
             } catch (Exception e) {
                 e.printStackTrace();
+                return false;
             }
         }
     }
 
-    public void saveAs() {
+    public Boolean saveAs() {
 
         JFileChooser fc = new JFileChooser();
         if(file == null) {
@@ -66,21 +65,19 @@ public class FileSystem {
                     int confirmcode = JOptionPane.showConfirmDialog(null, "File already exists. Do you want to overwrite the file");
                     if (confirmcode == JOptionPane.CANCEL_OPTION) {
                         saveAs();
-                        return;
                     } else if (confirmcode == JOptionPane.NO_OPTION) {
-                        return;
+                        return false;
                     }
 
                 }betterFile = new File(file.getAbsolutePath());
 
             }
             try (ObjectOutputStream output = new ObjectOutputStream(new FileOutputStream(betterFile))) {
-                output.writeObject(database.getPerformances());
-                databaseOld = database;
-            } catch (Exception e) {
+                output.writeObject(database.getPerformances());} catch (Exception e) {
                 e.printStackTrace();
             }
         }
+        return false;
 
     }
 
@@ -121,10 +118,10 @@ public class FileSystem {
 
     private boolean askForSaving()
     {
-        if(file == null || database.equals(databaseOld)) {
+        if(hasDataChanged) {
             int confirmCode = JOptionPane.showConfirmDialog(null, "Do want to save changes");
             if (confirmCode == JOptionPane.OK_OPTION) {
-                saveAs();
+                return save();
 
             } else if (confirmCode == JOptionPane.CANCEL_OPTION || confirmCode == JOptionPane.CLOSED_OPTION) {
                 return false;
@@ -133,5 +130,8 @@ public class FileSystem {
         }return true;
     }
 
-
+    @Override
+    public void onDataChanged() {
+        hasDataChanged = true;
+    }
 }

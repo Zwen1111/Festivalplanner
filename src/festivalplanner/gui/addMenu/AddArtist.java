@@ -25,7 +25,7 @@ public class AddArtist extends JFrame {
         setVisible(true);
         setLayout(null);
 
-        JLabel naamLabel = new JLabel("Naam:");
+        JLabel naamLabel = new JLabel("Name:");
         naamLabel.setFont(new Font(Font.SERIF,Font.PLAIN,25));
         add(naamLabel);
         naamLabel.setBounds(20,0,100,100);

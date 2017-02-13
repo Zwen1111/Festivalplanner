@@ -46,6 +46,7 @@ public class GUIFrame extends JFrame implements Database.OnDataChangedListener{
 
 		database.addOnDataChangedListener(this);
 		database.addOnDataChangedListener(panel2d);
+		database.addOnDataChangedListener(panelTable);
 
 		mainPanel.add(tabs,BorderLayout.CENTER);
 

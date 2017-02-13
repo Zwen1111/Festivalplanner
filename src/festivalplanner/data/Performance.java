@@ -77,10 +77,27 @@ public class Performance implements Serializable {
 	 *
 	 * @return the popularity of this performance, on a scale from 0-10.
 	 */
-	public int generatePopularity() {
+	public double generatePopularity() {
 		check();
-		int artResult = artists.stream().mapToInt(Artist::getPopularity)
-				.sum()/artists.size();
+		return generatePopularity(artists);
+		//TODO Implement time-based influence.
+		/*int start = startTime.getHour() * 60 + startTime.getMinute();
+		if (start < SLEEP_TILL_VALUE)
+		int timeResult = (int) ((start - SLEEP_TILL_VALUE)/1440.0*10);
+		int result = artResult + timeResult / 2;
+		return result;*/
+	}
+
+	/**
+	 * Calculates the popularity of this performance, based on the artist(s) performing as well
+	 * as the time of day the performance starts (currently not implemented).
+	 *
+	 * @return the popularity of this performance, on a scale from 0-10.
+	 */
+	public static double generatePopularity(Collection<Artist> artistCollection) {
+		if (artistCollection == null || artistCollection.size() == 0) return 0;
+		double artResult = artistCollection.stream().mapToInt(Artist::getPopularity)
+				.sum()/ (double) artistCollection.size();
 		//TODO Implement time-based influence.
 		/*int start = startTime.getHour() * 60 + startTime.getMinute();
 		if (start < SLEEP_TILL_VALUE)
@@ -123,9 +140,15 @@ public class Performance implements Serializable {
 	 */
 	public String getArtistGenres() {
 		check();
-		StringBuilder builder = new StringBuilder(artists.get(0).getGenre());
-		for (int i = 1; i < artists.size(); i++)
-			builder.append(", ").append(artists.get(i).getGenre());
+		return getArtistGenres(artists);
+	}
+
+	public static String getArtistGenres(java.util.List<Artist> artistList) {
+		if (artistList == null) return "No Genres";
+		StringBuilder builder = new StringBuilder();
+		if (artistList.size() >= 1) builder.append(artistList.get(0).getGenre());
+		for (int i = 1; i < artistList.size(); i++)
+			builder.append(", ").append(artistList.get(i).getGenre());
 		return builder.toString();
 	}
 

@@ -2,6 +2,7 @@ package festivalplanner.gui.table2d;
 
 import festivalplanner.data.Performance;
 import festivalplanner.data.Database;
+import festivalplanner.gui.PerformanceOverview;
 
 import javax.swing.*;
 import java.awt.event.MouseAdapter;
@@ -13,7 +14,9 @@ import java.awt.event.MouseEvent;
 public class CheckPerformanceButton extends JButton {
     public CheckPerformanceButton(Performance performance, Database database) {
 
-        addActionListener(e -> new ArtisGui(performance, database,getBounds()));
+        addActionListener(e -> {
+            new PerformanceOverview(database).setPerformance(performance).setLocation(getBounds().getLocation());
+        });
         addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {

@@ -1,7 +1,6 @@
 package festivalplanner.gui;
 
 import festivalplanner.data.Database;
-import festivalplanner.gui.table2d.AddPerformanceGui;
 
 import javax.swing.*;
 
@@ -16,13 +15,13 @@ public class AddPerformanceButton extends JButton {
         setBorderPainted(false);
         setIcon(new ImageIcon(getClass().getResource("/icon's/addIcon.png")));
         addActionListener(e -> {
-            if(database.getStages().size() == 0) {
+            /*if(database.getStages().size() == 0) {
                 JOptionPane.showMessageDialog(null,"Please add a stage");
                 return;
             }else if(database.getArtists().size() == 0) {
                 JOptionPane.showMessageDialog(null,"Please add a Artist");
                 return;
-            }
+            }*/
             new AddPerformanceGui(database);
         });
 

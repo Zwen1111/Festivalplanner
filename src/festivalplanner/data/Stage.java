@@ -58,10 +58,7 @@ public class Stage implements Serializable{
 
 	@Override
 	public String toString() {
-		return "Stage{" +
-				"name='" + name + '\'' +
-				", capacity=" + capacity +
-				'}';
+		return name + " (capacity: " + capacity + ')';
 	}
 
 	@Override

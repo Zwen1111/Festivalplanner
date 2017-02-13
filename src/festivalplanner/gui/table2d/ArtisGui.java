@@ -1,47 +1,40 @@
 package festivalplanner.gui.table2d;
 
-import festivalplanner.data.Artist;
 import festivalplanner.data.Database;
 import festivalplanner.data.Performance;
-import festivalplanner.data.Stage;
+import festivalplanner.gui.PerformanceOverview;
 
-import javax.swing.*;
 import java.awt.*;
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.util.*;
 
 /**
  * @author Maarten Nieuwenhuize, Zwen van Erkelens, Coen Boelhouwers
  */
-public class ArtisGui extends JFrame {
+public class ArtisGui extends PerformanceOverview {
 
-	private static final double WEIGHT_LEFT = 0.1;
+	public ArtisGui(Performance performance, Database database, Rectangle rectangle) {
+		super(database);
+		setPerformance(performance);
+		setLocation(rectangle.getLocation());
+	}
+
+	/*private static final double WEIGHT_LEFT = 0.1;
 	private static final double WEIGHT_RIGHT = 0.9;
 
-    private JComboBox<String> stageComboBox;
+	private JComboBox<String> stageComboBox;
 	private JList<Artist> artistJList;
 
-    private JSpinner startTimeJSpinner;
-    private JSpinner endTimeJSpinner;
+	private JSpinner startTimeJSpinner;
+	private JSpinner endTimeJSpinner;
 
-    private Database database;
+	private Database database;
 
-    public ArtisGui(Performance performance, Database database,Rectangle rectangle) {
+	public ArtisGui(Performance performance, Database database, Rectangle rectangle) {
 		setSize(350, 300);
 		setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 		setLocation(rectangle.getLocation());
 		this.database = database;
 
 		artistJList = setupArtistsList(database);
-		// Select the current performing artist(s) in the list.
-		performance.getArtists().forEach(artist -> {
-			int index = database.getArtists().indexOf(artist);
-			artistJList.addSelectionInterval(index, index);
-		});
 
 		stageComboBox = new JComboBox<>();
 		database.getStages().forEach(stage -> stageComboBox.addItem(stage.getName()));
@@ -65,11 +58,11 @@ public class ArtisGui extends JFrame {
 		}
 
 		//Create buttons
-		JButton saveButton = new JButton("Save");
-		saveButton.addActionListener(e -> saveButton(performance));
+		JButton savePerformance = new JButton("Save");
+		savePerformance.addActionListener(e -> savePerformance(performance));
 
-		JButton closeButton = new JButton("Close");
-		closeButton.addActionListener(e -> closeButton());
+		JButton closeDialog = new JButton("Close");
+		closeDialog.addActionListener(e -> closeDialog());
 
 		// Position those widgets
 		JPanel centerPanel = new JPanel(new GridBagLayout());
@@ -101,8 +94,8 @@ public class ArtisGui extends JFrame {
 		});
 
 		JPanel bottomPanel = new JPanel();
-		bottomPanel.add(saveButton);
-		bottomPanel.add(closeButton);
+		bottomPanel.add(savePerformance);
+		bottomPanel.add(closeDialog);
 
 		JPanel mainPanel = new JPanel(new BorderLayout());
 		mainPanel.add(centerPanel, BorderLayout.CENTER);
@@ -112,19 +105,19 @@ public class ArtisGui extends JFrame {
 		setVisible(true);
 	}
 
-    private static GridBagConstraints constraints(int x, int y, double weight, int pad) {
-    	GridBagConstraints leftColumn = new GridBagConstraints();
+	private static GridBagConstraints constraints(int x, int y, double weight, int pad) {
+		GridBagConstraints leftColumn = new GridBagConstraints();
 		leftColumn.weightx = weight;
 		leftColumn.gridx = x;
 		leftColumn.gridy = y;
 		leftColumn.ipady = pad;
 		leftColumn.fill = GridBagConstraints.HORIZONTAL;
-		leftColumn.insets = new Insets(2,2,2,2);
+		leftColumn.insets = new Insets(2, 2, 2, 2);
 		return leftColumn;
 	}
 
-    private JList<Artist> setupArtistsList(Database database) {
-    	JList<Artist> list = new JList<>();
+	private JList<Artist> setupArtistsList(Database database) {
+		JList<Artist> list = new JList<>();
 		ListModel<Artist> model = new DefaultListModel<Artist>() {
 			@Override
 			public int getSize() {
@@ -140,21 +133,21 @@ public class ArtisGui extends JFrame {
 		return list;
 	}
 
-    public void saveButton(Performance performance){
-        performance.setStage(database.getStages().get(stageComboBox.getSelectedIndex()));
-        performance.setStartTime(LocalDateTime.ofInstant(((Date) startTimeJSpinner.getValue()).toInstant(),
+	public void savePerformance(Performance performance) {
+		performance.setStage(database.getStages().get(stageComboBox.getSelectedIndex()));
+		performance.setStartTime(LocalDateTime.ofInstant(((Date) startTimeJSpinner.getValue()).toInstant(),
 				ZoneId.systemDefault()).toLocalTime());
 		performance.setEndTime(LocalDateTime.ofInstant(((Date) endTimeJSpinner.getValue()).toInstant(),
 				ZoneId.systemDefault()).toLocalTime());
 		performance.getArtists().clear();
 		performance.getArtists().addAll(artistJList.getSelectedValuesList());
 		database.notifyDataChanged();
-        dispose();
-    }
+		dispose();
+	}
 
-    public void closeButton(){
-        dispose();
-    }
+	public void closeDialog() {
+		dispose();
+	}
 
 	public String getGenreArtists(java.util.List<Artist> artists) {
 		StringBuilder builder = new StringBuilder(artists.get(0).getGenre());
@@ -163,16 +156,16 @@ public class ArtisGui extends JFrame {
 		return builder.toString();
 	}
 
-    public int getRightStage(Stage stage){
-        int stageNumber = -1;
+	public int getRightStage(Stage stage) {
+		int stageNumber = -1;
 
-        for (int i = 0; i < database.getStages().size(); i++) {
-            if (database.getStages().get(i).equals(stage)){
-                stageNumber = i;
-            }
-        }
-        return stageNumber;
-    }
+		for (int i = 0; i < database.getStages().size(); i++) {
+			if (database.getStages().get(i).equals(stage)) {
+				stageNumber = i;
+			}
+		}
+		return stageNumber;
+	}
 
 	private static class DisabledTextField extends JTextField {
 
@@ -180,5 +173,5 @@ public class ArtisGui extends JFrame {
 			super(text);
 			setEnabled(false);
 		}
-	}
+	}*/
 }

@@ -109,6 +109,10 @@ public class Database implements Serializable {
 		return nextTime;
 	}
 
+	public void removeOnDataChangedListener(OnDataChangedListener l) {
+		listeners.remove(l);
+	}
+
 	/**
 	 * Removes the performance from the list of performances
 	 *

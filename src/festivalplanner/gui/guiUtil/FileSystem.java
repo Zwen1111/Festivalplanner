@@ -104,6 +104,7 @@ public class FileSystem {
                 try (ObjectInputStream input = new ObjectInputStream(new FileInputStream(fc.getSelectedFile()))) {
                     database.clear();
                     database.addPerformances((Collection<Performance>) input.readObject());
+                    database.notifyDataChanged();
                 } catch (Exception e) {
                     e.printStackTrace();
                 }

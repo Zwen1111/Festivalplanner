@@ -119,10 +119,10 @@ public class FileSystem implements Database.OnDataChangedListener{
 
     private boolean askForSaving()
     {
-        if(file == null && hasDataChanged) {
+        if(hasDataChanged) {
             int confirmCode = JOptionPane.showConfirmDialog(null, "Do want to save changes");
             if (confirmCode == JOptionPane.OK_OPTION) {
-                saveAs();
+                save();
 
             } else if (confirmCode == JOptionPane.CANCEL_OPTION || confirmCode == JOptionPane.CLOSED_OPTION) {
                 return false;

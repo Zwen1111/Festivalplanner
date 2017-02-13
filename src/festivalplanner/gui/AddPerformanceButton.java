@@ -22,7 +22,7 @@ public class AddPerformanceButton extends JButton {
                 JOptionPane.showMessageDialog(null,"Please add a Artist");
                 return;
             }*/
-            new AddPerformanceGui(database);
+            new PerformanceOverview(database);
         });
 
     }

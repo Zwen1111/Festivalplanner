@@ -100,7 +100,13 @@ public class FileSystem implements Database.OnDataChangedListener{
                 this.file = fc.getSelectedFile();
                 try (ObjectInputStream input = new ObjectInputStream(new FileInputStream(fc.getSelectedFile()))) {
                     database.clear();
-                    database.addPerformances((Collection<Performance>) input.readObject());
+                    try {
+						database.addPerformances((Collection<Performance>) input.readObject());
+					} catch (InvalidClassException e) {
+						JOptionPane.showMessageDialog(null, "There seems to be a mismatch" +
+										" of versions between the software. Sadly, we cannot recover the data.",
+								"Could not read file", JOptionPane.ERROR_MESSAGE);
+					}
                     database.notifyDataChanged();
                 } catch (Exception e) {
                     e.printStackTrace();

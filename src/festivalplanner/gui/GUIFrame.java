@@ -44,6 +44,20 @@ public class GUIFrame extends JFrame implements Database.OnDataChangedListener{
 
 		CalendarTable panelTable = new CalendarTable(database);
 
+		JPanel simulator = new JPanel();
+
+		tabs.addChangeListener(e -> {
+            Component p = ((JTabbedPane) e.getSource()).getSelectedComponent();
+            if(p.equals(simulator)) {
+
+                setExtendedState(JFrame.MAXIMIZED_BOTH);
+                //size of simulator = 1915 ,950
+                setVisible(true);
+            }else {
+                setResizable(true);
+            }
+        });
+
 		database.addOnDataChangedListener(this);
 		database.addOnDataChangedListener(panel2d);
 		database.addOnDataChangedListener(fileSystem);
@@ -100,6 +114,7 @@ public class GUIFrame extends JFrame implements Database.OnDataChangedListener{
 
 		tabs.add(panel2d);
 		tabs.add(panelTable);
+		tabs.add(simulator);
 
 
 		setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);

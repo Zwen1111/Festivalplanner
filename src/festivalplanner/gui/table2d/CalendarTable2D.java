@@ -111,7 +111,6 @@ public class CalendarTable2D extends JPanel implements Database.OnDataChangedLis
             int stageWidth = ((tableWidth - widthTimeColum) / amountOfStages) ;
             String nameStage = database.getStages().get(i).getName();
             String croppedNameStage = "";
-            System.out.println(stageWidth);
             if(nameStage.length() < stageWidth / 12)
             {
                  croppedNameStage = nameStage;

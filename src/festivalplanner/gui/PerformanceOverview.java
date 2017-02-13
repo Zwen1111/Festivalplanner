@@ -8,13 +8,8 @@ import festivalplanner.gui.addMenu.AddStage;
 
 import javax.swing.*;
 import java.awt.*;
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.util.Calendar;
-import java.util.Date;
+import java.time.LocalTime;
+import java.time.format.DateTimeParseException;
 
 /**
  * @author Coen Boelhouwers
@@ -27,14 +22,16 @@ public class PerformanceOverview extends JFrame implements Database.OnDataChange
 
 	private JComboBox<Object> stageComboBox;
 	private JList<Artist> artistJList;
-	private JSpinner startTimeJSpinner;
-	private JSpinner endTimeJSpinner;
+	private JTextField startTimeField;
+	private JTextField endTimeField;
 	private DisabledTextField genreTextField;
 	private DisabledTextField popularityTextField;
 	private JButton saveButton;
-	private JButton closeButton;
-	private JButton newStageButton;
-	private JButton newArtistButton;
+
+	private LocalTime startTime;
+	private LocalTime endTime;
+	private boolean startTimeValid;
+	private boolean endTimeValid;
 
 	private Database database;
 	private Performance shownPerformance;
@@ -43,28 +40,52 @@ public class PerformanceOverview extends JFrame implements Database.OnDataChange
 		setSize(350, 300);
 		setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 		this.database = database;
+		this.startTime = LocalTime.now();
+		this.endTime = LocalTime.now();
 
 		artistJList = setupArtistsList(database);
 
-		newArtistButton = new JButton("New");
+		JButton newArtistButton = new JButton("New");
 		newArtistButton.addActionListener(l -> new AddArtist(database));
 
-		newStageButton = new JButton("New");
+		JButton newStageButton = new JButton("New");
 		newStageButton.addActionListener(l -> new AddStage(database));
 
 		stageComboBox = new JComboBox<>(database.getStages().toArray());
 
-		//Start time ComboBox
-		startTimeJSpinner = new JSpinner(new SpinnerDateModel(new Date(), null, null, Calendar.MINUTE));
-		startTimeJSpinner.setEditor(new JSpinner.DateEditor(startTimeJSpinner, "HH:mm"));
-		startTimeJSpinner.setValue(new Date());
-		startTimeJSpinner.addChangeListener(l -> updateFields());
+		startTimeField = new JTextField();
+		startTimeField.setInputVerifier(new InputVerifier() {
+			@Override
+			public boolean verify(JComponent input) {
+				try {
+					startTime = LocalTime.parse(((JTextField) input).getText());
+					input.setForeground(Color.black);
+					startTimeValid = true;
+				} catch (DateTimeParseException e) {
+					input.setForeground(Color.red);
+					startTimeValid = false;
+				}
+				updateFields();
+				return startTimeValid;
+			}
+		});
 
-		//End time ComboBox
-		endTimeJSpinner = new JSpinner(new SpinnerDateModel(new Date(), null, null, Calendar.MINUTE));
-		endTimeJSpinner.setEditor(new JSpinner.DateEditor(endTimeJSpinner, "HH:mm"));
-		endTimeJSpinner.setValue(new Date());
-		endTimeJSpinner.addChangeListener(l -> updateFields());
+		endTimeField = new JTextField();
+		endTimeField.setInputVerifier(new InputVerifier() {
+			@Override
+			public boolean verify(JComponent input) {
+				try {
+					endTime = LocalTime.parse(((JTextField) input).getText());
+					input.setForeground(Color.black);
+					endTimeValid = true;
+				} catch (DateTimeParseException e) {
+					input.setForeground(Color.red);
+					endTimeValid = false;
+				}
+				updateFields();
+				return endTimeValid;
+			}
+		});
 
 		genreTextField = new DisabledTextField("");
 		popularityTextField = new DisabledTextField("");
@@ -73,7 +94,7 @@ public class PerformanceOverview extends JFrame implements Database.OnDataChange
 		saveButton = new JButton("Save");
 		saveButton.addActionListener(e -> savePerformance(shownPerformance));
 
-		closeButton = new JButton("Close");
+		JButton closeButton = new JButton("Close");
 		closeButton.addActionListener(e -> closeDialog());
 
 		// Position those widgets
@@ -82,9 +103,9 @@ public class PerformanceOverview extends JFrame implements Database.OnDataChange
 		centerPanel.add(stageComboBox, constraints(1, 0, WEIGHT_COLUMN_2, 0));
 		centerPanel.add(newStageButton, constraints(2, 0, WEIGHT_COLUMN_3, 0));
 		centerPanel.add(new JLabel("Start time:"), constraints(0, 1, WEIGHT_COLUMN_1, 0));
-		centerPanel.add(startTimeJSpinner, constraints(1, 1, WEIGHT_COLUMN_2, 0));
+		centerPanel.add(startTimeField, constraints(1, 1, WEIGHT_COLUMN_2, 0));
 		centerPanel.add(new JLabel("End time:"), constraints(0, 2, WEIGHT_COLUMN_1, 0));
-		centerPanel.add(endTimeJSpinner, constraints(1, 2, WEIGHT_COLUMN_2, 0));
+		centerPanel.add(endTimeField, constraints(1, 2, WEIGHT_COLUMN_2, 0));
 		centerPanel.add(new JLabel("Artists:"), constraints(0, 3, WEIGHT_COLUMN_1, 0));
 		centerPanel.add(new JScrollPane(artistJList), constraints(1, 3, WEIGHT_COLUMN_2, 60));
 		centerPanel.add(newArtistButton, constraints(2, 3, WEIGHT_COLUMN_3, 0));
@@ -126,15 +147,17 @@ public class PerformanceOverview extends JFrame implements Database.OnDataChange
 
 			stageComboBox.setSelectedIndex(database.getStages().indexOf(performance.getStage()));
 
-			// Sadly, converting between an old Date and new the LocalTime is hard.
-			DateFormat time = new SimpleDateFormat("HH:mm");
-			try {
-				startTimeJSpinner.setValue(time.parse(performance.getStartTime().toString()));
-				endTimeJSpinner.setValue(time.parse(performance.getEndTime().toString()));
-			} catch (ParseException e) {
-				System.err.println("Could not parse the time. Should not normally happen.");
-			}
+			startTime = performance.getStartTime();
+			endTime = performance.getEndTime();
+			startTimeField.setText(startTime.toString());
+			endTimeField.setText(endTime.toString());
+			startTimeValid = true;
+			endTimeValid = true;
+		} else {
+			startTimeField.setText(startTime.toString());
+			endTimeField.setText(endTime.toString());
 		}
+		updateFields();
 		return this;
 	}
 
@@ -142,12 +165,12 @@ public class PerformanceOverview extends JFrame implements Database.OnDataChange
 		genreTextField.setText(Performance.getArtistGenres(artistJList.getSelectedValuesList()));
 		popularityTextField.setText(String.format("%.1f", Performance.generatePopularity(
 				artistJList.getSelectedValuesList())));
-		Date date1 = ((Date) startTimeJSpinner.getValue());
-		Date date2 = ((Date) endTimeJSpinner.getValue());
-		saveButton.setEnabled(
-				artistJList.getSelectedValuesList().size() >= 1 &&
-				stageComboBox.getSelectedIndex() >= 0 && ((Date) endTimeJSpinner.getValue()).getTime() >
-						((Date) startTimeJSpinner.getValue()).getTime());
+		saveButton.setEnabled(artistJList.getSelectedValuesList().size() >= 1 &&
+				startTimeValid && endTimeValid &&
+				stageComboBox.getSelectedIndex() >= 0 && endTime.isAfter(startTime));
+		System.out.println("update. artists:" + (artistJList.getSelectedValuesList().size() >= 1) +
+				", startValid:" + startTimeValid + ", endValid:" + endTimeValid +
+				", stage:" + (stageComboBox.getSelectedIndex() >= 0) + ", after:" + endTime.isAfter(startTime));
 	}
 
 	private static GridBagConstraints constraints(int x, int y, double weight, int pad) {
@@ -163,17 +186,6 @@ public class PerformanceOverview extends JFrame implements Database.OnDataChange
 
 	private JList<Artist> setupArtistsList(Database database) {
 		JList<Artist> list = new JList<>();
-		/*ListModel<Artist> model = new DefaultListModel<Artist>() {
-			@Override
-			public int getSize() {
-				return database.getArtists().size();
-			}
-
-			@Override
-			public Artist getElementAt(int index) {
-				return database.getArtists().get(index);
-			}
-		};*/
 		DefaultListModel<Artist> model = new DefaultListModel<>();
 		database.getArtists().forEach(model::addElement);
 		list.setModel(model);
@@ -184,18 +196,13 @@ public class PerformanceOverview extends JFrame implements Database.OnDataChange
 		if (performance == null) {
 			Performance newPerformance = new Performance(
 					database.getStages().get(stageComboBox.getSelectedIndex()),
-					LocalDateTime.ofInstant(((Date) startTimeJSpinner.getValue()).toInstant(),
-							ZoneId.systemDefault()).toLocalTime(),
-					LocalDateTime.ofInstant(((Date) endTimeJSpinner.getValue()).toInstant(),
-							ZoneId.systemDefault()).toLocalTime(),
+					startTime, endTime,
 					artistJList.getSelectedValuesList());
 			database.addPerformance(newPerformance);
 		} else {
 			performance.setStage(database.getStages().get(stageComboBox.getSelectedIndex()));
-			performance.setStartTime(LocalDateTime.ofInstant(((Date) startTimeJSpinner.getValue()).toInstant(),
-					ZoneId.systemDefault()).toLocalTime());
-			performance.setEndTime(LocalDateTime.ofInstant(((Date) endTimeJSpinner.getValue()).toInstant(),
-					ZoneId.systemDefault()).toLocalTime());
+			performance.setStartTime(startTime);
+			performance.setEndTime(endTime);
 			performance.getArtists().clear();
 			performance.getArtists().addAll(artistJList.getSelectedValuesList());
 			database.notifyDataChanged();

@@ -33,7 +33,7 @@ public class Stage implements Serializable{
 	 * @param capacity the number of people that can attend a performance given on this stage.
 	 */
 	public Stage(String name, int capacity) {
-		this.name = name == null ? "Unnamed Stage" : name;
+		this.name = name == null || name.isEmpty() ? "Unnamed Stage" : name;
 		if (capacity < 0) throw new IllegalArgumentException();
 		else this.capacity = capacity;
 	}

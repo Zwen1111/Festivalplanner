@@ -200,8 +200,6 @@ public class CalendarTable extends JPanel implements Database.OnDataChangedListe
     @Override
     public void onDataChanged() {
 
-
-
      if(database.getPerformances().size() == 0) {
          index = 0;
          performancesSorted = new ArrayList<>();

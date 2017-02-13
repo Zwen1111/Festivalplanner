@@ -12,8 +12,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.util.Calendar;
-import java.util.Date;
+import java.util.*;
 
 /**
  * @author Maarten Nieuwenhuize, Zwen van Erkelens, Coen Boelhouwers
@@ -83,10 +82,23 @@ public class ArtisGui extends JFrame {
 		centerPanel.add(new JLabel("Artists:"), constraints(0, 3, WEIGHT_LEFT, 0));
 		centerPanel.add(new JScrollPane(artistJList), constraints(1, 3, WEIGHT_RIGHT, 60));
 		centerPanel.add(new JLabel("Genres:"), constraints(0, 4, WEIGHT_LEFT, 0));
-		centerPanel.add(new DisabledTextField(performance.getArtistGenres()), constraints(1, 4, WEIGHT_RIGHT, 0));
+		DisabledTextField genreTextField = new DisabledTextField(getGenreArtists(artistJList.getSelectedValuesList()));
+		centerPanel.add(genreTextField, constraints(1, 4, WEIGHT_RIGHT, 0));
 		centerPanel.add(new JLabel("Popularity:"), constraints(0, 5, WEIGHT_LEFT, 0));
-		centerPanel.add(new DisabledTextField(String.valueOf(performance.generatePopularity())),
+		DisabledTextField popularityTextField = new DisabledTextField(String.valueOf(database.getPerformances().get(0).generatePopularity()));
+		centerPanel.add(popularityTextField,
 				constraints(1, 5, WEIGHT_RIGHT, 0));
+
+		//makes sure that the genre and popularity display updates
+		artistJList.addListSelectionListener(e -> {
+			genreTextField.setText(getGenreArtists(artistJList.getSelectedValuesList()));
+			int popularityTotal = 0;
+			for (Artist artist : artistJList.getSelectedValuesList()) {
+				popularityTotal += artist.getPopularity();
+			}
+			int popularity = popularityTotal / artistJList.getSelectedValuesList().size();
+			popularityTextField.setText(Integer.toString(popularity));
+		});
 
 		JPanel bottomPanel = new JPanel();
 		bottomPanel.add(saveButton);
@@ -144,11 +156,18 @@ public class ArtisGui extends JFrame {
         dispose();
     }
 
+	public String getGenreArtists(java.util.List<Artist> artists) {
+		StringBuilder builder = new StringBuilder(artists.get(0).getGenre());
+		for (int i = 1; i < artists.size(); i++)
+			builder.append(", ").append(artists.get(i).getGenre());
+		return builder.toString();
+	}
+
     public int getRightStage(Stage stage){
         int stageNumber = -1;
 
         for (int i = 0; i < database.getStages().size(); i++) {
-            if (database.getStages().get(i) == stage){
+            if (database.getStages().get(i).equals(stage)){
                 stageNumber = i;
             }
         }

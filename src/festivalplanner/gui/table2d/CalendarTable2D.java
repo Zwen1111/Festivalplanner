@@ -11,7 +11,7 @@ import java.util.ArrayList;
 /**
  * @author Maarten Nieuwehuize
  */
-public class CalendarTable2D extends JPanel {
+public class CalendarTable2D extends JPanel implements Database.OnDataChangedListener{
     private int tableHeight;
     private int columHeigth;
     private int beginTableX;
@@ -88,7 +88,7 @@ public class CalendarTable2D extends JPanel {
         g2d.setColor(Color.black);
         g2d.drawRect(beginTableX, beginTableY, tableWidth - beginTableX - 1, heightRow * hour);
         //draws the line next to the time collum
-        g2d.drawLine(widthTimeColum, beginTableY, widthTimeColum, heightRow * hour + 10);
+        g2d.drawLine(widthTimeColum, beginTableY, widthTimeColum, tableHeight + beginTableY - 2);
 
         /*draws the line above the agenda*/
         g2d.setColor(Color.darkGray);
@@ -115,6 +115,7 @@ public class CalendarTable2D extends JPanel {
                             ((tableWidth - widthTimeColum) / amountOfStages) * i,
                     heightRow * hour + beginTableY);
         }
+
 
         while (database.getPerformances().size() > buttons.size())
         {
@@ -156,8 +157,9 @@ public class CalendarTable2D extends JPanel {
         //repaint();
 
     }
-    public void resetCheckPerformanceButtons()
-    {
+
+    @Override
+    public void onDataChanged() {
         for (CheckPerformanceButton button : buttons) {
             remove(button);
         }

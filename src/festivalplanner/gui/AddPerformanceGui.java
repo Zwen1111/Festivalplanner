@@ -1,9 +1,10 @@
-package festivalplanner.gui.table2d;
+package festivalplanner.gui;
 
 import festivalplanner.data.Artist;
 import festivalplanner.data.Database;
 import festivalplanner.data.Performance;
 import festivalplanner.data.Stage;
+import festivalplanner.gui.PerformanceOverview;
 
 import javax.swing.*;
 import java.awt.*;
@@ -22,9 +23,13 @@ import java.util.List;
 /**
  * @author Maarten Nieuwenhuize, Zwen van Erkelens, Coen Boelhouwers
  */
-public class AddPerformanceGui extends JFrame {
+public class AddPerformanceGui extends PerformanceOverview {
 
-    private static final double WEIGHT_LEFT = 0.1;
+    public AddPerformanceGui(Database database) {
+        super(database);
+    }
+
+    /*private static final double WEIGHT_LEFT = 0.1;
     private static final double WEIGHT_RIGHT = 0.9;
 
     private JComboBox<String> stageComboBox;
@@ -71,10 +76,10 @@ public class AddPerformanceGui extends JFrame {
 
         //Create buttons
         JButton addButton = new JButton("Save");
-        addButton.addActionListener(e -> saveButton(database));
+        addButton.addActionListener(e -> savePerformance(database));
 
-        JButton closeButton = new JButton("Close");
-        closeButton.addActionListener(e -> closeButton());
+        JButton closeDialog = new JButton("Close");
+        closeDialog.addActionListener(e -> closeDialog());
 
         // Position those widgets
         JPanel centerPanel = new JPanel(new GridBagLayout());
@@ -114,7 +119,7 @@ public class AddPerformanceGui extends JFrame {
 
         JPanel bottomPanel = new JPanel();
         bottomPanel.add(addButton);
-        bottomPanel.add(closeButton);
+        bottomPanel.add(closeDialog);
 
         JPanel mainPanel = new JPanel(new BorderLayout());
         mainPanel.add(centerPanel, BorderLayout.CENTER);
@@ -154,7 +159,7 @@ public class AddPerformanceGui extends JFrame {
         return list;
     }
 
-    public void saveButton(Database database){
+    public void savePerformance(Database database){
         Stage stage = database.getStages().get(stageComboBox.getSelectedIndex());
         LocalTime starTime = LocalDateTime.ofInstant(((Date) startTimeJSpinner.getValue()).toInstant(),
                 ZoneId.systemDefault()).toLocalTime();
@@ -168,7 +173,7 @@ public class AddPerformanceGui extends JFrame {
         dispose();
     }
 
-    public void closeButton(){
+    public void closeDialog(){
         dispose();
     }
 
@@ -186,7 +191,7 @@ public class AddPerformanceGui extends JFrame {
             super(text);
             setEnabled(false);
         }
-    }
+    }*/
 
 
 }

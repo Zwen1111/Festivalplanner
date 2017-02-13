@@ -91,8 +91,6 @@ public class CalendarTable extends JPanel implements Database.OnDataChangedListe
 
         });
 
-        table.setModel(model);
-
         index = 0;
         mainScreen = new JPanel(new BorderLayout());
         JTable mainStage = new JTable();
@@ -177,8 +175,6 @@ public class CalendarTable extends JPanel implements Database.OnDataChangedListe
     public String indexToStage() {
         String text = "";
         List<Stage> stages = database.getStages();
-
-
         text = stages.get(index).getName();
 
         return text;

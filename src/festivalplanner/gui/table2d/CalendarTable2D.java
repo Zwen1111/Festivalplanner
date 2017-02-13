@@ -100,19 +100,29 @@ public class CalendarTable2D extends JPanel implements Database.OnDataChangedLis
         g2d.drawString("Time", 10, 30);
 
         /*write's the stagename above collum and puts a line between collums*/
-        if (getWidth() / 55 >= 20) {
+
             g2d.setFont(new Font(Font.SERIF, Font.BOLD, 20));
-        } else g2d.setFont(new Font(Font.SERIF, Font.BOLD, getWidth() / 60));
+
         int amountOfStages = database.getStages().size();
         for (int i = 0; i < amountOfStages; i++) {
 
             g2d.setColor(Color.WHITE);
-            g2d.drawString(database.getStages().get(i).getName(),
-                    widthTimeColum + ((tableWidth - widthTimeColum) / amountOfStages) * i,
+
+            int stageWidth = ((tableWidth - widthTimeColum) / amountOfStages) ;
+            String nameStage = database.getStages().get(i).getName();
+            String croppedNameStage = "";
+            System.out.println(stageWidth);
+            if(nameStage.length() < stageWidth / 12)
+            {
+                 croppedNameStage = nameStage;
+            } else {croppedNameStage = nameStage.substring(0,stageWidth / 12) + "...";}
+
+            g2d.drawString(croppedNameStage,
+                    widthTimeColum + stageWidth * i,
                     beginTableY - 2);
             g2d.setColor(Color.black);
-            g2d.drawLine(widthTimeColum + ((tableWidth - widthTimeColum) / amountOfStages) * i, beginTableY, widthTimeColum +
-                            ((tableWidth - widthTimeColum) / amountOfStages) * i,
+            g2d.drawLine(widthTimeColum + stageWidth * i, beginTableY, widthTimeColum +
+                           stageWidth * i,
                     heightRow * hour + beginTableY);
         }
 

@@ -18,22 +18,20 @@ public class CalendarTable extends JPanel implements Database.OnDataChangedListe
 
     private AbstractTableModel model;
     private ArrayList<Performance> performancesSorted;
-    private Main main;
     private Database database;
     private JPanel mainScreen;
     private int index;
-    private int maxIndex;
-    private JLabel stageLabel;
-    private JOptionPane warning;
-    private JTable table;
+    private JComboBox stageComboBox;
 
     public CalendarTable(Database database) {
-        table = new JTable();
+        JTable table = new JTable();
+         stageComboBox = new JComboBox();
 		AddPerformanceButton addButton = new AddPerformanceButton(database);
         setName("Table");
 		this.database = database;
 		index = 0;
-        filterPerformances();
+
+		if (database.getPerformances().size() != 0) {filterPerformances();}
 
         LocalTime timeTable = LocalTime.of(0,0);
         table.setModel(model = new AbstractTableModel()
@@ -46,7 +44,6 @@ public class CalendarTable extends JPanel implements Database.OnDataChangedListe
 
             @Override
             public int getColumnCount () {
-                System.out.println("lol");
             return 4;
         }
 
@@ -91,6 +88,14 @@ public class CalendarTable extends JPanel implements Database.OnDataChangedListe
 
         });
 
+        fillComboBox();
+
+        stageComboBox.addActionListener(e -> {
+            index = stageComboBox.getSelectedIndex();
+            if (database.getPerformances().size() != 0) {filterPerformances();}
+            this.repaint();
+        });
+
         index = 0;
         mainScreen = new JPanel(new BorderLayout());
         JTable mainStage = new JTable();
@@ -101,7 +106,6 @@ public class CalendarTable extends JPanel implements Database.OnDataChangedListe
         codeStage.setModel(model);
         littleGirlStage.setModel(model);
         teenageStage.setModel(model);
-        warning = new JOptionPane();
 
         mainScreen.add(new JScrollPane(mainStage), BorderLayout.CENTER);
 
@@ -109,52 +113,18 @@ public class CalendarTable extends JPanel implements Database.OnDataChangedListe
         littleGirlStage.setVisible(false);
         teenageStage.setVisible(false);
         JPanel bottemScreen = new JPanel();
-         stageLabel = new JLabel("");
 
-        JButton next = new JButton("next");
-        next.addActionListener((ActionEvent e) ->
-        {
-            if(database.getStages().size() != 0) {
-                index++;
-                if (index > maxIndex) {
-                    index = 0;
-                }
-                filterPerformances();
-                stageLabel.setText(indexToStage());
-                this.repaint();
-            }
-            else
-            {
-            warning.showMessageDialog(null, "there aren't any stages");
-            }
-        });
-        JButton back = new JButton("back");
-        back.addActionListener(e ->
-        {
-            if(database.getStages().size() != 0) {
-                index--;
-                if (index < 0) {
-                    index = maxIndex;
-                }
-                filterPerformances();
-                stageLabel.setText(indexToStage());
-                this.repaint();
-            }
-            else
-            {
-                warning.showMessageDialog(null, "there aren't any stages");
-            }
-
-        });
-
-        stageLabel.setText(indexToStage());
         bottemScreen.add(addButton);
-        bottemScreen.add(back);
-        bottemScreen.add(stageLabel);
-        bottemScreen.add(next);
+        bottemScreen.add(stageComboBox);
         mainScreen.add(bottemScreen, BorderLayout.SOUTH);
 
         this.add(mainScreen);
+    }
+
+    public void fillComboBox(){
+        for (Stage stage:database.getStages()) {
+            stageComboBox.addItem(stage.getName());
+        }
     }
 
     public void filterByStage(Stage stage) {
@@ -169,15 +139,6 @@ public class CalendarTable extends JPanel implements Database.OnDataChangedListe
     public void filterPerformances() {
     	List<Stage> stages = database.getStages();
     	filterByStage(stages.get(index));
-        maxIndex = stages.size() - 1;
-    }
-
-    public String indexToStage() {
-        String text = "";
-        List<Stage> stages = database.getStages();
-        text = stages.get(index).getName();
-
-        return text;
     }
 
     public Performance performanceTimeCheck(LocalTime timeTable) {
@@ -202,7 +163,7 @@ public class CalendarTable extends JPanel implements Database.OnDataChangedListe
      }
      if(database.getStages().size() == 0)
      {
-      stageLabel.setText("");
+      stageComboBox.removeAllItems();
      }
      model.fireTableDataChanged();
      repaint();

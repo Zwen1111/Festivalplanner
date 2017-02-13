@@ -18,12 +18,15 @@ import java.awt.*;
  */
 public class GUIFrame extends JFrame implements Database.OnDataChangedListener{
 
+	public static final String APP_NAME = "Festivalplanner";
+	public static final String APP_VERSION = "0.1";
+
 	private Database database;
 	private FileSystem fileSystem;
 
 	@Override
 	public void onDataChanged() {
-		setTitle(fileSystem.getNameFile());
+		setTitle(fileSystem.getNameFile() + " - " + APP_NAME + " v" + APP_VERSION);
 		repaint();
 	}
 
@@ -31,7 +34,7 @@ public class GUIFrame extends JFrame implements Database.OnDataChangedListener{
 		database = new Database();
 
 		fileSystem = new FileSystem(database);
-		setTitle(fileSystem.getNameFile());
+		setTitle(fileSystem.getNameFile() + " - " + APP_NAME + " v" + APP_VERSION);
 
 		Main.test(database);
 		JTabbedPane tabs = new JTabbedPane(JTabbedPane.SCROLL_TAB_LAYOUT);
@@ -57,7 +60,7 @@ public class GUIFrame extends JFrame implements Database.OnDataChangedListener{
 		JMenuItem newAgenda = new JMenuItem("New");
 		newAgenda.addActionListener(e -> {
 			database.notifyDataChanged();
-			fileSystem.newAgenda();
+			fileSystem.newCalendar();
 			repaint();
 		});
 		fileMenu.add(newAgenda);

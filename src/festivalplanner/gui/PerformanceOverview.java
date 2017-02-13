@@ -168,9 +168,6 @@ public class PerformanceOverview extends JFrame implements Database.OnDataChange
 		saveButton.setEnabled(artistJList.getSelectedValuesList().size() >= 1 &&
 				startTimeValid && endTimeValid &&
 				stageComboBox.getSelectedIndex() >= 0 && endTime.isAfter(startTime));
-		System.out.println("update. artists:" + (artistJList.getSelectedValuesList().size() >= 1) +
-				", startValid:" + startTimeValid + ", endValid:" + endTimeValid +
-				", stage:" + (stageComboBox.getSelectedIndex() >= 0) + ", after:" + endTime.isAfter(startTime));
 	}
 
 	private static GridBagConstraints constraints(int x, int y, double weight, int pad) {

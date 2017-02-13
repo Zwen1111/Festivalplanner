@@ -1,4 +1,4 @@
-package festivalplanner.gui.guiUtil;
+package festivalplanner.util;
 
 import festivalplanner.data.Database;
 import festivalplanner.data.Performance;

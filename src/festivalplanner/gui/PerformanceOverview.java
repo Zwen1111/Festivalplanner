@@ -3,8 +3,8 @@ package festivalplanner.gui;
 import festivalplanner.data.Artist;
 import festivalplanner.data.Database;
 import festivalplanner.data.Performance;
-import festivalplanner.gui.addMenu.AddArtist;
-import festivalplanner.gui.addMenu.AddStage;
+import festivalplanner.gui.menu.AddArtist;
+import festivalplanner.gui.menu.AddStage;
 
 import javax.swing.*;
 import java.awt.*;

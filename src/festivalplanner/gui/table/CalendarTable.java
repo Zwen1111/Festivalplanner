@@ -14,7 +14,7 @@ import java.time.LocalTime;
 import java.util.*;
 import java.util.List;
 
-public class CalendarTable extends JPanel {
+public class CalendarTable extends JPanel implements Database.OnDataChangedListener{
 
     private AbstractTableModel model;
     private ArrayList<Performance> performancesSorted;
@@ -23,9 +23,12 @@ public class CalendarTable extends JPanel {
     private JPanel mainScreen;
     private int index;
     private int maxIndex;
+    private JLabel stageLabel;
+    private JOptionPane warning;
+    private JTable table;
 
     public CalendarTable(Database database) {
-		JTable table = new JTable();
+        table = new JTable();
 		AddPerformanceButton addButton = new AddPerformanceButton(database);
         setName("Table");
 		this.database = database;
@@ -96,6 +99,7 @@ public class CalendarTable extends JPanel {
         codeStage.setModel(model);
         littleGirlStage.setModel(model);
         teenageStage.setModel(model);
+        warning = new JOptionPane();
 
         mainScreen.add(new JScrollPane(mainStage), BorderLayout.CENTER);
 
@@ -103,29 +107,41 @@ public class CalendarTable extends JPanel {
         littleGirlStage.setVisible(false);
         teenageStage.setVisible(false);
         JPanel bottemScreen = new JPanel();
-        JLabel stageLabel = new JLabel("");
+         stageLabel = new JLabel("");
 
         JButton next = new JButton("next");
         next.addActionListener((ActionEvent e) ->
         {
-            index++;
-            if (index > maxIndex) {
-                index = 0;
+            if(database.getStages().size() != 0) {
+                index++;
+                if (index > maxIndex) {
+                    index = 0;
+                }
+                filterPerformances();
+                stageLabel.setText(indexToStage());
+                this.repaint();
             }
-            filterPerformances();
-            stageLabel.setText(indexToStage());
-            this.repaint();
+            else
+            {
+            warning.showMessageDialog(null, "there aren't any stages");
+            }
         });
         JButton back = new JButton("back");
         back.addActionListener(e ->
         {
-            index--;
-            if (index < 0) {
-                index = maxIndex;
+            if(database.getStages().size() != 0) {
+                index--;
+                if (index < 0) {
+                    index = maxIndex;
+                }
+                filterPerformances();
+                stageLabel.setText(indexToStage());
+                this.repaint();
             }
-            filterPerformances();
-            stageLabel.setText(indexToStage());
-            this.repaint();
+            else
+            {
+                warning.showMessageDialog(null, "there aren't any stages");
+            }
 
         });
 
@@ -177,4 +193,16 @@ public class CalendarTable extends JPanel {
         return null;
     }
 
+    @Override
+    public void onDataChanged() {
+     if(database.getPerformances().size() == 0) {
+         index = 0;
+     }
+     if(database.getStages().size() == 0)
+     {
+      stageLabel.setText("");
+     }
+     model.fireTableDataChanged();
+
+    }
 }

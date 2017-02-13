@@ -151,11 +151,14 @@ public class CalendarTable2D extends JPanel implements Database.OnDataChangedLis
             button.setBackground(Color.DARK_GRAY);
 
             int startYOfPerformance = (int) Math.floor(heightRow * (performance.getStartTime().getHour() + ((float) performance.getStartTime().getMinute() / 60)));
-            int endWithOfPerformance = (int) Math.floor(heightRow * ((performance.getEndTime().getHour() + ((float) performance.getEndTime().getMinute() / 60)) - (performance.getStartTime().getHour() + ((float) performance.getStartTime().getMinute() / 60))));
+            int endWidthOfPerformance = (int) Math.floor(heightRow * ((performance.getEndTime().getHour() + ((float) performance.getEndTime().getMinute() / 60)) - (performance.getStartTime().getHour() + ((float) performance.getStartTime().getMinute() / 60))));
 
             button.setBounds(widthTimeColum + (tableWidth - widthTimeColum) / amountOfStages * colIndex,
                     startYOfPerformance + beginTableY,
-                    ((tableWidth - widthTimeColum) / amountOfStages), endWithOfPerformance);
+                    ((tableWidth - widthTimeColum) / amountOfStages), endWidthOfPerformance);
+            if (endWidthOfPerformance/2 > 15){button.setFont(new Font("Serif", Font.BOLD, 20));}else{
+                button.setFont(new Font("Serif", Font.BOLD, endWidthOfPerformance/2));
+            }
 
         }
 

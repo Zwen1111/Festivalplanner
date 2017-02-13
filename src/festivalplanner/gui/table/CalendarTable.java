@@ -40,11 +40,13 @@ public class CalendarTable extends JPanel implements Database.OnDataChangedListe
         {
             @Override
             public int getRowCount () {
+
             return 48;
         }
 
             @Override
             public int getColumnCount () {
+                System.out.println("lol");
             return 4;
         }
 
@@ -88,6 +90,8 @@ public class CalendarTable extends JPanel implements Database.OnDataChangedListe
 
 
         });
+
+        table.setModel(model);
 
         index = 0;
         mainScreen = new JPanel(new BorderLayout());
@@ -195,14 +199,19 @@ public class CalendarTable extends JPanel implements Database.OnDataChangedListe
 
     @Override
     public void onDataChanged() {
+
+
+
      if(database.getPerformances().size() == 0) {
          index = 0;
+         performancesSorted = new ArrayList<>();
      }
      if(database.getStages().size() == 0)
      {
       stageLabel.setText("");
      }
      model.fireTableDataChanged();
+     repaint();
 
     }
 }

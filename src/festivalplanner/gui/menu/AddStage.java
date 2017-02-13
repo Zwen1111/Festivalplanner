@@ -1,19 +1,17 @@
-package festivalplanner.gui.addMenu;
+package festivalplanner.gui.menu;
 
-import festivalplanner.data.Artist;
 import festivalplanner.data.Database;
+import festivalplanner.data.Stage;
 
 import javax.swing.*;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
 import java.awt.*;
 
 /**
  * Created by Maarten on 10/02/2017.
  */
-public class AddArtist extends JFrame {
+public class AddStage extends JFrame {
 
-    public AddArtist(Database database)
+    public AddStage(Database database)
     {
         setSize(300, 400);
         setResizable(false);
@@ -34,29 +32,17 @@ public class AddArtist extends JFrame {
         add(naam);
         naam.setBounds(130,25,150,50);
 
-
-        JLabel genreLabel = new JLabel("Genre:");
-        genreLabel.setFont(new Font(Font.SERIF,Font.PLAIN,25));
-        add(genreLabel);
-        genreLabel.setBounds(20,120,100,100);
-        JTextField genre = new JTextField("");
-        genre.setFont(new Font(Font.SERIF,Font.PLAIN,25));
-        add(genre);
-        genre.setBounds(130,145,150,50);
-
-        JLabel popularityLabel = new JLabel("Popularity:");
-        popularityLabel.setFont(new Font(Font.SERIF,Font.PLAIN,25));
-        add(popularityLabel);
-        popularityLabel.setBounds(20,220,100,100);
-        JSpinner popularity = new JSpinner(new SpinnerNumberModel(0, 0, 10, 1));
-        popularity.setFont(new Font(Font.SERIF,Font.PLAIN,25));
-        add(popularity);
-        popularity.setBounds(130,245,150,50);
-
         JButton confirm = new JButton("Confirm");
         confirm.setBounds(30,getHeight() - 100, 100,50);
         confirm.addActionListener(e -> {
-            database.addArtist(new Artist(naam.getText(),genre.getText(), (int) popularity.getValue()));
+            Stage newStage = new Stage(naam.getText());
+            for (Stage stage : database.getStages()) {
+                if(newStage.equals(stage)) {
+                    JOptionPane.showMessageDialog(null,"This stage already exists");
+                    return;
+                }
+            }
+            database.addStage(newStage);
             dispose();
         });
         add(confirm);
@@ -67,5 +53,8 @@ public class AddArtist extends JFrame {
             dispose();
         });
         add(cancel);
+
+
+
     }
 }

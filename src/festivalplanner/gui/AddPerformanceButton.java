@@ -14,16 +14,7 @@ public class AddPerformanceButton extends JButton {
         setContentAreaFilled(false);
         setBorderPainted(false);
         setIcon(new ImageIcon(getClass().getResource("/icon's/addIcon.png")));
-        addActionListener(e -> {
-            /*if(database.getStages().size() == 0) {
-                JOptionPane.showMessageDialog(null,"Please add a stage");
-                return;
-            }else if(database.getArtists().size() == 0) {
-                JOptionPane.showMessageDialog(null,"Please add a Artist");
-                return;
-            }*/
-            new AddPerformanceGui(database);
-        });
+        addActionListener(e -> new PerformanceOverview(database));
 
     }
 }

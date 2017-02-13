@@ -2,9 +2,9 @@ package festivalplanner.gui;
 
 import festivalplanner.Main;
 import festivalplanner.data.Database;
-import festivalplanner.gui.addMenu.AddArtist;
-import festivalplanner.gui.addMenu.AddStage;
-import festivalplanner.gui.guiUtil.FileSystem;
+import festivalplanner.gui.menu.AddArtist;
+import festivalplanner.gui.menu.AddStage;
+import festivalplanner.util.FileSystem;
 import festivalplanner.gui.table.CalendarTable;
 import festivalplanner.gui.table2d.CalendarTable2D;
 
@@ -60,7 +60,7 @@ public class GUIFrame extends JFrame implements Database.OnDataChangedListener{
 
 		database.addOnDataChangedListener(this);
 		database.addOnDataChangedListener(panel2d);
-		database.addOnDataChangedListener(fileSystem);
+		database.addOnDataChangedListener(panelTable);
 
 		mainPanel.add(tabs,BorderLayout.CENTER);
 

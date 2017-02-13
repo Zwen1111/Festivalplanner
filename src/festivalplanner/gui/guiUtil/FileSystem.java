@@ -11,12 +11,13 @@ import java.util.Collection;
 /**
  * @author Maarten Nieuwenhuize
  */
-public class FileSystem {
+public class FileSystem implements Database.OnDataChangedListener{
     private File file;
     private Database database;
-    private Database databaseOld;
+    private Boolean hasDataChanged;
 
     public FileSystem(Database database) {
+        hasDataChanged = false;
         this.database = database;
     }
 
@@ -38,7 +39,6 @@ public class FileSystem {
         } else {
             try (ObjectOutputStream output = new ObjectOutputStream(new FileOutputStream(this.file))) {
                 output.writeObject(database.getPerformances());
-                databaseOld = database;
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -75,9 +75,7 @@ public class FileSystem {
 
             }
             try (ObjectOutputStream output = new ObjectOutputStream(new FileOutputStream(betterFile))) {
-                output.writeObject(database.getPerformances());
-                databaseOld = database;
-            } catch (Exception e) {
+                output.writeObject(database.getPerformances());} catch (Exception e) {
                 e.printStackTrace();
             }
         }
@@ -121,7 +119,7 @@ public class FileSystem {
 
     private boolean askForSaving()
     {
-        if(file == null || database.equals(databaseOld)) {
+        if(file == null && hasDataChanged) {
             int confirmCode = JOptionPane.showConfirmDialog(null, "Do want to save changes");
             if (confirmCode == JOptionPane.OK_OPTION) {
                 saveAs();
@@ -133,5 +131,8 @@ public class FileSystem {
         }return true;
     }
 
-
+    @Override
+    public void onDataChanged() {
+        hasDataChanged = true;
+    }
 }

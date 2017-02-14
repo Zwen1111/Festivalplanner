@@ -1,4 +1,4 @@
-package festivalplanner.gui.Simulator;
+package festivalplanner.gui.simulator;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
@@ -7,7 +7,7 @@ import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 
 /**
- * Created by Maarten on 13/02/2017.
+ * @author Maarten Nieuwenhuize
  */
 public class Simulator extends JPanel {
 

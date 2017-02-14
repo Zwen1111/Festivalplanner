@@ -2,6 +2,7 @@ package festivalplanner.gui;
 
 import festivalplanner.Main;
 import festivalplanner.data.Database;
+import festivalplanner.gui.Simulator.Simulator;
 import festivalplanner.gui.menu.AddArtist;
 import festivalplanner.gui.menu.AddStage;
 import festivalplanner.util.FileSystem;
@@ -46,6 +47,23 @@ public class GUIFrame extends JFrame implements Database.OnDataChangedListener{
 		CalendarTable2D panel2d = new CalendarTable2D(database);
 
 		CalendarTable panelTable = new CalendarTable(database);
+
+		Simulator simulator = new Simulator();
+
+
+
+		tabs.addChangeListener(e -> {
+            Component p = ((JTabbedPane) e.getSource()).getSelectedComponent();
+            if(p.equals(simulator)) {
+
+                setExtendedState(JFrame.MAXIMIZED_BOTH);
+                
+                //size of simulator = 1915 ,950
+                setVisible(true);
+            }else {
+                setResizable(true);
+            }
+        });
 
 		database.addOnDataChangedListener(this);
 		database.addOnDataChangedListener(panel2d);
@@ -103,6 +121,7 @@ public class GUIFrame extends JFrame implements Database.OnDataChangedListener{
 
 		tabs.add(panel2d);
 		tabs.add(panelTable);
+		tabs.add(simulator);
 
 
 		setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);

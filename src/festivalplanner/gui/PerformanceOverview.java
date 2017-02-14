@@ -7,6 +7,8 @@ import festivalplanner.gui.menu.AddArtist;
 import festivalplanner.gui.menu.AddStage;
 
 import javax.swing.*;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import java.awt.*;
 import java.time.LocalTime;
 import java.time.format.DateTimeParseException;
@@ -37,7 +39,16 @@ public class PerformanceOverview extends JFrame implements Database.OnDataChange
 	private Database database;
 	private Performance shownPerformance;
 
-	public PerformanceOverview(Database database) {
+	/**
+	 * The PerformanceOverview is a detail-pop-up of a single performance.
+	 * <p/>
+	 * The pop-up can be initialized w/o a performance. In the later case, a new performance
+	 * will be created and added to the database once the user hits confirm.
+	 *
+	 * @param database a reference to the database.
+	 * @param performance the performance to show, or null if a new one should be created.
+	 */
+	public PerformanceOverview(Database database, Performance performance) {
 		setSize(350, 300);
 		setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 		this.database = database;
@@ -55,40 +66,30 @@ public class PerformanceOverview extends JFrame implements Database.OnDataChange
 		stageComboBox = new JComboBox<>(database.getStages().toArray());
 
 		startTimeField = new JTextField();
-		startTimeField.setInputVerifier(new InputVerifier() {
-			@Override
-			public boolean verify(JComponent input) {
-				try {
-					startTime = LocalTime.parse(((JTextField) input).getText());
-					input.setForeground(Color.black);
-					startTimeValid = true;
-				} catch (DateTimeParseException e) {
-					input.setForeground(Color.red);
-					startTimeValid = false;
-				}
-				updateFields();
-				return startTimeValid;
+		startTimeField.getDocument().addDocumentListener((SimpleDocumentListener)() -> {
+			try {
+				startTime = LocalTime.parse(startTimeField.getText());
+				startTimeField.setForeground(Color.black);
+				startTimeValid = true;
+			} catch (DateTimeParseException e) {
+				startTimeField.setForeground(Color.red);
+				startTimeValid = false;
 			}
+			updateFields();
 		});
-		startTimeField.setText(startTime.truncatedTo(ChronoUnit.MINUTES).toString());
 
 		endTimeField = new JTextField();
-		endTimeField.setInputVerifier(new InputVerifier() {
-			@Override
-			public boolean verify(JComponent input) {
-				try {
-					endTime = LocalTime.parse(((JTextField) input).getText());
-					input.setForeground(Color.black);
-					endTimeValid = true;
-				} catch (DateTimeParseException e) {
-					input.setForeground(Color.red);
-					endTimeValid = false;
-				}
-				updateFields();
-				return endTimeValid;
+		endTimeField.getDocument().addDocumentListener((SimpleDocumentListener) () -> {
+			try {
+				endTime = LocalTime.parse(endTimeField.getText());
+				endTimeField.setForeground(Color.black);
+				endTimeValid = true;
+			} catch (DateTimeParseException e) {
+				endTimeField.setForeground(Color.red);
+				endTimeValid = false;
 			}
+			updateFields();
 		});
-		endTimeField.setText(endTime.truncatedTo(ChronoUnit.MINUTES).plusHours(1).toString());
 
 		genreTextField = new DisabledTextField("");
 		popularityTextField = new DisabledTextField("");
@@ -135,6 +136,7 @@ public class PerformanceOverview extends JFrame implements Database.OnDataChange
 
 		setContentPane(mainPanel);
 		setVisible(true);
+		setPerformance(performance);
 	}
 
 	public PerformanceOverview setPerformance(Performance performance) {
@@ -156,6 +158,9 @@ public class PerformanceOverview extends JFrame implements Database.OnDataChange
 			endTimeField.setText(endTime.toString());
 			startTimeValid = true;
 			endTimeValid = true;
+		} else {
+			startTimeField.setText(startTime.truncatedTo(ChronoUnit.MINUTES).toString());
+			endTimeField.setText(endTime.truncatedTo(ChronoUnit.MINUTES).plusHours(1).toString());
 		}
 		updateFields();
 		return this;
@@ -227,6 +232,26 @@ public class PerformanceOverview extends JFrame implements Database.OnDataChange
 		public DisabledTextField(String text) {
 			super(text);
 			setEnabled(false);
+		}
+	}
+
+	@FunctionalInterface
+	private interface SimpleDocumentListener extends DocumentListener {
+
+		void update();
+		@Override
+		default void insertUpdate(DocumentEvent e) {
+			update();
+		}
+
+		@Override
+		default void removeUpdate(DocumentEvent e) {
+			update();
+		}
+
+		@Override
+		default void changedUpdate(DocumentEvent e) {
+			update();
 		}
 	}
 }

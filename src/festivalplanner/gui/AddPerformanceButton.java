@@ -14,7 +14,7 @@ public class AddPerformanceButton extends JButton {
         setContentAreaFilled(false);
         setBorderPainted(false);
         setIcon(new ImageIcon(getClass().getResource("/icon's/addIcon.png")));
-        addActionListener(e -> new PerformanceOverview(database));
+        addActionListener(e -> new PerformanceOverview(database, null));
 
     }
 }

@@ -14,7 +14,7 @@ import java.awt.event.MouseEvent;
 public class CheckPerformanceButton extends JButton {
     public CheckPerformanceButton(Performance performance, Database database) {
 
-        addActionListener(e -> new PerformanceOverview(database).setPerformance(performance)
+        addActionListener(e -> new PerformanceOverview(database, performance)
 				.setLocation(getBounds().getLocation()));
         addMouseListener(new MouseAdapter() {
             @Override

@@ -109,6 +109,13 @@ public class Database implements Serializable {
 		return nextTime;
 	}
 
+	public boolean isStageInUse(Stage stage, LocalTime start, LocalTime end, Performance ignore) {
+		return performances.stream().anyMatch(perf -> (ignore == null || !perf.equals(ignore)) &&
+				perf.getStage().equals(stage) &&
+				((perf.getStartTime().isAfter(start) && perf.getStartTime().isBefore(end)) ||
+						(perf.getEndTime().isAfter(start) && perf.getEndTime().isBefore(end))));
+	}
+
 	public void removeOnDataChangedListener(OnDataChangedListener l) {
 		listeners.remove(l);
 	}

@@ -14,6 +14,7 @@ import java.awt.*;
 import java.time.LocalTime;
 import java.time.format.DateTimeParseException;
 import java.time.temporal.ChronoUnit;
+import java.util.List;
 
 /**
  * @author Coen Boelhouwers
@@ -172,7 +173,7 @@ public class PerformanceOverview extends JFrame implements Database.OnDataChange
 		shownPerformance = performance;
 		if (performance != null) {
 			// Select the current performing artist(s) in the list.
-			java.util.List<Artist> artists = database.getArtists();
+			List<Artist> artists = database.getArtists();
 			artistJList.removeSelectionInterval(0, artists.size() - 1);
 			performance.getArtists().forEach(artist -> {
 				int index = database.getArtists().indexOf(artist);
@@ -225,6 +226,7 @@ public class PerformanceOverview extends JFrame implements Database.OnDataChange
 	}
 
 	public void savePerformance(Performance performance) {
+		database.removeOnDataChangedListener(this);
 		if (performance == null) {
 			Performance newPerformance = new Performance(
 					database.getStages().get(stageComboBox.getSelectedIndex()),
@@ -249,11 +251,21 @@ public class PerformanceOverview extends JFrame implements Database.OnDataChange
 
 	@Override
 	public void onDataChanged() {
+		//Rebuild stage list:
+		Stage previousSelectedStage = (Stage) stageComboBox.getSelectedItem();
 		stageComboBox.removeAllItems();
 		database.getStages().forEach(stageComboBox::addItem);
+		stageComboBox.setSelectedIndex(database.getStages().indexOf(previousSelectedStage));
+
+		//Rebuild artist list:
+		List<Artist> previousSelectedArtists = artistJList.getSelectedValuesList();
 		DefaultListModel<Artist> model = (DefaultListModel<Artist>) artistJList.getModel();
 		model.clear();
 		database.getArtists().forEach(model::addElement);
+		previousSelectedArtists.forEach(artist -> {
+			int index = database.getArtists().indexOf(artist);
+			artistJList.addSelectionInterval(index, index);
+		});
 		updateFields();
 	}
 

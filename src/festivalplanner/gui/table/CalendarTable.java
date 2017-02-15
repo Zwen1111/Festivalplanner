@@ -189,7 +189,7 @@ public class CalendarTable extends JPanel implements Database.OnDataChangedListe
         } else {
             fillComboBox();
         }
-
+        filterPerformances();
         model.fireTableDataChanged();
         repaint();
 

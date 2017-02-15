@@ -102,32 +102,9 @@ public class CalendarTable extends JPanel implements Database.OnDataChangedListe
             this.repaint();
         });
 
-//        TableRowSorter<TableModel> sorter = new TableRowSorter<>(model);
-//
-//
-//        List<RowSorter.SortKey> sortKeys = new ArrayList<>();
-//        sortKeys.add(new RowSorter.SortKey(1, SortOrder.ASCENDING));
-//        sortKeys.add(new RowSorter.SortKey(3, SortOrder.ASCENDING));
-//        sorter.setSortKeys(sortKeys);
-//        table.setRowSorter(sorter);
-
-
-        index = 0;
         mainScreen = new JPanel(new BorderLayout());
-        JTable mainStage = new JTable();
-        JTable codeStage = new JTable();
-        JTable littleGirlStage = new JTable();
-        JTable teenageStage = new JTable();
-        mainStage.setModel(model);
-        codeStage.setModel(model);
-        littleGirlStage.setModel(model);
-        teenageStage.setModel(model);
+        mainScreen.add(new JScrollPane(table), BorderLayout.CENTER);
 
-        mainScreen.add(new JScrollPane(mainStage), BorderLayout.CENTER);
-
-        codeStage.setVisible(false);
-        littleGirlStage.setVisible(false);
-        teenageStage.setVisible(false);
         JPanel bottemScreen = new JPanel();
 
         bottemScreen.add(addButton);

@@ -11,11 +11,22 @@ import java.awt.event.MouseEvent;
 /**
  * @author Maarten Nieuwenhuize
  */
-public class CheckPerformanceButton extends JButton {
+public class CheckPerformanceButton extends JButton implements PerformanceOverview.OnClosedListener{
+    private boolean hasOpened;
     public CheckPerformanceButton(Performance performance, Database database) {
+        hasOpened = false;
+        addActionListener(e -> {
+            if(hasOpened == false)
+            {
+                PerformanceOverview performanceOverview = new PerformanceOverview(database, performance);
+                performanceOverview.setLocation(getBounds().getLocation());
+                performanceOverview.addListener(this);
+                hasOpened = true;
+            }
 
-        addActionListener(e -> new PerformanceOverview(database, performance)
-				.setLocation(getBounds().getLocation()));
+
+
+        });
         addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
@@ -30,5 +41,10 @@ public class CheckPerformanceButton extends JButton {
                 }
             }
         });
+    }
+
+    @Override
+    public void onClosed() {
+        hasOpened = false;
     }
 }

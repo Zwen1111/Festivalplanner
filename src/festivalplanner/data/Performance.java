@@ -188,4 +188,14 @@ public class Performance implements Serializable {
 	public void setEndTime(LocalTime time){
 		this.endTime = time;
 	}
+
+	@Override
+	public String toString() {
+		return "Performance{" +
+				"stage=" + stage +
+				", artists=" + artists +
+				", startTime=" + startTime +
+				", endTime=" + endTime +
+				'}';
+	}
 }

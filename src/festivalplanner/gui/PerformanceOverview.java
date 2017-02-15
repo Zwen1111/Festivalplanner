@@ -3,6 +3,7 @@ package festivalplanner.gui;
 import festivalplanner.data.Artist;
 import festivalplanner.data.Database;
 import festivalplanner.data.Performance;
+import festivalplanner.data.Stage;
 import festivalplanner.gui.menu.AddArtist;
 import festivalplanner.gui.menu.AddStage;
 
@@ -23,12 +24,13 @@ public class PerformanceOverview extends JFrame implements Database.OnDataChange
 	private static final double WEIGHT_COLUMN_2 = 0.8;
 	private static final double WEIGHT_COLUMN_3 = 0.01;
 
-	private JComboBox<Object> stageComboBox;
+	private JComboBox<Stage> stageComboBox;
 	private JList<Artist> artistJList;
 	private JTextField startTimeField;
 	private JTextField endTimeField;
 	private DisabledTextField genreTextField;
 	private DisabledTextField popularityTextField;
+	private JLabel errorLabel;
 	private JButton saveButton;
 
 	private LocalTime startTime;
@@ -64,7 +66,9 @@ public class PerformanceOverview extends JFrame implements Database.OnDataChange
 		JButton newStageButton = new JButton("New");
 		newStageButton.addActionListener(l -> new AddStage(database));
 
-		stageComboBox = new JComboBox<>(database.getStages().toArray());
+		stageComboBox = new JComboBox<>();//database.getStages().toArray());
+		database.getStages().forEach(stageComboBox::addItem);
+		stageComboBox.addItemListener(l -> updateFields());
 
 		startTimeField = new JTextField();
 		startTimeField.getDocument().addDocumentListener((SimpleDocumentListener)() -> {
@@ -95,6 +99,9 @@ public class PerformanceOverview extends JFrame implements Database.OnDataChange
 		genreTextField = new DisabledTextField("");
 		popularityTextField = new DisabledTextField("");
 
+		errorLabel = new JLabel(" ");
+		errorLabel.setForeground(Color.red);
+
 		//Create buttons
 		saveButton = new JButton("Save");
 		saveButton.addActionListener(e -> savePerformance(shownPerformance));
@@ -104,21 +111,22 @@ public class PerformanceOverview extends JFrame implements Database.OnDataChange
 
 		// Position those widgets
 		JPanel centerPanel = new JPanel(new GridBagLayout());
-		centerPanel.add(new JLabel("Stage:"), constraints(0, 0, WEIGHT_COLUMN_1, 0));
-		centerPanel.add(stageComboBox, constraints(1, 0, WEIGHT_COLUMN_2, 0));
-		centerPanel.add(newStageButton, constraints(2, 0, WEIGHT_COLUMN_3, 0));
-		centerPanel.add(new JLabel("Start time:"), constraints(0, 1, WEIGHT_COLUMN_1, 0));
-		centerPanel.add(startTimeField, constraints(1, 1, WEIGHT_COLUMN_2, 0));
-		centerPanel.add(new JLabel("End time:"), constraints(0, 2, WEIGHT_COLUMN_1, 0));
-		centerPanel.add(endTimeField, constraints(1, 2, WEIGHT_COLUMN_2, 0));
-		centerPanel.add(new JLabel("Artists:"), constraints(0, 3, WEIGHT_COLUMN_1, 0));
+		centerPanel.add(new JLabel("Stage:"), constraints(0, 0, WEIGHT_COLUMN_1));
+		centerPanel.add(stageComboBox, constraints(1, 0, WEIGHT_COLUMN_2));
+		centerPanel.add(newStageButton, constraints(2, 0, WEIGHT_COLUMN_3));
+		centerPanel.add(new JLabel("Start time:"), constraints(0, 1, WEIGHT_COLUMN_1));
+		centerPanel.add(startTimeField, constraints(1, 1, WEIGHT_COLUMN_2));
+		centerPanel.add(new JLabel("End time:"), constraints(0, 2, WEIGHT_COLUMN_1));
+		centerPanel.add(endTimeField, constraints(1, 2, WEIGHT_COLUMN_2));
+		centerPanel.add(new JLabel("Artists:"), constraints(0, 3, WEIGHT_COLUMN_1));
 		centerPanel.add(new JScrollPane(artistJList), constraints(1, 3, WEIGHT_COLUMN_2, 60));
-		centerPanel.add(newArtistButton, constraints(2, 3, WEIGHT_COLUMN_3, 0));
-		centerPanel.add(new JLabel("Genres:"), constraints(0, 4, WEIGHT_COLUMN_1, 0));
-		centerPanel.add(genreTextField, constraints(1, 4, WEIGHT_COLUMN_2, 0));
-		centerPanel.add(new JLabel("Popularity:"), constraints(0, 5, WEIGHT_COLUMN_1, 0));
+		centerPanel.add(newArtistButton, constraints(2, 3, WEIGHT_COLUMN_3));
+		centerPanel.add(new JLabel("Genres:"), constraints(0, 4, WEIGHT_COLUMN_1));
+		centerPanel.add(genreTextField, constraints(1, 4, WEIGHT_COLUMN_2));
+		centerPanel.add(new JLabel("Popularity:"), constraints(0, 5, WEIGHT_COLUMN_1));
 		centerPanel.add(popularityTextField,
-				constraints(1, 5, WEIGHT_COLUMN_2, 0));
+				constraints(1, 5, WEIGHT_COLUMN_2));
+		centerPanel.add(errorLabel, constraints(0, 6, WEIGHT_COLUMN_1, 0, 3));
 
 		// Make sure that the genre and popularity are constant updated as data changes (internal and external).
 		artistJList.addListSelectionListener(e -> updateFields());
@@ -138,6 +146,26 @@ public class PerformanceOverview extends JFrame implements Database.OnDataChange
 		setContentPane(mainPanel);
 		setVisible(true);
 		setPerformance(performance);
+	}
+
+	private static GridBagConstraints constraints(int x, int y, double weight) {
+		return constraints(x, y, weight, 0, 1);
+	}
+
+	private static GridBagConstraints constraints(int x, int y, double weight, int pad) {
+		return constraints(x, y, weight, pad, 1);
+	}
+
+	private static GridBagConstraints constraints(int x, int y, double weight, int pad, int vSpan) {
+		GridBagConstraints leftColumn = new GridBagConstraints();
+		leftColumn.weightx = weight;
+		leftColumn.gridx = x;
+		leftColumn.gridy = y;
+		leftColumn.ipady = pad;
+		leftColumn.fill = GridBagConstraints.HORIZONTAL;
+		leftColumn.gridwidth = vSpan;
+		leftColumn.insets = new Insets(2,2,2,2);
+		return leftColumn;
 	}
 
 	public PerformanceOverview setPerformance(Performance performance) {
@@ -171,20 +199,21 @@ public class PerformanceOverview extends JFrame implements Database.OnDataChange
 		genreTextField.setText(Performance.getArtistGenres(artistJList.getSelectedValuesList()));
 		popularityTextField.setText(String.format("%.1f", Performance.generatePopularity(
 				artistJList.getSelectedValuesList())));
-		saveButton.setEnabled(artistJList.getSelectedValuesList().size() >= 1 &&
-				startTimeValid && endTimeValid &&
-				stageComboBox.getSelectedIndex() >= 0 && endTime.isAfter(startTime));
+		StringBuilder builder = new StringBuilder();
+		if (artistJList.getSelectedValuesList().size() == 0) disableSave(builder, "No artist selected");
+		if (!(startTimeValid && endTimeValid)) disableSave(builder, "Times not valid");
+		if (stageComboBox.getSelectedIndex() < 0) disableSave(builder, "No stage selected");
+		if (endTime.isBefore(startTime)) disableSave(builder, "End time is before start time");
+		if (database.isStageInUse((Stage) stageComboBox.getSelectedItem(), startTime, endTime, shownPerformance))
+			disableSave(builder, "Stage already in use at this time");
+		errorLabel.setText(builder.toString());
+		if (builder.length() == 0) saveButton.setEnabled(true);
 	}
 
-	private static GridBagConstraints constraints(int x, int y, double weight, int pad) {
-		GridBagConstraints leftColumn = new GridBagConstraints();
-		leftColumn.weightx = weight;
-		leftColumn.gridx = x;
-		leftColumn.gridy = y;
-		leftColumn.ipady = pad;
-		leftColumn.fill = GridBagConstraints.HORIZONTAL;
-		leftColumn.insets = new Insets(2,2,2,2);
-		return leftColumn;
+	private void disableSave(StringBuilder builder, String message) {
+		if (builder.length() != 0) builder.append("; ");
+		builder.append(message);
+		saveButton.setEnabled(false);
 	}
 
 	private JList<Artist> setupArtistsList(Database database) {

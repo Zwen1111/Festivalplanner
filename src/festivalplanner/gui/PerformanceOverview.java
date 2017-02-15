@@ -38,6 +38,7 @@ public class PerformanceOverview extends JFrame implements Database.OnDataChange
 
 	private Database database;
 	private Performance shownPerformance;
+	private OnClosedListener onClosedListener;
 
 	/**
 	 * The PerformanceOverview is a detail-pop-up of a single performance.
@@ -253,5 +254,24 @@ public class PerformanceOverview extends JFrame implements Database.OnDataChange
 		default void changedUpdate(DocumentEvent e) {
 			update();
 		}
+	}
+
+	/**
+	 * Notify all listeners that data in the database has changed.
+	 */
+	public void notifyDataChanged() {
+		onClosedListener.onClosed();
+	}
+
+	public void addListener(OnClosedListener onClosedListener) {
+		this.onClosedListener = onClosedListener;
+	}
+
+	@FunctionalInterface
+	public interface OnClosedListener {
+		/**
+		 * Called when something changed in the data. The type of change is unknown.
+		 */
+		void onClosed();
 	}
 }

@@ -11,6 +11,8 @@ import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import java.awt.*;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.time.LocalTime;
 import java.time.format.DateTimeParseException;
 import java.time.temporal.ChronoUnit;
@@ -55,6 +57,13 @@ public class PerformanceOverview extends JFrame implements Database.OnDataChange
 	public PerformanceOverview(Database database, Performance performance) {
 		setSize(350, 300);
 		setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+		addWindowListener(new WindowAdapter() {
+			@Override
+			public void windowClosing(WindowEvent e) {
+				super.windowClosing(e);
+				onClosedListener.onClosed();
+			}
+		});
 		this.database = database;
 		this.startTime = LocalTime.now();
 		this.endTime = LocalTime.now();
@@ -245,6 +254,7 @@ public class PerformanceOverview extends JFrame implements Database.OnDataChange
 	}
 
 	public void closeDialog(){
+		onClosedListener.onClosed();
 		database.removeOnDataChangedListener(this);
 		dispose();
 	}

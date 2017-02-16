@@ -1,11 +1,9 @@
-package festivalplanner.gui;
+package festivalplanner.gui.dialog;
 
 import festivalplanner.data.Artist;
 import festivalplanner.data.Database;
 import festivalplanner.data.Performance;
 import festivalplanner.data.Stage;
-import festivalplanner.gui.menu.AddArtist;
-import festivalplanner.gui.menu.AddStage;
 
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
@@ -19,7 +17,7 @@ import java.util.List;
 /**
  * @author Coen Boelhouwers
  */
-public class PerformanceOverview extends JFrame implements Database.OnDataChangedListener {
+public class PerformanceDialog extends JDialog implements Database.OnDataChangedListener {
 
 	private static final double WEIGHT_COLUMN_1 = 0.1;
 	private static final double WEIGHT_COLUMN_2 = 0.8;
@@ -41,10 +39,9 @@ public class PerformanceOverview extends JFrame implements Database.OnDataChange
 
 	private Database database;
 	private Performance shownPerformance;
-	private OnClosedListener onClosedListener;
 
 	/**
-	 * The PerformanceOverview is a detail-pop-up of a single performance.
+	 * The PerformanceDialog is a detail-pop-up of a single performance.
 	 * <p/>
 	 * The pop-up can be initialized w/o a performance. In the later case, a new performance
 	 * will be created and added to the database once the user hits confirm.
@@ -52,9 +49,9 @@ public class PerformanceOverview extends JFrame implements Database.OnDataChange
 	 * @param database a reference to the database.
 	 * @param performance the performance to show, or null if a new one should be created.
 	 */
-	public PerformanceOverview(Database database, Performance performance) {
-		setSize(350, 300);
-		setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+	public PerformanceDialog(Database database, Performance performance, Point point) {
+		super(null, ModalityType.APPLICATION_MODAL);
+
 		this.database = database;
 		this.startTime = LocalTime.now();
 		this.endTime = LocalTime.now();
@@ -62,10 +59,10 @@ public class PerformanceOverview extends JFrame implements Database.OnDataChange
 		artistJList = setupArtistsList(database);
 
 		JButton newArtistButton = new JButton("New");
-		newArtistButton.addActionListener(l -> new AddArtist(database));
+		newArtistButton.addActionListener(l -> new AddArtistDialog(database));
 
 		JButton newStageButton = new JButton("New");
-		newStageButton.addActionListener(l -> new AddStage(database));
+		newStageButton.addActionListener(l -> new AddStageDialog(database));
 
 		stageComboBox = new JComboBox<>();//database.getStages().toArray());
 		database.getStages().forEach(stageComboBox::addItem);
@@ -145,8 +142,10 @@ public class PerformanceOverview extends JFrame implements Database.OnDataChange
 		mainPanel.add(bottomPanel, BorderLayout.SOUTH);
 
 		setContentPane(mainPanel);
-		setVisible(true);
+		setSize(350, 300);
 		setPerformance(performance);
+		if (point != null) setLocation(point);
+		setVisible(true);
 	}
 
 	private static GridBagConstraints constraints(int x, int y, double weight) {
@@ -169,7 +168,7 @@ public class PerformanceOverview extends JFrame implements Database.OnDataChange
 		return leftColumn;
 	}
 
-	public PerformanceOverview setPerformance(Performance performance) {
+	public PerformanceDialog setPerformance(Performance performance) {
 		shownPerformance = performance;
 		if (performance != null) {
 			// Select the current performing artist(s) in the list.
@@ -295,24 +294,5 @@ public class PerformanceOverview extends JFrame implements Database.OnDataChange
 		default void changedUpdate(DocumentEvent e) {
 			update();
 		}
-	}
-
-	/**
-	 * Notify all listeners that data in the database has changed.
-	 */
-	public void notifyDataChanged() {
-		onClosedListener.onClosed();
-	}
-
-	public void addListener(OnClosedListener onClosedListener) {
-		this.onClosedListener = onClosedListener;
-	}
-
-	@FunctionalInterface
-	public interface OnClosedListener {
-		/**
-		 * Called when something changed in the data. The type of change is unknown.
-		 */
-		void onClosed();
 	}
 }

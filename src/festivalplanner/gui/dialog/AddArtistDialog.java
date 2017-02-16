@@ -1,4 +1,4 @@
-package festivalplanner.gui.menu;
+package festivalplanner.gui.dialog;
 
 import festivalplanner.data.Artist;
 import festivalplanner.data.Database;
@@ -9,10 +9,10 @@ import java.awt.*;
 /**
  * Created by Maarten on 10/02/2017.
  */
-public class AddArtist extends JFrame {
+public class AddArtistDialog extends JDialog {
 
-    public AddArtist(Database database)
-    {
+    public AddArtistDialog(Database database) {
+        super(null, ModalityType.APPLICATION_MODAL);
         setSize(300, 400);
         setResizable(false);
         setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
@@ -20,7 +20,7 @@ public class AddArtist extends JFrame {
         JPanel mainPanel = new JPanel();
         setContentPane(mainPanel);
         //setUndecorated(true);
-        setVisible(true);
+        //setVisible(true);
         setLayout(null);
 
         JLabel naamLabel = new JLabel("Name:");
@@ -65,5 +65,8 @@ public class AddArtist extends JFrame {
             dispose();
         });
         add(cancel);
+        //Once setVisible is called on a dialog, the main thread is blocked.
+		//Keep this call last!
+        setVisible(true);
     }
 }

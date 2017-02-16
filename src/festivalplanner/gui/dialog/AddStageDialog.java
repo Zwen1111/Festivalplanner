@@ -1,4 +1,4 @@
-package festivalplanner.gui.menu;
+package festivalplanner.gui.dialog;
 
 import festivalplanner.data.Database;
 import festivalplanner.data.Stage;
@@ -7,12 +7,12 @@ import javax.swing.*;
 import java.awt.*;
 
 /**
- * Created by Maarten on 10/02/2017.
+ * @author Maarten Nieuwenhuize
  */
-public class AddStage extends JFrame {
+public class AddStageDialog extends JDialog {
 
-    public AddStage(Database database)
-    {
+    public AddStageDialog(Database database) {
+        super(null, ModalityType.APPLICATION_MODAL);
         setSize(300, 400);
         setResizable(false);
         setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
@@ -20,7 +20,7 @@ public class AddStage extends JFrame {
         JPanel mainPanel = new JPanel();
         setContentPane(mainPanel);
         //setUndecorated(true);
-        setVisible(true);
+        //setVisible(true);
         setLayout(null);
 
         JLabel naamLabel = new JLabel("Name:");
@@ -53,8 +53,8 @@ public class AddStage extends JFrame {
             dispose();
         });
         add(cancel);
-
-
-
+		//Once setVisible is called on a dialog, the main thread is blocked.
+		//Keep this call last!
+        setVisible(true);
     }
 }

@@ -3,8 +3,8 @@ package festivalplanner.gui;
 import festivalplanner.Main;
 import festivalplanner.data.Database;
 import festivalplanner.gui.simulator.Simulator;
-import festivalplanner.gui.menu.AddArtist;
-import festivalplanner.gui.menu.AddStage;
+import festivalplanner.gui.dialog.AddArtistDialog;
+import festivalplanner.gui.dialog.AddStageDialog;
 import festivalplanner.util.FileSystem;
 import festivalplanner.gui.table.CalendarTable;
 import festivalplanner.gui.table2d.CalendarTable2D;
@@ -107,11 +107,11 @@ public class GUIFrame extends JFrame implements Database.OnDataChangedListener{
 
 		JMenuItem stageMenuItem = new JMenuItem("Stage");
 		stageMenuItem.addActionListener(e -> {
-			new AddStage(database);
+			new AddStageDialog(database);
 		});
 		JMenuItem artistMenuItem = new JMenuItem("Artist");
 		artistMenuItem.addActionListener(e -> {
-			new AddArtist(database);
+			new AddArtistDialog(database);
 		});
 		addMenu.add(stageMenuItem);
 		addMenu.add(artistMenuItem);

@@ -59,18 +59,12 @@ public class SimulatorPanel extends JPanel implements MouseMotionListener, Mouse
 
         zoomInButton.addActionListener(e -> {
             simulator.setPosition(null);
-            simulator.setTransform(new AffineTransform());
             if ((simulator.getScaleY() < MAX_ZOOM_Y) && (simulator.getScaleX() < MAX_ZOOM_X)) {
                 double oldX = simulator.getScaleX();
                 double oldY = simulator.getScaleY();
                 simulator.setScaleX(oldX + 0.25);
                 simulator.setScaleY(oldY + 0.25);
             }
-            double oldX = simulator.getScaleX();
-            double oldY = simulator.getScaleY();
-            simulator.setScaleX(oldX + 0.25);
-            simulator.setScaleY(oldY + 0.25);
-            simulator.setPosition(null);
             this.repaint();
         });
 

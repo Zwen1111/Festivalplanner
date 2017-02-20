@@ -1,5 +1,7 @@
 package festivalplanner.gui.simulator;
 
+import festivalplanner.simulator.TileMap;
+
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
@@ -16,6 +18,7 @@ public class Simulator extends JPanel {
         super(null);
         setSize(1080,960);
         setName("Test for the simulator");
+		TileMap map = new TileMap("/Map+Colliosion.json");
     }
 
     public void paintComponent(Graphics g) {

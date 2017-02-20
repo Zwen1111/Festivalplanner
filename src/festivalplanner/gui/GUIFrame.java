@@ -48,9 +48,7 @@ public class GUIFrame extends JFrame implements Database.OnDataChangedListener{
 
 		CalendarTable panelTable = new CalendarTable(database);
 
-		Simulator simulator = new Simulator();
-
-
+		JPanel simulator = new SimulatorPanel();
 
 		tabs.addChangeListener(e -> {
             Component p = ((JTabbedPane) e.getSource()).getSelectedComponent();

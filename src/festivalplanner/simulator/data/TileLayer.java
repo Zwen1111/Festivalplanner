@@ -2,6 +2,7 @@ package festivalplanner.simulator.data;
 
 import javax.json.*;
 import javax.json.stream.JsonParser;
+import java.io.IOException;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
@@ -21,24 +22,45 @@ public class TileLayer {
 	private double alpha;
 	private String title;
 
-	public TileLayer(JsonObject layerJson) {
-		JsonArray dataArray = layerJson.getJsonArray("data");
-		data = new ArrayList<>(dataArray.size());
-		for (int i = 0; i < dataArray.size(); i++) {
-			data.add(dataArray.getInt(i));
+	public TileLayer(JsonObject layerJson) throws UnsupportedLayerTypeException {
+		String type = layerJson.getString("type");
+		if (type.equals("tilelayer")) {
+			JsonArray dataArray = layerJson.getJsonArray("data");
+			data = new ArrayList<>(dataArray.size());
+			for (int i = 0; i < dataArray.size(); i++) {
+				data.add(dataArray.getInt(i));
+			}
+			x = layerJson.getInt("x");
+			y = layerJson.getInt("y");
+			width = layerJson.getInt("width");
+			height = layerJson.getInt("height");
+			alpha = layerJson.getInt("opacity");
+			title = layerJson.getString("name");
+		} else {
+			throw new UnsupportedLayerTypeException("Unsupported layer type: " + type);
 		}
-		x = layerJson.getInt("x");
-		y = layerJson.getInt("y");
-		width = layerJson.getInt("width");
-		height = layerJson.getInt("height");
-		alpha = layerJson.getInt("opacity");
-		title = layerJson.getString("name");
-		System.out.print("");
 	}
 
-	public static void main(String[] args) {
-		StringReader source = new StringReader("{\"heigth\":30, \"layers\":[{\"data\":[290, 380]}]}");
-		JsonReader reader = Json.createReader(source);
-		new TileLayer(reader.readObject().getJsonArray("layers").getJsonObject(0));
+	public List<Integer> getData() {
+		return data;
+	}
+
+	public int getData(int index) {
+		return data.get(index);
+	}
+
+	public int getWidth() {
+		return width;
+	}
+
+	public int getHeight() {
+		return height;
+	}
+
+	public class UnsupportedLayerTypeException extends IOException {
+
+		public UnsupportedLayerTypeException(String message) {
+			super(message);
+		}
 	}
 }

@@ -3,16 +3,18 @@ package festivalplanner.gui.simulator;
 import festivalplanner.simulator.data.Tileset;
 
 import javax.json.JsonArray;
+import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Created by Maarten on 20/02/2017.
+ * @author Maarten Nieuwenhuize, Sander de Nooijer
  */
 public class TilesetManager {
-    List<Tileset> tilesets;
-    List<BufferedImage> images;
+
+    private List<Tileset> tilesets;
+    private List<BufferedImage> images;
 
     /**
      * makes the tilesetManager
@@ -47,7 +49,7 @@ public class TilesetManager {
      * @param gid the number of the tile wich is specified in the layaur
      * @return the image of the gid;
      */
-    public BufferedImage getImage(int gid) {
+    public Image getImage(int gid) {
 
         if(gid <= 0 || gid > images.size() ) {
             System.err.println("Gid doesn't exist");

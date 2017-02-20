@@ -32,11 +32,13 @@ public class Tileset {
               collums= tileset.getInt("columns");
               firstgid = tileset.getInt("firstgid");
               String imageName = tileset.getString("image");
-              image = ImageIO.read(getClass().getResourceAsStream("/tilesets/" + imageName));
+              imageName = imageName.substring(imageName.length()-4,imageName.length());
+             name = tileset.getString("name");
+              image = ImageIO.read(getClass().getResourceAsStream("/tilesets/" + name + imageName));
               imageHeight = tileset.getInt("imageheight");
               imageWidth = tileset.getInt("imagewidth");
               margin = tileset.getInt("margin");
-              name = tileset.getString("name");
+
               spacing = tileset.getInt("spacing");
               tileCount = tileset.getInt("tilecount");
               tileHeight = tileset.getInt("tileheight");

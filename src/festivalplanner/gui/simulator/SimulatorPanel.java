@@ -16,6 +16,8 @@ public class SimulatorPanel extends JPanel implements MouseMotionListener, Mouse
 
     private static final double MIN_ZOOM_X = 0.65;
     private static final double MIN_ZOOM_Y = 0.75;
+    private static final double MAX_ZOOM_X = 5.65;
+    private static final double MAX_ZOOM_Y = 5.75;
 
     private ArrayList<JButton> buttonArrayList;
     private Simulator simulator;
@@ -56,12 +58,14 @@ public class SimulatorPanel extends JPanel implements MouseMotionListener, Mouse
         });
 
         zoomInButton.addActionListener(e -> {
-            double oldX = simulator.getScaleX();
-            double oldY = simulator.getScaleY();
-            simulator.setScaleX(oldX + 0.25);
-            simulator.setScaleY(oldY + 0.25);
             simulator.setPosition(null);
             simulator.setTransform(new AffineTransform());
+            if ((simulator.getScaleY() < MAX_ZOOM_Y) && (simulator.getScaleX() < MAX_ZOOM_X)) {
+                double oldX = simulator.getScaleX();
+                double oldY = simulator.getScaleY();
+                simulator.setScaleX(oldX + 0.25);
+                simulator.setScaleY(oldY + 0.25);
+            }
             this.repaint();
         });
 

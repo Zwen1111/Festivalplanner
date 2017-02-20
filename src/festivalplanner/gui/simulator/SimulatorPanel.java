@@ -61,13 +61,11 @@ public class SimulatorPanel extends JPanel implements MouseMotionListener, Mouse
             simulator.setScaleX(oldX + 0.25);
             simulator.setScaleY(oldY + 0.25);
             simulator.setPosition(null);
-            simulator.setTransform(new AffineTransform());
             this.repaint();
         });
 
         zoomOutButton.addActionListener(e -> {
             simulator.setPosition(null);
-            simulator.setTransform(new AffineTransform());
             if ((simulator.getScaleY() > MIN_ZOOM_Y) && (simulator.getScaleX() > MIN_ZOOM_X)) {
                 double oldX = simulator.getScaleX();
                 double oldY = simulator.getScaleY();
@@ -121,8 +119,8 @@ public class SimulatorPanel extends JPanel implements MouseMotionListener, Mouse
 
     @Override
     public void mouseDragged(MouseEvent e) {
-        System.out.println("hoi2");
         simulator.setPosition(new Point2D.Double( e.getX() - mousePosition.getX()  ,  e.getY() - mousePosition.getY()));
+        mousePosition = new Point2D.Double(e.getX(), e.getY());
         this.repaint();
     }
 

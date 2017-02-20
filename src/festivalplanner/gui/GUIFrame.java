@@ -5,6 +5,7 @@ import festivalplanner.data.Database;
 import festivalplanner.gui.simulator.Simulator;
 import festivalplanner.gui.dialog.AddArtistDialog;
 import festivalplanner.gui.dialog.AddStageDialog;
+import festivalplanner.gui.simulator.SimulatorPanel;
 import festivalplanner.util.FileSystem;
 import festivalplanner.gui.table.CalendarTable;
 import festivalplanner.gui.table2d.CalendarTable2D;

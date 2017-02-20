@@ -52,7 +52,7 @@ public class TilesetManager {
     public Image getImage(int gid) {
 
         if(gid <= 0 || gid > images.size() ) {
-            System.err.println("Gid doesn't exist");
+            if (gid != 0) System.err.println("Gid doesn't exist");
             return null;
         }else return images.get(gid - 1);
     }

@@ -1,6 +1,5 @@
 package festivalplanner.simulator;
 
-import festivalplanner.gui.simulator.TilesetManager;
 import festivalplanner.simulator.data.TileLayer;
 
 import javax.json.Json;
@@ -23,6 +22,8 @@ public class TileMap {
 	private TilesetManager tilesetManager;
 	private List<TileLayer> layers;
 	private BufferedImage currentMap;
+	private int mapHeight;
+	private int mapWidth;
 
 	public TileMap(String location) {
 		try (FileReader source = new FileReader(location)) {
@@ -58,11 +59,15 @@ public class TileMap {
 			System.err.println("Could not build map: no layers.");
 			return;
 		}
-		currentMap = new BufferedImage(layers.get(0).getWidth() * 32, layers.get(0).getHeight() * 32,
+		currentMap = new BufferedImage(layers.get(0).getWidth() * tilesetManager.getLargestTileWidth(),
+				layers.get(0).getHeight() * tilesetManager.getLargestTileHeight(),
 				BufferedImage.TYPE_INT_RGB);
+		mapHeight = mapWidth = 0;
 
 		for (int i = 0; i < levels; i++) {
 			TileLayer testLayer = layers.get(i);
+			if (mapHeight < testLayer.getHeight()) mapHeight = testLayer.getHeight();
+			if (mapWidth < testLayer.getWidth()) mapWidth = testLayer.getWidth();
 			buildMap(currentMap, testLayer);
 		}
 	}
@@ -73,7 +78,8 @@ public class TileMap {
 			for (int y = 0; y < layer.getHeight(); y++) {
 				Image tileImage = tilesetManager.getImage(layer.getData(y * layer.getWidth() + x));
 				AffineTransform at = new AffineTransform();
-				at.translate(x * 32, y * 32);
+				at.translate(x * tilesetManager.getLargestTileWidth(),
+						y * tilesetManager.getLargestTileHeight());
 				//at.scale(0.5, 0.5);
 				g.drawImage(tileImage, at, null);
 			}
@@ -84,11 +90,16 @@ public class TileMap {
 		return currentMap;
 	}
 
-	public void draw(Graphics2D g) {
-		//g.drawImage(tilesetManager.getImage(5),new AffineTransform(),null);
-		//Test: draw layer 1:
-		//for (int i = 0; i < 5; i++) {
-		//	TileLayer testLayer = layers.get(i);
-		//}
+	public int getMapHeight() {
+		return mapHeight * tilesetManager.getLargestTileHeight();
+	}
+
+	/**
+	 * Returns the largest tile's width recorded while loading the TileSets.
+	 * Mostly, this value is the same for all sets.
+	 * @return the largest tile's width.
+	 */
+	public int getMapWidth() {
+		return mapWidth * tilesetManager.getLargestTileWidth();
 	}
 }

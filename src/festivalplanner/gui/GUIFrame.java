@@ -2,7 +2,6 @@ package festivalplanner.gui;
 
 import festivalplanner.Main;
 import festivalplanner.data.Database;
-import festivalplanner.gui.simulator.Simulator;
 import festivalplanner.gui.dialog.AddArtistDialog;
 import festivalplanner.gui.dialog.AddStageDialog;
 import festivalplanner.gui.simulator.SimulatorPanel;

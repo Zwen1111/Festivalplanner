@@ -2,36 +2,37 @@ package festivalplanner.gui.simulator;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
-import java.awt.event.MouseMotionListener;
-import java.awt.geom.AffineTransform;
+import java.awt.event.*;
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
 
 /**
- * Created by lars on 20-02-17.
+ * @author Lars Moesman
  */
-public class SimulatorPanel extends JPanel implements MouseMotionListener, MouseListener{
+public class SimulatorPanel extends JPanel implements MouseMotionListener, MouseListener, MouseWheelListener {
 
-    private static final double MIN_ZOOM_X = 0.65;
-    private static final double MIN_ZOOM_Y = 0.75;
-    private static final double MAX_ZOOM_X = 5.65;
-    private static final double MAX_ZOOM_Y = 5.75;
+    private static final double MIN_ZOOM = 0.65;
+    //private static final double MIN_ZOOM_Y = 0.75;
+    private static final double MAX_ZOOM = 5.65;
+    //private static final double MAX_ZOOM_Y = 5.75;
 
     private ArrayList<JButton> buttonArrayList;
-    private Simulator simulator;
+    private TileMapPanel tileMapPanel;
     private Point2D mousePosition;
 
     public SimulatorPanel() {
+    	setName("TileMapPanel");
         buttonArrayList = new ArrayList<>();
-        simulator = new Simulator();
+        tileMapPanel = new TileMapPanel();
+        tileMapPanel.setBackground(Color.black);
+
         mousePosition = new Point2D.Double(0, 0);
 
         SpringLayout springLayout = new SpringLayout();
         this.setLayout(springLayout);
-        simulator.addMouseMotionListener(this);
-        simulator.addMouseListener(this);
+        tileMapPanel.addMouseMotionListener(this);
+        tileMapPanel.addMouseListener(this);
+        tileMapPanel.addMouseWheelListener(this);
 
         JButton playButton = new JButton(new ImageIcon(getClass().getResource("/icon's/playIcon.png")));
         JButton zoomInButton = new JButton(new ImageIcon(getClass().getResource("/icon's/zoomInIcon.png")));
@@ -58,26 +59,28 @@ public class SimulatorPanel extends JPanel implements MouseMotionListener, Mouse
         });
 
         zoomInButton.addActionListener(e -> {
-            simulator.setPosition(null);
-            if ((simulator.getScaleY() < MAX_ZOOM_Y) && (simulator.getScaleX() < MAX_ZOOM_X)) {
-                double oldX = simulator.getScaleX();
-                double oldY = simulator.getScaleY();
-                simulator.setScaleX(oldX + 0.25);
-                simulator.setScaleY(oldY + 0.25);
-            }
+            //tileMapPanel.translateBy(null);
+            /*if ((tileMapPanel.getScaleY() < MAX_ZOOM_Y) && (tileMapPanel.getScaleX() < MAX_ZOOM_X)) {
+                double oldX = tileMapPanel.getScaleX();
+                double oldY = tileMapPanel.getScaleY();
+                tileMapPanel.setScaleX(oldX + 0.25);
+                tileMapPanel.setScaleY(oldY + 0.25);
+            }*/
+            if (tileMapPanel.getScale() < MAX_ZOOM) tileMapPanel.setScale(tileMapPanel.getScale() + 0.25);
             this.repaint();
         });
 
         zoomOutButton.addActionListener(e -> {
-            simulator.setPosition(null);
-            if ((simulator.getScaleY() > MIN_ZOOM_Y) && (simulator.getScaleX() > MIN_ZOOM_X)) {
-                double oldX = simulator.getScaleX();
-                double oldY = simulator.getScaleY();
-                simulator.setScaleX(oldX - 0.25);
-                simulator.setScaleY(oldY - 0.25);
-            }
-                this.repaint();
-        });
+			//tileMapPanel.translateBy(null);
+            /*if ((tileMapPanel.getScaleY() > MIN_ZOOM_Y) && (tileMapPanel.getScaleX() > MIN_ZOOM_X)) {
+                double oldX = tileMapPanel.getScaleX();
+                double oldY = tileMapPanel.getScaleY();
+                tileMapPanel.setScaleX(oldX - 0.25);
+                tileMapPanel.setScaleY(oldY - 0.25);
+            }*/
+			if (tileMapPanel.getScale() > MIN_ZOOM) tileMapPanel.setScale(tileMapPanel.getScale() - 0.25);
+			this.repaint();
+		});
 
         loadButtons();
 
@@ -85,10 +88,10 @@ public class SimulatorPanel extends JPanel implements MouseMotionListener, Mouse
         timeLabel.setFont(new Font(timeLabel.getFont().getName(), timeLabel.getFont().getStyle(), 20));
         timeLabel.setForeground(Color.WHITE);
 
-        springLayout.putConstraint(SpringLayout.NORTH, simulator, 0, SpringLayout.NORTH, this);
-        springLayout.putConstraint(SpringLayout.EAST, simulator, 0, SpringLayout.EAST, this);
-        springLayout.putConstraint(SpringLayout.WEST, simulator, 0, SpringLayout.WEST, this);
-        springLayout.putConstraint(SpringLayout.SOUTH, simulator, 0, SpringLayout.SOUTH, this);
+        springLayout.putConstraint(SpringLayout.NORTH, tileMapPanel, 0, SpringLayout.NORTH, this);
+        springLayout.putConstraint(SpringLayout.EAST, tileMapPanel, 0, SpringLayout.EAST, this);
+        springLayout.putConstraint(SpringLayout.WEST, tileMapPanel, 0, SpringLayout.WEST, this);
+        springLayout.putConstraint(SpringLayout.SOUTH, tileMapPanel, 0, SpringLayout.SOUTH, this);
 
         springLayout.putConstraint(SpringLayout.NORTH, timeLabel, -100, SpringLayout.SOUTH, this);
         springLayout.putConstraint(SpringLayout.HORIZONTAL_CENTER, timeLabel, 0, SpringLayout.HORIZONTAL_CENTER, this);
@@ -106,7 +109,7 @@ public class SimulatorPanel extends JPanel implements MouseMotionListener, Mouse
         add(zoomInButton);
         add(zoomOutButton);
         add(timeLabel);
-        add(simulator);
+        add(tileMapPanel);
 
 
     }
@@ -123,7 +126,7 @@ public class SimulatorPanel extends JPanel implements MouseMotionListener, Mouse
 
     @Override
     public void mouseDragged(MouseEvent e) {
-        simulator.setPosition(new Point2D.Double( e.getX() - mousePosition.getX()  ,  e.getY() - mousePosition.getY()));
+        tileMapPanel.translateBy(new Point2D.Double( e.getX() - mousePosition.getX()  ,  e.getY() - mousePosition.getY()));
         mousePosition = new Point2D.Double(e.getX(), e.getY());
         this.repaint();
     }
@@ -157,4 +160,16 @@ public class SimulatorPanel extends JPanel implements MouseMotionListener, Mouse
     public void mouseExited(MouseEvent e) {
 
     }
+
+	@Override
+	public void mouseWheelMoved(MouseWheelEvent e) {
+    	double value = e.getPreciseWheelRotation() * 0.1;
+		System.out.println("wheel: " + value);
+    	if ((value < 0 && tileMapPanel.getScale() > MIN_ZOOM) ||
+				(value > 0 && tileMapPanel.getScale() < MAX_ZOOM)) {
+			tileMapPanel.scaleBy(value);
+			System.out.println("scaled");
+			repaint();
+		}
+	}
 }

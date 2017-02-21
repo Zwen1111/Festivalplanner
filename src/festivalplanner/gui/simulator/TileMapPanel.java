@@ -41,14 +41,34 @@ public class TileMapPanel extends JPanel {
 	public void paintComponent(Graphics g) {
 		super.paintComponent(g);
 		Graphics2D g2d = (Graphics2D) g;
+		//The width and height of the panel are only known on the first layout.
+		//The smart-scaling can only be done once panel size is known (= paintComponent being called).
 		if (!init) {
-			//Center on screen once panel size is known.
-			translateBy(0, 0);
+			smartScale();
 			init = true;
 		}
 		g2d.translate(translateX, translateY);
 		g2d.scale(scale, scale);
 		g2d.drawImage(map.getMapImage(), null, null);
+	}
+
+	private void smartScale() {
+		//Scale until the map matches the screen's height and/or width.
+		//First, find the smallest distance to scale: either the height or width
+		//of the screen. Then calculate the scale.
+		double xdiff = Math.abs(getWidth() - map.getMapWidth());
+		double ydiff = Math.abs(getHeight() - map.getMapHeight());
+		if (ydiff <= xdiff) {
+			//The screen is more width (or equal to) than the map.
+			//Scale the map to match height of the screen.
+			scale = (double) getHeight() / map.getMapHeight();
+		} else {
+			//The screen has more height than the map.
+			//Scale the map to match width of the screen.
+			scale = map.getMapWidth() / getWidth();
+		}
+		//Then, center the map on the screen.
+		translateBy(0, 0);
 	}
 
 	public void scaleBy(double amount) {

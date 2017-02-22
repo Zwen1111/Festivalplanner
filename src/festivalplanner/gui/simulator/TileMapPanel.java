@@ -4,20 +4,25 @@ import festivalplanner.simulator.TileMap;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.*;
 import java.awt.geom.Point2D;
 
 /**
- * The TileMapPanel displays a TileMap.
- * The class has hooks to set the scaling of the map, as well as the offset position.
+ * The TileMapPanel displays a TileMap. The map can be dragged and zoomed using mouse
+ * input, but also exports hooks to control these values.
  * If the available size is more than the map's (scaled) size, the panel will center it.
  * If there is less room, only a part of the map will be visible and the user will be
  * allowed to move the map using translateBy(). The map is kept between the bounds.
  *
  * @author Coen Boelhouwers
  */
-public class TileMapPanel extends JPanel {
+public class TileMapPanel extends JPanel implements MouseMotionListener, MouseWheelListener, MouseListener {
+
+	private static final double MIN_ZOOM = 0.65;
+	private static final double MAX_ZOOM = 5.65;
 
 	private TileMap map;
+	private Point2D mousePosition;
 	private double scale;
 	private double translateX;
 	private double translateY;
@@ -28,6 +33,10 @@ public class TileMapPanel extends JPanel {
 		map = new TileMap(getClass().getResource("/Map+Colliosion.json").getPath());
 		map.buildMap(6);
 		scale = 0.65;
+		mousePosition = new Point2D.Double(0, 0);
+		addMouseMotionListener(this);
+		addMouseListener(this);
+		addMouseWheelListener(this);
 	}
 
 	public static void main(String[] args) {
@@ -99,6 +108,7 @@ public class TileMapPanel extends JPanel {
 			translateY = 0;
 		else if (translateY + map.getMapHeight() * scale < getHeight())
 			translateY = getHeight() - map.getMapHeight() * scale;
+		getParent().repaint();
 	}
 
 	public double getScale() {
@@ -106,8 +116,56 @@ public class TileMapPanel extends JPanel {
 	}
 
 	public void setScale(double scale) {
-		this.scale = scale;
+		if (scale < MIN_ZOOM) this.scale = MIN_ZOOM;
+		else if (scale > MAX_ZOOM) this.scale = MAX_ZOOM;
+		else this.scale = scale;
 		//Check map position after zooming in/out.
 		translateBy(0, 0);
+	}
+
+	@Override
+	public void mouseDragged(MouseEvent e) {
+		translateBy(new Point2D.Double( e.getX() - mousePosition.getX()  ,  e.getY() - mousePosition.getY()));
+		mousePosition = new Point2D.Double(e.getX(), e.getY());
+	}
+
+	@Override
+	public void mouseClicked(MouseEvent e) {
+
+	}
+
+	@Override
+	public void mousePressed(MouseEvent e) {
+		mousePosition = new Point2D.Double(e.getX(), e.getY());
+	}
+
+	@Override
+	public void mouseReleased(MouseEvent e) {
+
+	}
+
+	@Override
+	public void mouseEntered(MouseEvent e) {
+
+	}
+
+	@Override
+	public void mouseExited(MouseEvent e) {
+
+	}
+
+	@Override
+	public void mouseMoved(MouseEvent e) {
+
+	}
+
+	@Override
+	public void mouseWheelMoved(MouseWheelEvent e) {
+		double value = e.getPreciseWheelRotation() * -0.1;
+		if ((value < 0 && getScale() > MIN_ZOOM) ||
+				(value > 0 && getScale() < MAX_ZOOM)) {
+			scaleBy(value);
+			//repaint();
+		}
 	}
 }

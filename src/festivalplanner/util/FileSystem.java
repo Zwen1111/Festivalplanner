@@ -34,7 +34,7 @@ public class FileSystem implements Database.OnDataChangedListener {
     }
 
 
-    public Boolean save() {
+    public boolean save() {
         if (file == null) {
             return saveAs();
         } else {

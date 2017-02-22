@@ -163,12 +163,10 @@ public class SimulatorPanel extends JPanel implements MouseMotionListener, Mouse
 
 	@Override
 	public void mouseWheelMoved(MouseWheelEvent e) {
-    	double value = e.getPreciseWheelRotation() * 0.1;
-		System.out.println("wheel: " + value);
+    	double value = e.getPreciseWheelRotation() * -0.1;
     	if ((value < 0 && tileMapPanel.getScale() > MIN_ZOOM) ||
 				(value > 0 && tileMapPanel.getScale() < MAX_ZOOM)) {
 			tileMapPanel.scaleBy(value);
-			System.out.println("scaled");
 			repaint();
 		}
 	}

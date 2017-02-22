@@ -21,10 +21,11 @@ public class TileMapPanel extends JPanel {
 	private double scale;
 	private double translateX;
 	private double translateY;
-	private boolean init = false;
+	private boolean init;
 
 	public TileMapPanel() {
 		super(null);
+		init = false;
 		map = new TileMap(getClass().getResource("/Map+Colliosion.json").getPath());
 		map.buildMap(6);
 		scale = 0.65;

@@ -48,7 +48,7 @@ public class FileSystem implements Database.OnDataChangedListener {
         }
     }
 
-    public Boolean saveAs() {
+    public boolean saveAs() {
 
         JFileChooser fc = new JFileChooser();
 

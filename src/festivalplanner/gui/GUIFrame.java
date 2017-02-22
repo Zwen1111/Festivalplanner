@@ -27,7 +27,7 @@ public class GUIFrame extends JFrame implements Database.OnDataChangedListener{
 
 	@Override
 	public void onDataChanged() {
-		setTitle(fileSystem.getNameFile() + " - " + APP_NAME + " v" + APP_VERSION);
+		setTitle(fileSystem.getFileName() + " - " + APP_NAME + " v" + APP_VERSION);
 		repaint();
 	}
 
@@ -35,7 +35,7 @@ public class GUIFrame extends JFrame implements Database.OnDataChangedListener{
 		database = new Database();
 
 		fileSystem = new FileSystem(database);
-		setTitle(fileSystem.getNameFile() + " - " + APP_NAME + " v" + APP_VERSION);
+		setTitle(fileSystem.getFileName() + " - " + APP_NAME + " v" + APP_VERSION);
 
 		Main.test(database);
 		JTabbedPane tabs = new JTabbedPane(JTabbedPane.SCROLL_TAB_LAYOUT);

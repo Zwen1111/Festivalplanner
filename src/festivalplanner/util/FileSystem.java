@@ -112,7 +112,7 @@ public class FileSystem implements Database.OnDataChangedListener {
         }
     }
 
-    public String getNameFile() {
+    public String getFileName() {
         if (file == null) {
             return "unnamed." + DATABASE_EXTENSION;
         } else return file.getName();

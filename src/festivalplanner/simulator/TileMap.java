@@ -24,6 +24,8 @@ public class TileMap {
 	private BufferedImage currentMap;
 	private int mapHeight;
 	private int mapWidth;
+	private int tileHeight;
+	private int tilewidth;
 
 	public TileMap(String location) {
 		try (FileReader source = new FileReader(location)) {
@@ -31,6 +33,10 @@ public class TileMap {
 
 			//Tile sets:
 			tilesetManager = new TilesetManager(baseObject.getJsonArray("tilesets"));
+
+			//tileheight and width
+			tilewidth = baseObject.getInt("tilewidth");
+			tileHeight = baseObject.getInt("tileheight");
 
 			//Layers:
 			JsonArray layerArray = baseObject.getJsonArray("layers");
@@ -59,8 +65,8 @@ public class TileMap {
 			System.err.println("Could not build map: no layers.");
 			return;
 		}
-		currentMap = new BufferedImage(layers.get(0).getWidth() * tilesetManager.getLargestTileWidth(),
-				layers.get(0).getHeight() * tilesetManager.getLargestTileHeight(),
+		currentMap = new BufferedImage(layers.get(0).getWidth() * tilewidth,
+				layers.get(0).getHeight() * tileHeight,
 				BufferedImage.TYPE_INT_RGB);
 		mapHeight = mapWidth = 0;
 
@@ -78,8 +84,8 @@ public class TileMap {
 			for (int y = 0; y < layer.getHeight(); y++) {
 				Image tileImage = tilesetManager.getImage(layer.getData(y * layer.getWidth() + x));
 				AffineTransform at = new AffineTransform();
-				at.translate(x * tilesetManager.getLargestTileWidth(),
-						y * tilesetManager.getLargestTileHeight());
+				at.translate(x * tilewidth,
+						y * tileHeight);
 				//at.scale(0.5, 0.5);
 				g.drawImage(tileImage, at, null);
 			}
@@ -91,7 +97,7 @@ public class TileMap {
 	}
 
 	public int getMapHeight() {
-		return mapHeight * tilesetManager.getLargestTileHeight();
+		return mapHeight * tileHeight;
 	}
 
 	/**
@@ -100,6 +106,6 @@ public class TileMap {
 	 * @return the largest tile's width.
 	 */
 	public int getMapWidth() {
-		return mapWidth * tilesetManager.getLargestTileWidth();
+		return mapWidth * tilewidth;
 	}
 }

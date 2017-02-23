@@ -15,8 +15,6 @@ public class TilesetManager {
 
     private List<Tileset> tilesets;
     private List<BufferedImage> images;
-    private int largestTileHeight;
-    private int largestTileWidth;
 
     /**
      * makes the tilesetManager
@@ -33,8 +31,6 @@ public class TilesetManager {
 
         for (Tileset tileset : tilesets) {
             BufferedImage image = tileset.getImage();
-            if (largestTileHeight < tileset.getTileHeight()) largestTileHeight = tileset.getTileHeight();
-			if (largestTileWidth < tileset.getTileWidth()) largestTileWidth = tileset.getTileWidth();
             int rows = (int) Math.floor(tileset.getImageHeight() / tileset.getTileHeight());
                 for (int y = 0; y < rows; y++) {
                     for (int x = 0; x < tileset.getCollums(); x++) {
@@ -61,21 +57,4 @@ public class TilesetManager {
         }else return images.get(gid - 1);
     }
 
-	/**
-	 * Returns the largest tile's height recorded while loading the TileSets.
-	 * Mostly, this value is the same for all sets.
-	 * @return the largest tile's height.
-	 */
-	public int getLargestTileHeight() {
-    	return largestTileHeight;
-	}
-
-	/**
-	 * Returns the largest tile's width recorded while loading the TileSets.
-	 * Mostly, this value is the same for all sets.
-	 * @return the largest tile's width.
-	 */
-	public int getLargestTileWidth() {
-    	return largestTileWidth;
-	}
 }

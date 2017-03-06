@@ -9,7 +9,7 @@ import java.util.ArrayList;
 /**
  * @author Lars Moesman
  */
-public class SimulatorPanel extends JPanel implements MouseMotionListener, MouseListener, MouseWheelListener {
+public class SimulatorPanel extends JPanel implements MouseMotionListener, MouseListener, MouseWheelListener,ActionListener {
 
     private static final double MIN_ZOOM = 0.65;
     //private static final double MIN_ZOOM_Y = 0.75;
@@ -112,6 +112,9 @@ public class SimulatorPanel extends JPanel implements MouseMotionListener, Mouse
         add(tileMapPanel);
 
 
+
+        int fps = 60;
+        new Timer(fps/1000,this).start();
     }
 
     public void loadButtons() {
@@ -172,4 +175,10 @@ public class SimulatorPanel extends JPanel implements MouseMotionListener, Mouse
 			repaint();
 		}
 	}
+
+    @Override
+    public void actionPerformed(ActionEvent e) {
+
+        repaint();
+    }
 }

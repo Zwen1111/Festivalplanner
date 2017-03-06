@@ -26,7 +26,7 @@ public class TileMapPanel extends JPanel {
 	public TileMapPanel() {
 		super(null);
 		init = false;
-		map = new TileMap(getClass().getResource("/Map+Colliosion.json").getPath());
+		map = new TileMap(getClass().getResource("/maps/Map+Colliosion.json").getPath());
 		map.buildMap(6);
 		scale = 0.65;
 	}

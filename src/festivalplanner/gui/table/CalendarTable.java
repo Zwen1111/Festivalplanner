@@ -102,16 +102,14 @@ public class CalendarTable extends JPanel implements Database.OnDataChangedListe
             this.repaint();
         });
 
-        mainScreen = new JPanel(new BorderLayout());
-        mainScreen.add(new JScrollPane(table), BorderLayout.CENTER);
+        this.setLayout(new BorderLayout());
+        this.add(new JScrollPane(table), BorderLayout.CENTER);
 
         JPanel bottemScreen = new JPanel();
 
         bottemScreen.add(addButton);
         bottemScreen.add(stageComboBox);
-        mainScreen.add(bottemScreen, BorderLayout.SOUTH);
-
-        this.add(mainScreen);
+        this.add(bottemScreen, BorderLayout.SOUTH);
     }
 
     public void fillComboBox() {

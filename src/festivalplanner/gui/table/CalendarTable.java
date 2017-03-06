@@ -22,20 +22,19 @@ public class CalendarTable extends JPanel implements Database.OnDataChangedListe
 
     private AbstractTableModel model;
     private ArrayList<Performance> performancesSorted;
-    private Database database;
     private JPanel mainScreen;
     private int index;
     private JComboBox stageComboBox;
     private ArrayList<String> comboBoxItems;
 
-    public CalendarTable(Database database) {
+    public CalendarTable() {
         JTable table = new JTable();
         stageComboBox = new JComboBox();
-        AddPerformanceButton addButton = new AddPerformanceButton(database);
+        AddPerformanceButton addButton = new AddPerformanceButton();
         setName("Table");
-        this.database = database;
         index = 0;
         comboBoxItems = new ArrayList<>();
+        performancesSorted = new ArrayList<>();
 
         filterPerformances();
 
@@ -115,7 +114,7 @@ public class CalendarTable extends JPanel implements Database.OnDataChangedListe
     }
 
     public void fillComboBox() {
-        for (Stage stage : database.getStages()) {
+        for (Stage stage : Database.getStages()) {
             if (!comboBoxItems.contains(stage.getName())) {
                 comboBoxItems.add(stage.getName());
                 stageComboBox.addItem(stage.getName());
@@ -125,7 +124,7 @@ public class CalendarTable extends JPanel implements Database.OnDataChangedListe
 
     public void filterByStage(Stage stage) {
         performancesSorted = new ArrayList<>();
-        for (Performance p : database.getPerformances()) {
+        for (Performance p : Database.getPerformances()) {
             if (p.getStage().getName().equals(stage.getName())) {
                 performancesSorted.add(p);
             }
@@ -133,7 +132,7 @@ public class CalendarTable extends JPanel implements Database.OnDataChangedListe
     }
 
     public void filterPerformances() {
-        List<Stage> stages = database.getStages();
+        List<Stage> stages = Database.getStages();
         if (stages.size() > 0) {
             filterByStage(stages.get(index));
         }
@@ -156,11 +155,11 @@ public class CalendarTable extends JPanel implements Database.OnDataChangedListe
     @Override
     public void onDataChanged() {
 
-        if (database.getPerformances().size() == 0) {
+        if (Database.getPerformances().size() == 0) {
             index = 0;
             performancesSorted = new ArrayList<>();
         }
-        if (database.getStages().size() == 0) {
+        if (Database.getStages().size() == 0) {
             stageComboBox.removeAllItems();
             comboBoxItems.clear();
         } else {

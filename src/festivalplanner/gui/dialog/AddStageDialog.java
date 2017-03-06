@@ -11,7 +11,7 @@ import java.awt.*;
  */
 public class AddStageDialog extends JDialog {
 
-    public AddStageDialog(Database database) {
+    public AddStageDialog() {
         super(null, ModalityType.APPLICATION_MODAL);
         setSize(300, 400);
         setResizable(false);
@@ -36,13 +36,13 @@ public class AddStageDialog extends JDialog {
         confirm.setBounds(30,getHeight() - 100, 100,50);
         confirm.addActionListener(e -> {
             Stage newStage = new Stage(naam.getText());
-            for (Stage stage : database.getStages()) {
+            for (Stage stage : Database.getStages()) {
                 if(newStage.equals(stage)) {
                     JOptionPane.showMessageDialog(null,"This stage already exists");
                     return;
                 }
             }
-            database.addStage(newStage);
+            Database.addStage(newStage);
             dispose();
         });
         add(confirm);

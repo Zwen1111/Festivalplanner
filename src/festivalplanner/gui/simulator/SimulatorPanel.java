@@ -2,12 +2,14 @@ package festivalplanner.gui.simulator;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.ArrayList;
 
 /**
  * @author Lars Moesman
  */
-public class SimulatorPanel extends JPanel {
+public class SimulatorPanel extends JPanel implements ActionListener {
 
     private ArrayList<JButton> buttonArrayList;
     private TileMapPanel tileMapPanel;

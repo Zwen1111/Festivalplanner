@@ -31,22 +31,18 @@ public class GUIFrame extends JFrame implements Database.OnDataChangedListener{
 	}
 
 	public GUIFrame() {
-
-		fileSystem = new FileSystem();
-		setTitle(fileSystem.getFileName() + " - " + APP_NAME + " v" + APP_VERSION);
+		setTitle(APP_NAME + " v" + APP_VERSION);
 
 		//Main.test(Database);
 		JTabbedPane tabs = new JTabbedPane(JTabbedPane.SCROLL_TAB_LAYOUT);
 
 		JPanel mainPanel = new JPanel(new BorderLayout());
 
-
-
 		CalendarTable2D panel2d = new CalendarTable2D();
-
 		CalendarTable panelTable = new CalendarTable();
-
 		JPanel simulator = new SimulatorPanel();
+
+		fileSystem = new FileSystem();
 
 		tabs.addChangeListener(e -> {
             Component p = ((JTabbedPane) e.getSource()).getSelectedComponent();
@@ -73,7 +69,6 @@ public class GUIFrame extends JFrame implements Database.OnDataChangedListener{
 
 		JMenuItem newAgenda = new JMenuItem("New");
 		newAgenda.addActionListener(e -> {
-			Database.notifyDataChanged();
 			fileSystem.newCalendar();
 			repaint();
 		});

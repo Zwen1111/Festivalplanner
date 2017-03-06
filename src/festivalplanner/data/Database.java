@@ -34,7 +34,7 @@ public class Database implements Serializable {
 	public static void addArtist(Artist artist) {
 		if (!artists.contains(artist)) {
 			artists.add(artist);
-			notifyDataChanged();
+			notifyDataChanged("Added Artist: " + artist);
 		}
 	}
 
@@ -50,7 +50,7 @@ public class Database implements Serializable {
 		performances.add(performance);
 		addArtists(performance.getArtists());
 		addStage(performance.getStage());
-		notifyDataChanged();
+		notifyDataChanged("Added Performance: " + performance);
 	}
 
 	public static void addPerformances(Collection<Performance> performances) {
@@ -60,7 +60,7 @@ public class Database implements Serializable {
 	public static void addStage(Stage stage) {
 		if (!stages.contains(stage)) {
 			stages.add(stage);
-			notifyDataChanged();
+			notifyDataChanged("Added Stage: " + stage);
 		}
 	}
 
@@ -71,10 +71,12 @@ public class Database implements Serializable {
 	public static void clearPerformances() {
 		performances.clear();
 		artists.clear();
+		notifyDataChanged("Cleared all Performances and Artists");
 	}
 
 	public static void clearStages() {
 		stages.clear();
+		notifyDataChanged("Cleared all stages");
 	}
 
 	public static List<Artist> getArtists() {
@@ -134,7 +136,7 @@ public class Database implements Serializable {
 		int numerOfPerformance = performances.indexOf(performance);
 		if (performances.get(numerOfPerformance).equals(performance)) {
 			performances.remove(numerOfPerformance);
-			notifyDataChanged();
+			notifyDataChanged("Removed Performance: " + performance);
 			return true;
 		} else return false;
 	}
@@ -145,6 +147,15 @@ public class Database implements Serializable {
 	 * Notify all listeners that data in the database has changed.
 	 */
 	public static void notifyDataChanged() {
+		notifyDataChanged(null);
+	}
+
+	/**
+	 * Notify all listeners that data in the database has changed.
+	 *
+	 */
+	public static void notifyDataChanged(String message) {
+		System.out.println("Data changed: " + message);
 		listeners.forEach(OnDataChangedListener::onDataChanged);
 	}
 

@@ -85,7 +85,7 @@ public class SimulatorPanel extends JPanel implements ActionListener {
 
 
         int fps = 60;
-        new Timer(fps/1000,this).start();
+        new Timer(1000/fps,this).start();
     }
 
     public void loadButtons() {

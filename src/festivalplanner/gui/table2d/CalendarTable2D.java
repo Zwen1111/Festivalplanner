@@ -58,6 +58,10 @@ public class CalendarTable2D extends JPanel implements Database.OnDataChangedLis
         tableWidth = getWidth() - beginTableX;
 
 
+        int amountOfStages = database.getStages().size();
+        int stageWidth = ((tableWidth - widthTimeColum) / amountOfStages) ;
+        tableWidth = (tableWidth / amountOfStages) * amountOfStages;
+
         /*makes the background of the agenda excluding the border*/
         int heightRow = (int) Math.floor(tableHeight / hour);
         int currentYRow = beginTableY;
@@ -103,12 +107,11 @@ public class CalendarTable2D extends JPanel implements Database.OnDataChangedLis
 
             g2d.setFont(new Font(Font.SERIF, Font.BOLD, 20));
 
-        int amountOfStages = database.getStages().size();
         for (int i = 0; i < amountOfStages; i++) {
 
             g2d.setColor(Color.WHITE);
 
-            int stageWidth = ((tableWidth - widthTimeColum) / amountOfStages) ;
+
             String nameStage = database.getStages().get(i).getName();
             String croppedNameStage = "";
             if(nameStage.length() < stageWidth / 12)

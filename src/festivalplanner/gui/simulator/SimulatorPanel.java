@@ -67,7 +67,6 @@ public class SimulatorPanel extends JPanel implements MouseMotionListener, Mouse
                 tileMapPanel.setScaleY(oldY + 0.25);
             }*/
             if (tileMapPanel.getScale() < MAX_ZOOM) tileMapPanel.setScale(tileMapPanel.getScale() + 0.25);
-            this.repaint();
         });
 
         zoomOutButton.addActionListener(e -> {
@@ -79,7 +78,6 @@ public class SimulatorPanel extends JPanel implements MouseMotionListener, Mouse
                 tileMapPanel.setScaleY(oldY - 0.25);
             }*/
 			if (tileMapPanel.getScale() > MIN_ZOOM) tileMapPanel.setScale(tileMapPanel.getScale() - 0.25);
-			this.repaint();
 		});
 
         loadButtons();
@@ -131,7 +129,6 @@ public class SimulatorPanel extends JPanel implements MouseMotionListener, Mouse
     public void mouseDragged(MouseEvent e) {
         tileMapPanel.translateBy(new Point2D.Double( e.getX() - mousePosition.getX()  ,  e.getY() - mousePosition.getY()));
         mousePosition = new Point2D.Double(e.getX(), e.getY());
-        this.repaint();
     }
 
     @Override
@@ -172,13 +169,12 @@ public class SimulatorPanel extends JPanel implements MouseMotionListener, Mouse
 				(value > 0 && tileMapPanel.getScale() < MAX_ZOOM)) {
 			tileMapPanel.scaleBy(value);
 			System.out.println("scaled");
-			repaint();
 		}
 	}
 
     @Override
     public void actionPerformed(ActionEvent e) {
-
+        tileMapPanel.update();
         repaint();
     }
 }

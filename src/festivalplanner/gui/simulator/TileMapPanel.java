@@ -31,12 +31,8 @@ public class TileMapPanel extends JPanel {
 		scale = 0.65;
 	}
 
-	public static void main(String[] args) {
-		JFrame frame = new JFrame();
-		frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-		frame.setSize(1000, 1000);
-		frame.setVisible(true);
-		frame.setContentPane(new SimulatorPanel());
+	public void update() {
+
 	}
 
 	public void paintComponent(Graphics g) {
@@ -111,4 +107,5 @@ public class TileMapPanel extends JPanel {
 		//Check map position after zooming in/out.
 		translateBy(0, 0);
 	}
+
 }

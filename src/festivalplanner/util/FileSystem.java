@@ -96,10 +96,11 @@ public class FileSystem implements Database.OnDataChangedListener {
                 try (ObjectInputStream input = new ObjectInputStream(new FileInputStream(fc.getSelectedFile()))) {
                     try {
 						Collection<Performance> newPerformances = (Collection<Performance>) input.readObject();
+						//Successful read. Only now replace the performances.
+						this.file = fc.getSelectedFile();
 						Database.clearPerformances();
 						Database.addPerformances(newPerformances);
 						hasDataChanged = false;
-						this.file = fc.getSelectedFile();
 					} catch (InvalidClassException e) {
 						JOptionPane.showMessageDialog(null, "There seems to be a mismatch" +
 										" of versions between the software. Sadly, we cannot recover the data.",

@@ -26,7 +26,7 @@ public class FileSystem implements Database.OnDataChangedListener {
     public void newCalendar() {
         if(closeCurrentCalendar()) {
             file = null;
-            Database.clear();
+            Database.clearPerformances();
             Database.notifyDataChanged();
         }
     }
@@ -94,7 +94,7 @@ public class FileSystem implements Database.OnDataChangedListener {
             if (returnVal == JFileChooser.APPROVE_OPTION) {
                 this.file = fc.getSelectedFile();
                 try (ObjectInputStream input = new ObjectInputStream(new FileInputStream(fc.getSelectedFile()))) {
-                    Database.clear();
+                    Database.clearPerformances();
                     try {
 						Database.addPerformances((Collection<Performance>) input.readObject());
 					} catch (InvalidClassException e) {

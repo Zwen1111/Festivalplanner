@@ -68,10 +68,13 @@ public class Database implements Serializable {
 		stages.forEach(Database::addStage);
 	}
 
-	public static void clear() {
+	public static void clearPerformances() {
 		performances.clear();
-		stages.clear();
 		artists.clear();
+	}
+
+	public static void clearStages() {
+		stages.clear();
 	}
 
 	public static List<Artist> getArtists() {

@@ -37,35 +37,32 @@ public class PerformanceDialog extends JDialog implements Database.OnDataChanged
 	private boolean startTimeValid;
 	private boolean endTimeValid;
 
-	private Database database;
 	private Performance shownPerformance;
 
 	/**
 	 * The PerformanceDialog is a detail-pop-up of a single performance.
 	 * <p/>
 	 * The pop-up can be initialized w/o a performance. In the later case, a new performance
-	 * will be created and added to the database once the user hits confirm.
+	 * will be created and added to the Database once the user hits confirm.
 	 *
-	 * @param database a reference to the database.
 	 * @param performance the performance to show, or null if a new one should be created.
 	 */
-	public PerformanceDialog(Database database, Performance performance, Point point) {
+	public PerformanceDialog(Performance performance, Point point) {
 		super(null, ModalityType.APPLICATION_MODAL);
-
-		this.database = database;
+		
 		this.startTime = LocalTime.now();
 		this.endTime = LocalTime.now();
 
-		artistJList = setupArtistsList(database);
+		artistJList = setupArtistsList();
 
 		JButton newArtistButton = new JButton("New");
-		newArtistButton.addActionListener(l -> new AddArtistDialog(database));
+		newArtistButton.addActionListener(l -> new AddArtistDialog());
 
 		JButton newStageButton = new JButton("New");
-		newStageButton.addActionListener(l -> new AddStageDialog(database));
+		newStageButton.addActionListener(l -> new AddStageDialog());
 
-		stageComboBox = new JComboBox<>();//database.getStages().toArray());
-		database.getStages().forEach(stageComboBox::addItem);
+		stageComboBox = new JComboBox<>();//Database.getStages().toArray());
+		Database.getStages().forEach(stageComboBox::addItem);
 		stageComboBox.addItemListener(l -> updateFields());
 
 		startTimeField = new JTextField();
@@ -128,7 +125,7 @@ public class PerformanceDialog extends JDialog implements Database.OnDataChanged
 
 		// Make sure that the genre and popularity are constant updated as data changes (internal and external).
 		artistJList.addListSelectionListener(e -> updateFields());
-		database.addOnDataChangedListener(this);
+		Database.addOnDataChangedListener(this);
 
 		// Initialize fields.
 		updateFields();
@@ -172,14 +169,14 @@ public class PerformanceDialog extends JDialog implements Database.OnDataChanged
 		shownPerformance = performance;
 		if (performance != null) {
 			// Select the current performing artist(s) in the list.
-			List<Artist> artists = database.getArtists();
+			List<Artist> artists = Database.getArtists();
 			artistJList.removeSelectionInterval(0, artists.size() - 1);
 			performance.getArtists().forEach(artist -> {
-				int index = database.getArtists().indexOf(artist);
+				int index = Database.getArtists().indexOf(artist);
 				artistJList.addSelectionInterval(index, index);
 			});
 
-			stageComboBox.setSelectedIndex(database.getStages().indexOf(performance.getStage()));
+			stageComboBox.setSelectedIndex(Database.getStages().indexOf(performance.getStage()));
 
 			startTime = performance.getStartTime();
 			endTime = performance.getEndTime();
@@ -204,7 +201,7 @@ public class PerformanceDialog extends JDialog implements Database.OnDataChanged
 		if (!(startTimeValid && endTimeValid)) disableSave(builder, "Times not valid");
 		if (stageComboBox.getSelectedIndex() < 0) disableSave(builder, "No stage selected");
 		if (endTime.isBefore(startTime)) disableSave(builder, "End time is before start time");
-		if (database.isStageInUse((Stage) stageComboBox.getSelectedItem(), startTime, endTime, shownPerformance))
+		if (Database.isStageInUse((Stage) stageComboBox.getSelectedItem(), startTime, endTime, shownPerformance))
 			disableSave(builder, "Stage already in use at this time");
 		errorLabel.setText(builder.toString());
 		if (builder.length() == 0) saveButton.setEnabled(true);
@@ -216,35 +213,35 @@ public class PerformanceDialog extends JDialog implements Database.OnDataChanged
 		saveButton.setEnabled(false);
 	}
 
-	private JList<Artist> setupArtistsList(Database database) {
+	private JList<Artist> setupArtistsList() {
 		JList<Artist> list = new JList<>();
 		DefaultListModel<Artist> model = new DefaultListModel<>();
-		database.getArtists().forEach(model::addElement);
+		Database.getArtists().forEach(model::addElement);
 		list.setModel(model);
 		return list;
 	}
 
 	public void savePerformance(Performance performance) {
-		database.removeOnDataChangedListener(this);
+		Database.removeOnDataChangedListener(this);
 		if (performance == null) {
 			Performance newPerformance = new Performance(
-					database.getStages().get(stageComboBox.getSelectedIndex()),
+					Database.getStages().get(stageComboBox.getSelectedIndex()),
 					startTime, endTime,
 					artistJList.getSelectedValuesList());
-			database.addPerformance(newPerformance);
+			Database.addPerformance(newPerformance);
 		} else {
-			performance.setStage(database.getStages().get(stageComboBox.getSelectedIndex()));
+			performance.setStage(Database.getStages().get(stageComboBox.getSelectedIndex()));
 			performance.setStartTime(startTime);
 			performance.setEndTime(endTime);
 			performance.getArtists().clear();
 			performance.getArtists().addAll(artistJList.getSelectedValuesList());
-			database.notifyDataChanged();
+			Database.notifyDataChanged();
 		}
 		closeDialog();
 	}
 
 	public void closeDialog(){
-		database.removeOnDataChangedListener(this);
+		Database.removeOnDataChangedListener(this);
 		dispose();
 	}
 
@@ -253,16 +250,16 @@ public class PerformanceDialog extends JDialog implements Database.OnDataChanged
 		//Rebuild stage list:
 		Stage previousSelectedStage = (Stage) stageComboBox.getSelectedItem();
 		stageComboBox.removeAllItems();
-		database.getStages().forEach(stageComboBox::addItem);
-		stageComboBox.setSelectedIndex(database.getStages().indexOf(previousSelectedStage));
+		Database.getStages().forEach(stageComboBox::addItem);
+		stageComboBox.setSelectedIndex(Database.getStages().indexOf(previousSelectedStage));
 
 		//Rebuild artist list:
 		List<Artist> previousSelectedArtists = artistJList.getSelectedValuesList();
 		DefaultListModel<Artist> model = (DefaultListModel<Artist>) artistJList.getModel();
 		model.clear();
-		database.getArtists().forEach(model::addElement);
+		Database.getArtists().forEach(model::addElement);
 		previousSelectedArtists.forEach(artist -> {
-			int index = database.getArtists().indexOf(artist);
+			int index = Database.getArtists().indexOf(artist);
 			artistJList.addSelectionInterval(index, index);
 		});
 		updateFields();

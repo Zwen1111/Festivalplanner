@@ -13,9 +13,9 @@ import java.awt.event.MouseEvent;
  */
 public class CheckPerformanceButton extends JButton {
 
-    public CheckPerformanceButton(Performance performance, Database database) {
+    public CheckPerformanceButton(Performance performance) {
         addActionListener(e ->
-				new PerformanceDialog(database, performance, getBounds().getLocation()));
+				new PerformanceDialog(performance, getBounds().getLocation()));
 
         addMouseListener(new MouseAdapter() {
             @Override
@@ -24,7 +24,7 @@ public class CheckPerformanceButton extends JButton {
                 if(SwingUtilities.isRightMouseButton(e)) {
                     int optioncode = JOptionPane.showConfirmDialog(null,"Do you want to remove this Performance");
                     if(optioncode == JOptionPane.OK_OPTION) {
-                        if(!database.removePerformance(performance)) {
+                        if(!Database.removePerformance(performance)) {
                             JOptionPane.showMessageDialog(null,"Error performance not removed");
                         }
                     }

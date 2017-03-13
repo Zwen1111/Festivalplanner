@@ -17,19 +17,17 @@ public class FileSystem implements Database.OnDataChangedListener {
 	private static final String DATABASE_EXTENSION = "fd";
 
     private File file;
-    private Database database;
     private boolean hasDataChanged;
 
-    public FileSystem(Database database) {
+    public FileSystem() {
         hasDataChanged = false;
-        this.database = database;
     }
 
     public void newCalendar() {
         if(closeCurrentCalendar()) {
             file = null;
-            database.clear();
-            database.notifyDataChanged();
+            Database.clear();
+            Database.notifyDataChanged();
         }
     }
 
@@ -39,7 +37,7 @@ public class FileSystem implements Database.OnDataChangedListener {
             return saveAs();
         } else {
             try (ObjectOutputStream output = new ObjectOutputStream(new FileOutputStream(this.file))) {
-                output.writeObject(database.getPerformances());
+                output.writeObject(Database.getPerformances());
                 return true;
             } catch (Exception e) {
                 e.printStackTrace();
@@ -77,7 +75,7 @@ public class FileSystem implements Database.OnDataChangedListener {
                 betterFile = new File(file.getAbsolutePath());
             }
             try (ObjectOutputStream output = new ObjectOutputStream(new FileOutputStream(betterFile))) {
-                output.writeObject(database.getPerformances());
+                output.writeObject(Database.getPerformances());
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -96,15 +94,15 @@ public class FileSystem implements Database.OnDataChangedListener {
             if (returnVal == JFileChooser.APPROVE_OPTION) {
                 this.file = fc.getSelectedFile();
                 try (ObjectInputStream input = new ObjectInputStream(new FileInputStream(fc.getSelectedFile()))) {
-                    database.clear();
+                    Database.clear();
                     try {
-						database.addPerformances((Collection<Performance>) input.readObject());
+						Database.addPerformances((Collection<Performance>) input.readObject());
 					} catch (InvalidClassException e) {
 						JOptionPane.showMessageDialog(null, "There seems to be a mismatch" +
 										" of versions between the software. Sadly, we cannot recover the data.",
 								"Could not read file", JOptionPane.ERROR_MESSAGE);
 					}
-                    database.notifyDataChanged();
+                    Database.notifyDataChanged();
                 } catch (Exception e) {
                     e.printStackTrace();
                 }

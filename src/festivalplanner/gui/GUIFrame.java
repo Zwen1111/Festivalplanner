@@ -22,7 +22,6 @@ public class GUIFrame extends JFrame implements Database.OnDataChangedListener{
 	public static final String APP_NAME = "Festivalplanner";
 	public static final String APP_VERSION = "0.1";
 
-	private Database database;
 	private FileSystem fileSystem;
 
 	@Override
@@ -32,21 +31,20 @@ public class GUIFrame extends JFrame implements Database.OnDataChangedListener{
 	}
 
 	public GUIFrame() {
-		database = new Database();
 
-		fileSystem = new FileSystem(database);
+		fileSystem = new FileSystem();
 		setTitle(fileSystem.getFileName() + " - " + APP_NAME + " v" + APP_VERSION);
 
-		Main.test(database);
+		//Main.test(Database);
 		JTabbedPane tabs = new JTabbedPane(JTabbedPane.SCROLL_TAB_LAYOUT);
 
 		JPanel mainPanel = new JPanel(new BorderLayout());
 
 
 
-		CalendarTable2D panel2d = new CalendarTable2D(database);
+		CalendarTable2D panel2d = new CalendarTable2D();
 
-		CalendarTable panelTable = new CalendarTable(database);
+		CalendarTable panelTable = new CalendarTable();
 
 		JPanel simulator = new SimulatorPanel();
 
@@ -63,9 +61,9 @@ public class GUIFrame extends JFrame implements Database.OnDataChangedListener{
             }
         });
 
-		database.addOnDataChangedListener(this);
-		database.addOnDataChangedListener(panel2d);
-		database.addOnDataChangedListener(panelTable);
+		Database.addOnDataChangedListener(this);
+		Database.addOnDataChangedListener(panel2d);
+		Database.addOnDataChangedListener(panelTable);
 
 		mainPanel.add(tabs,BorderLayout.CENTER);
 
@@ -75,7 +73,7 @@ public class GUIFrame extends JFrame implements Database.OnDataChangedListener{
 
 		JMenuItem newAgenda = new JMenuItem("New");
 		newAgenda.addActionListener(e -> {
-			database.notifyDataChanged();
+			Database.notifyDataChanged();
 			fileSystem.newCalendar();
 			repaint();
 		});
@@ -105,11 +103,11 @@ public class GUIFrame extends JFrame implements Database.OnDataChangedListener{
 
 		JMenuItem stageMenuItem = new JMenuItem("Stage");
 		stageMenuItem.addActionListener(e -> {
-			new AddStageDialog(database);
+			new AddStageDialog();
 		});
 		JMenuItem artistMenuItem = new JMenuItem("Artist");
 		artistMenuItem.addActionListener(e -> {
-			new AddArtistDialog(database);
+			new AddArtistDialog();
 		});
 		addMenu.add(stageMenuItem);
 		addMenu.add(artistMenuItem);

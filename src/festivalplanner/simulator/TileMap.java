@@ -1,5 +1,8 @@
 package festivalplanner.simulator;
 
+import festivalplanner.data.Database;
+import festivalplanner.simulator.data.Layer;
+import festivalplanner.simulator.data.ObjectLayer;
 import festivalplanner.simulator.data.TileLayer;
 
 import javax.json.Json;
@@ -43,7 +46,13 @@ public class TileMap {
 			layers = new ArrayList<>(layerArray.size());
 			for (int i = 0; i < layerArray.size(); i++) {
 				try {
-					layers.add(new TileLayer(layerArray.getJsonObject(i)));
+					Layer layer = Layer.parseJson(layerArray.getJsonObject(i));
+					if (layer instanceof TileLayer) {
+						layers.add((TileLayer) layer);
+					} else if (layer instanceof ObjectLayer) {
+						if (layer.getTitle().equals("Objects"))
+							Database.addStages(((ObjectLayer) layer).parseAsStagesLayer());
+					}
 				} catch (TileLayer.UnsupportedLayerTypeException e) {
 					System.out.println("Some layer was of the wrong type:");
 					e.printStackTrace();

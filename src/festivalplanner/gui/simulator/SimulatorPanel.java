@@ -66,7 +66,7 @@ public class SimulatorPanel extends JPanel implements MouseMotionListener, Mouse
 		if (target != null) {
 			for (int x = 0; x < target.getLayer().getWidth(); x++) {
 				for (int y = 0; y < target.getLayer().getHeight(); y++) {
-					g2d.drawString(String.valueOf(target.getCell(x, y)),
+					g2d.drawString(String.valueOf(target.getDistance(x, y)),
 							x * map.getTileWidth(),
 							y * map.getTileHeight() + 10);
 				}
@@ -148,14 +148,15 @@ public class SimulatorPanel extends JPanel implements MouseMotionListener, Mouse
 
 	@Override
 	public void mouseClicked(MouseEvent e) {
-		for (Visitor v : simulator.getVisitors()) {
-			v.setxDestination(e.getX() / scale - translateX / scale);
-			v.setyDestination(e.getY() / scale - translateY / scale);
-		}
 		long mil = System.currentTimeMillis();
 		target = new Target(new Point2D.Double(e.getX() / scale - translateX / scale,
 				e.getY() / scale - translateY / scale), map){};
 		System.out.println("took " + (System.currentTimeMillis() - mil) + " ms");
+		for (Visitor v : simulator.getVisitors()) {
+			v.setTarget(target);
+			//v.setxDestination(e.getX() / scale - translateX / scale);
+			//v.setyDestination(e.getY() / scale - translateY / scale);
+		}
 	}
 
 	@Override

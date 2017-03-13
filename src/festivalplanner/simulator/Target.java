@@ -17,12 +17,14 @@ public abstract class Target {
 	private int capacity;
 	private Point2D position;
 	private int[][] destinations;
+	private TileMap map;
 	private CollisionLayer data;
 	private int startIndex;
 
 	public Target(Point2D position, TileMap map) {
 		this.position = position;
-		data = map.getCollisionLayer();
+		this.map = map;
+		this.data = map.getCollisionLayer();
 		destinations = new int[data.getWidth()][data.getHeight()];
 		startIndex = data.getIndex((int) Math.floor(position.getX() / map.getTileWidth()),
 				(int) Math.floor(position.getY() / map.getTileHeight()));
@@ -33,8 +35,24 @@ public abstract class Target {
 		destinations[index % data.getWidth()][Math.floorDiv(index, data.getWidth())] = value;
 	}
 
-	public int getCell(int x, int y) {
-		return destinations[x][y];
+	public Distance getDistances(Point2D position) {
+		return getDistances((int) Math.floor(position.getX() / map.getTileWidth()),
+				(int) Math.floor(position.getY() / map.getTileHeight()));
+	}
+
+	public Distance getDistances(int x, int y) {
+		//System.out.println("New Distance object of " + x + ", " + y);
+		return new Distance(x, y,
+				getDistance(x, y),
+				getDistance(x, y-1),
+				getDistance(x+1, y),
+				getDistance(x, y+1),
+				getDistance(x-1, y));
+	}
+
+	public int getDistance(int x, int y) {
+		return x >= 0 && x < data.getWidth() && y >= 0 && y < data.getHeight() ?
+				destinations[x][y] : -1;
 	}
 
 	public CollisionLayer getLayer() {
@@ -57,7 +75,7 @@ public abstract class Target {
 	private void bfs(Queue<Integer> q, Collection<Integer> checked, int cellIndex) {
 		int cellX = cellIndex % data.getWidth();
 		int cellY = Math.floorDiv(cellIndex, data.getWidth());
-		int cellDistance = getCell(cellX, cellY);
+		int cellDistance = destinations[cellX][cellY];
 
 		int northIndex = data.getIndex(cellX, cellY - 1);
 		int eastIndex = data.getIndex(cellX + 1, cellY);
@@ -116,7 +134,69 @@ public abstract class Target {
 		this.position = position;
 	}
 
-	public int[][] getDestinations() {
-		return destinations;
+	public class Distance {
+		private int x;
+		private int y;
+		private int center;
+		private int north;
+		private int east;
+		private int south;
+		private int west;
+
+		private Distance(int x, int y, int center, int north, int east, int south, int west) {
+			this.x = x;
+			this.y = y;
+			this.center = center;
+			this.north = north;
+			this.east = east;
+			this.south = south;
+			this.west = west;
+		}
+
+		public int getCenter() {
+			return center;
+		}
+
+		public Point2D getCenterPoint() {
+			return new Point2D.Double(x, y);
+		}
+
+		private Point2D getPoint(int x, int y) {
+			int tw = map.getTileWidth();
+			int th = map.getTileHeight();
+			return new Point2D.Double((x * tw) + (tw / 2), (y * th) + (th / 2));
+		}
+
+		public int getNorth() {
+			return north;
+		}
+
+		public Point2D getNorthPoint() {
+			return getPoint(x, y - 1);
+		}
+
+		public int getEast() {
+			return east;
+		}
+
+		public Point2D getEastPoint() {
+			return getPoint(x + 1, y);
+		}
+
+		public int getSouth() {
+			return south;
+		}
+
+		public Point2D getSouthPoint() {
+			return getPoint(x, y + 1);
+		}
+
+		public int getWest() {
+			return west;
+		}
+
+		public Point2D getWestPoint() {
+			return getPoint(x - 1, y);
+		}
 	}
 }

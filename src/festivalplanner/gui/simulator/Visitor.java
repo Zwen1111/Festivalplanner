@@ -1,5 +1,7 @@
 package festivalplanner.gui.simulator;
 
+import festivalplanner.simulator.Target;
+
 import java.awt.*;
 import java.awt.geom.Ellipse2D;
 import java.awt.geom.Point2D;
@@ -18,6 +20,8 @@ private Point2D position;
 private double xDestination;
 private double yDestination;
 private Point2D newPosition;
+private Target target;
+private boolean targetSet;
 
 
     public double getxDestination() {
@@ -60,6 +64,23 @@ private Point2D newPosition;
 
     public void setSize(int size) {
         this.size = size;
+    }
+
+    public void setTarget(Target newTarget) {
+        targetSet = false;
+        target = newTarget;
+    }
+
+    public void setTargetSet(boolean value) {
+        targetSet = value;
+    }
+
+    public boolean isTargetSet() {
+        return targetSet;
+    }
+
+    public Target getTarget() {
+        return target;
     }
 
     //public Color getLook() {

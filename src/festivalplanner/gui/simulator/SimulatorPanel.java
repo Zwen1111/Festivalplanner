@@ -1,12 +1,13 @@
 package festivalplanner.gui.simulator;
 
-import festivalplanner.simulator.TileMap;
+import festivalplanner.simulator.Target;
+import festivalplanner.simulator.map.TileMap;
+import festivalplanner.simulator.Simulator;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.awt.geom.Point2D;
-import java.util.ArrayList;
 
 /**
  * The SimulatorPanel displays a TileMap. The map can be dragged and zoomed using mouse
@@ -29,6 +30,7 @@ public class SimulatorPanel extends JPanel implements MouseMotionListener, Mouse
 	private double translateX;
 	private double translateY;
 	private boolean init;
+	private Target target;
 
 	public SimulatorPanel() {
 		super(null);
@@ -61,6 +63,15 @@ public class SimulatorPanel extends JPanel implements MouseMotionListener, Mouse
 		g2d.scale(scale, scale);
 
 		g2d.drawImage(map.getMapImage(), null, null);
+		if (target != null) {
+			for (int x = 0; x < target.getLayer().getWidth(); x++) {
+				for (int y = 0; y < target.getLayer().getHeight(); y++) {
+					g2d.drawString(String.valueOf(target.getCell(x, y)),
+							x * map.getTileWidth(),
+							y * map.getTileHeight() + 10);
+				}
+			}
+		}
 		for(Visitor v : simulator.getVisitors())
 		{
 			v.draw(g2d);
@@ -138,9 +149,13 @@ public class SimulatorPanel extends JPanel implements MouseMotionListener, Mouse
 	@Override
 	public void mouseClicked(MouseEvent e) {
 		for (Visitor v : simulator.getVisitors()) {
-			v.setxDestination(e.getX() / scale);
-			v.setyDestination(e.getY() / scale);
+			v.setxDestination(e.getX() / scale - translateX / scale);
+			v.setyDestination(e.getY() / scale - translateY / scale);
 		}
+		long mil = System.currentTimeMillis();
+		target = new Target(new Point2D.Double(e.getX() / scale - translateX / scale,
+				e.getY() / scale - translateY / scale), map){};
+		System.out.println("took " + (System.currentTimeMillis() - mil) + " ms");
 	}
 
 	@Override

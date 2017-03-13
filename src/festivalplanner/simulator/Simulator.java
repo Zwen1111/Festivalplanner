@@ -1,4 +1,6 @@
-package festivalplanner.gui.simulator;
+package festivalplanner.simulator;
+
+import festivalplanner.gui.simulator.Visitor;
 
 import java.awt.geom.Point2D;
 import java.util.ArrayList;

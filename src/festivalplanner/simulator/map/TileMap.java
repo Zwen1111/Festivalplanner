@@ -1,6 +1,7 @@
-package festivalplanner.simulator;
+package festivalplanner.simulator.map;
 
 import festivalplanner.data.Database;
+import festivalplanner.simulator.data.CollisionLayer;
 import festivalplanner.simulator.data.Layer;
 import festivalplanner.simulator.data.ObjectLayer;
 import festivalplanner.simulator.data.TileLayer;
@@ -24,11 +25,12 @@ public class TileMap {
 
 	private TilesetManager tilesetManager;
 	private List<TileLayer> layers;
+	private CollisionLayer collisionLayer;
 	private BufferedImage currentMap;
 	private int mapHeight;
 	private int mapWidth;
 	private int tileHeight;
-	private int tilewidth;
+	private int tileWidth;
 
 	public TileMap(String location) {
 		try (FileReader source = new FileReader(location)) {
@@ -38,7 +40,7 @@ public class TileMap {
 			tilesetManager = new TilesetManager(baseObject.getJsonArray("tilesets"));
 
 			//tileheight and width
-			tilewidth = baseObject.getInt("tilewidth");
+			tileWidth = baseObject.getInt("tilewidth");
 			tileHeight = baseObject.getInt("tileheight");
 
 			//Layers:
@@ -47,7 +49,9 @@ public class TileMap {
 			for (int i = 0; i < layerArray.size(); i++) {
 				try {
 					Layer layer = Layer.parseJson(layerArray.getJsonObject(i));
-					if (layer instanceof TileLayer) {
+					if (layer instanceof CollisionLayer) {
+						collisionLayer = ((CollisionLayer) layer);
+					} else if (layer instanceof TileLayer) {
 						layers.add((TileLayer) layer);
 					} else if (layer instanceof ObjectLayer) {
 						if (layer.getTitle().equals("Objects"))
@@ -74,7 +78,7 @@ public class TileMap {
 			System.err.println("Could not build map: no layers.");
 			return;
 		}
-		currentMap = new BufferedImage(layers.get(0).getWidth() * tilewidth,
+		currentMap = new BufferedImage(layers.get(0).getWidth() * tileWidth,
 				layers.get(0).getHeight() * tileHeight,
 				BufferedImage.TYPE_INT_RGB);
 		mapHeight = mapWidth = 0;
@@ -91,14 +95,18 @@ public class TileMap {
 		Graphics2D g = image.createGraphics();
 		for (int x = 0; x < layer.getWidth(); x++) {
 			for (int y = 0; y < layer.getHeight(); y++) {
-				Image tileImage = tilesetManager.getImage(layer.getData(y * layer.getWidth() + x));
+				Image tileImage = tilesetManager.getImage(layer.getData(x, y));
 				AffineTransform at = new AffineTransform();
-				at.translate(x * tilewidth,
+				at.translate(x * tileWidth,
 						y * tileHeight);
 				//at.scale(0.5, 0.5);
 				g.drawImage(tileImage, at, null);
 			}
 		}
+	}
+
+	public CollisionLayer getCollisionLayer() {
+		return collisionLayer;
 	}
 
 	public Image getMapImage() {
@@ -115,6 +123,14 @@ public class TileMap {
 	 * @return the largest tile's width.
 	 */
 	public int getMapWidth() {
-		return mapWidth * tilewidth;
+		return mapWidth * tileWidth;
+	}
+
+	public int getTileHeight() {
+		return tileHeight;
+	}
+
+	public int getTileWidth() {
+		return tileWidth;
 	}
 }

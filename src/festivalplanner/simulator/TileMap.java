@@ -117,4 +117,8 @@ public class TileMap {
 	public int getMapWidth() {
 		return mapWidth * tilewidth;
 	}
+
+    public int getTileHeight() {
+        return tileHeight;
+    }
 }

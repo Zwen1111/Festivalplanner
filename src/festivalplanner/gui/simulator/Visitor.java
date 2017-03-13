@@ -16,8 +16,7 @@ public class Visitor  {
 private double speed;
 private double angle;
 private Point2D position;
-private double xDestination;
-private double yDestination;
+private Point2D destination;
 private Point2D newPosition;
 
 private BufferedImage image;
@@ -32,6 +31,7 @@ private int blather;
 private int maxBlather;
 
 private boolean isThirsty;
+
 private CurrentAction currentAction;
 
 public enum CurrentAction {
@@ -57,10 +57,9 @@ public static java.util.List<BufferedImage> images;
 
     public Visitor(double speed, Point2D position) {
         this.speed = speed;
-        this.angle = 0.0;
+        angle = 0.0;
         this.position = position;
-        this.yDestination = 500;
-        this.xDestination = 500;
+        destination = new Point2D.Double(500,500);
         radius = 10;
         image = Visitor.images.get((int) (Math.random() * 8));
 
@@ -93,8 +92,8 @@ public static java.util.List<BufferedImage> images;
     public void update()
     {
         preferences();
-        double dx = xDestination - position.getX();
-        double dy = yDestination - position.getY();
+        double dx = destination.getX() - position.getX();
+        double dy = destination.getY() - position.getY();
 
         double newAngle = Math.atan2(dy, dx);
 
@@ -120,7 +119,6 @@ public static java.util.List<BufferedImage> images;
         //if blather is full the visitor has to pee
         if(blather >= maxBlather) {
             hasToPee = true;
-            //currentAction = CurrentAction.PEEING;
         }
 
         // checks howLong a visitor
@@ -142,7 +140,13 @@ public static java.util.List<BufferedImage> images;
                     break;
                 case 2:
                     currentAction = CurrentAction.WATCHING;
+                    /*currentTarget = random stage check if an performance is on the change
+
+                    if so currentTarget is that stage
+                    if not check rest of the changes else do nothing
+
                     //currentTarget = targets.get(Math.random * target.size - 1);
+                    */
             }
         }
 
@@ -153,7 +157,6 @@ public static java.util.List<BufferedImage> images;
                 currentAction = CurrentAction.BUYINGDRINKS;
                 //currentTarget = getNearestStand;
             }
-
     }
 
     public boolean checkcollision(ArrayList<Visitor> visitors)
@@ -181,13 +184,10 @@ public static java.util.List<BufferedImage> images;
 
 
 
-    public void setxDestination(double xDestination) {
-        this.xDestination = xDestination;
-    }
 
 
-    public void setyDestination(double yDestination) {
-        this.yDestination = yDestination;
+    public void setDestination(Point2D destination) {
+        this.destination = destination;
     }
 
     public void drink(){

@@ -39,10 +39,12 @@ public class TileMapPanel extends JPanel implements MouseMotionListener, MouseWh
 		mousePosition = new Point2D.Double(0, 0);
 		visitors = new ArrayList<>();
 		Visitor.getImages();
-		for(int index = 0; index < 50; index++) {
-			Point2D.Double posistion = new  Point2D.Double(Math.random() * 1000, Math.random() * 1000);
-			Visitor visitor = new Visitor(3, posistion );
-			visitors.add(visitor);
+		for(int index = 0; index < 2000; index++) {
+			Point2D.Double position = new  Point2D.Double(Math.random() * 1000, Math.random() * 900);
+			Visitor visitor = new Visitor(3, position );
+			if(canSpawn(visitor)) {
+                visitors.add(visitor);
+            }
 		}
 
 		addMouseMotionListener(this);
@@ -52,28 +54,32 @@ public class TileMapPanel extends JPanel implements MouseMotionListener, MouseWh
 		System.out.println("Height: " + map.getMapHeight() + " | Width: " + map.getMapWidth());
 	}
 
-	public void update() {
+    private boolean canSpawn(Visitor visitor) {
+	    visitor.update();
+        return !visitor.checkcollision(visitors);
+    }
+
+    public void update() {
 		for (Visitor v : visitors) {
 			v.update();
-			if (v.getPosition().getX() > map.getMapWidth()) {
-				v.setPosition(new Point2D.Double(map.getMapWidth(), v.getPosition().getY()));
-			} else {
-				if (v.getPosition().getX() < 0) {
-					v.setPosition(new Point2D.Double(0, v.getPosition().getY()));
-				}
-
-				if (v.getPosition().getY() > map.getMapHeight()) {
-					v.setPosition(new Point2D.Double(v.getPosition().getX(), map.getMapHeight()));
-				} else {
-					if (v.getPosition().getY() < 0) {
-						v.setPosition(new Point2D.Double(v.getPosition().getX(), 0));
-					}
-
-				}
-			}
 		}
-		for (Visitor visitor : visitors) {
-			visitor.checkcollision(visitors);
+		for (Visitor v : visitors) {
+			v.checkcollision(visitors);
+            if (v.getPosition().getX() > map.getMapWidth()) {
+                v.setPosition(new Point2D.Double(map.getMapWidth(), v.getPosition().getY()));
+            } else {
+                if (v.getPosition().getX() < 0) {
+                    v.setPosition(new Point2D.Double(0, v.getPosition().getY()));
+                }
+            }
+
+            if (v.getPosition().getY() > map.getMapHeight() * map.getTileHeight()) {
+                v.setPosition(new Point2D.Double(v.getPosition().getX(), map.getMapHeight() * map.getTileHeight()));
+            } else {
+                if (v.getPosition().getY() < 0) {
+                    v.setPosition(new Point2D.Double(v.getPosition().getX(), 0));
+                }
+            }
 		}
 	}
 
@@ -163,22 +169,27 @@ public class TileMapPanel extends JPanel implements MouseMotionListener, MouseWh
 
 	@Override
 	public void mouseDragged(MouseEvent e) {
-		translateBy(new Point2D.Double( e.getX() - mousePosition.getX()  ,  e.getY() - mousePosition.getY()));
-		mousePosition = new Point2D.Double(e.getX(), e.getY());
+	    if(!e.isControlDown()) {
+            translateBy(new Point2D.Double(e.getX() - mousePosition.getX(), e.getY() - mousePosition.getY()));
+            mousePosition = new Point2D.Double(e.getX(), e.getY());
+        }
 	}
 
 	@Override
 	public void mouseClicked(MouseEvent e) {
-	for (Visitor v : visitors)
-	{
-	v.setxDestination(e.getX() / scale);
-	v.setyDestination(e.getY() / scale);
-	}
+	    if(e.isControlDown()) {
+            for (Visitor v : visitors) {
+                v.setDestination(new Point2D.Double(-translateX / scale + e.getX() / scale,
+                        -translateY / scale + e.getY() / scale));
+
+            }
+        }
 	}
 
 	@Override
 	public void mousePressed(MouseEvent e) {
-		mousePosition = new Point2D.Double(e.getX(), e.getY());
+		if(!e.isControlDown())
+	    mousePosition = new Point2D.Double(e.getX(), e.getY());
 	}
 
 	@Override

@@ -73,8 +73,8 @@ public class TileMapPanel extends JPanel implements MouseMotionListener, MouseWh
                 }
             }
 
-            if (v.getPosition().getY() > map.getMapHeight() * map.getTileHeight()) {
-                v.setPosition(new Point2D.Double(v.getPosition().getX(), map.getMapHeight() * map.getTileHeight()));
+            if (v.getPosition().getY() > map.getMapHeight() ) {
+                v.setPosition(new Point2D.Double(v.getPosition().getX(), map.getMapHeight() ));
             } else {
                 if (v.getPosition().getY() < 0) {
                     v.setPosition(new Point2D.Double(v.getPosition().getX(), 0));

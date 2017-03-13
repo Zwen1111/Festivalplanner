@@ -15,7 +15,7 @@ public class Simulator {
 		visitors = new ArrayList<>();
 		for(int index = 0; index < 50; index++) {
 			Point2D.Double position = new  Point2D.Double(Math.random() * 1000, Math.random() * 1000);
-			Visitor visitor = new Visitor(1.0, position );
+			Visitor visitor = new Visitor(2.0, position );
 			visitors.add(visitor);
 		}
 	}

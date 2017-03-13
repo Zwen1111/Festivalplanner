@@ -137,8 +137,8 @@ public class SimulatorPanel extends JPanel implements MouseMotionListener, Mouse
 	@Override
 	public void mouseClicked(MouseEvent e) {
 		for (Visitor v : simulator.getVisitors()) {
-			v.setxDestination(e.getX());
-			v.setyDestination(e.getY());
+			v.setxDestination(e.getX() / scale);
+			v.setyDestination(e.getY() / scale);
 		}
 	}
 

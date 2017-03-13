@@ -22,13 +22,13 @@ public class SimulatorPanel extends JPanel implements MouseMotionListener, Mouse
 	private static final double MIN_ZOOM = 0.65;
 	private static final double MAX_ZOOM = 5.65;
 
+	private Simulator simulator;
 	private TileMap map;
 	private Point2D mousePosition;
 	private double scale;
 	private double translateX;
 	private double translateY;
 	private boolean init;
-	private ArrayList<Visitor> visitors;
 
 	public SimulatorPanel() {
 		super(null);
@@ -37,41 +37,10 @@ public class SimulatorPanel extends JPanel implements MouseMotionListener, Mouse
 		map.buildMap(6);
 		scale = 0.65;
 		mousePosition = new Point2D.Double(0, 0);
-		visitors = new ArrayList<>();
-		for(int index = 0; index < 50; index++) {
-			Point2D.Double posistion = new  Point2D.Double(Math.random() * 1000, Math.random() * 1000);
-			Visitor visitor = new Visitor(1.0, posistion );
-			visitors.add(visitor);
-		}
+
 		addMouseMotionListener(this);
 		addMouseListener(this);
 		addMouseWheelListener(this);
-
-		System.out.println("Height: " + map.getMapHeight() + " | Width: " + map.getMapWidth());
-	}
-
-	public void update() {
-		for (Visitor v : visitors) {
-			v.update();
-			if (v.getPosition().getX() > map.getMapWidth()) {
-				v.setPosition(new Point2D.Double(map.getMapWidth(), v.getPosition().getY()));
-			} else {
-				if (v.getPosition().getX() < 0) {
-					v.setPosition(new Point2D.Double(0, v.getPosition().getY()));
-				}
-
-				if (v.getPosition().getY() > map.getMapHeight()) {
-					v.setPosition(new Point2D.Double(v.getPosition().getX(), map.getMapHeight()));
-				} else {
-					if (v.getPosition().getY() < 0) {
-						v.setPosition(new Point2D.Double(v.getPosition().getX(), 0));
-					}
-
-				}
-
-				v.checkcollision(visitors);
-			}
-		}
 	}
 
 
@@ -86,11 +55,12 @@ public class SimulatorPanel extends JPanel implements MouseMotionListener, Mouse
 			init = true;
 		}
 
+		simulator.runSimulation();
 		g2d.translate(translateX, translateY);
 		g2d.scale(scale, scale);
 
 		g2d.drawImage(map.getMapImage(), null, null);
-		for(Visitor v : visitors)
+		for(Visitor v : simulator.getVisitors())
 		{
 			v.draw(g2d);
 		}
@@ -166,11 +136,10 @@ public class SimulatorPanel extends JPanel implements MouseMotionListener, Mouse
 
 	@Override
 	public void mouseClicked(MouseEvent e) {
-	for (Visitor v : visitors)
-	{
-	v.setxDestination(e.getX());
-	v.setyDestination(e.getY());
-	}
+		for (Visitor v : simulator.getVisitors()) {
+			v.setxDestination(e.getX());
+			v.setyDestination(e.getY());
+		}
 	}
 
 	@Override

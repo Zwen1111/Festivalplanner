@@ -40,7 +40,7 @@ public class TileMapPanel extends JPanel implements MouseMotionListener, MouseWh
 		visitors = new ArrayList<>();
 		for(int index = 0; index < 50; index++) {
 			Point2D.Double posistion = new  Point2D.Double(Math.random() * 1000, Math.random() * 1000);
-			Visitor visitor = new Visitor(1.0, posistion );
+			Visitor visitor = new Visitor(2, posistion );
 			visitors.add(visitor);
 		}
 		addMouseMotionListener(this);
@@ -168,8 +168,8 @@ public class TileMapPanel extends JPanel implements MouseMotionListener, MouseWh
 	public void mouseClicked(MouseEvent e) {
 	for (Visitor v : visitors)
 	{
-	v.setxDestination(e.getX());
-	v.setyDestination(e.getY());
+	v.setxDestination(e.getX() / scale);
+	v.setyDestination(e.getY() / scale);
 	}
 	}
 

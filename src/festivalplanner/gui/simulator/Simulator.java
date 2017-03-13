@@ -23,6 +23,7 @@ public class Simulator {
 	public void runSimulation() {
 		for (Visitor v : visitors) {
 			v.update();
+			v.checkcollision((ArrayList<Visitor>) visitors);
 		}
 	}
 

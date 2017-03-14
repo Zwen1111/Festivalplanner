@@ -13,7 +13,6 @@ public class SimulatorPanel extends JPanel implements ActionListener {
 
     private ArrayList<JButton> buttonArrayList;
     private TileMapPanel tileMapPanel;
-    private ArrayList<Visitor> vistors;
 
     public SimulatorPanel() {
     	setName("TileMapPanel");
@@ -100,6 +99,7 @@ public class SimulatorPanel extends JPanel implements ActionListener {
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
+        if(buttonArrayList.get(0).getName().equals("Play"))
 		tileMapPanel.update();
 
 		repaint();

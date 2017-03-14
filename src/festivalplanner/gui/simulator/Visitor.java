@@ -1,9 +1,10 @@
 package festivalplanner.gui.simulator;
 
+import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.geom.AffineTransform;
-import java.awt.geom.Ellipse2D;
 import java.awt.geom.Point2D;
+import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 
 
@@ -11,83 +12,72 @@ import java.util.ArrayList;
  * Created by Gebruiker on 6-3-2017.
  */
 public class Visitor  {
+
 private double speed;
-private int size;
-//private Color look;
 private double angle;
 private Point2D position;
-private double xDestination;
-private double yDestination;
+private Point2D destination;
 private Point2D newPosition;
 
+private BufferedImage image;
+private int radius;
 
-    public double getxDestination() {
-        return xDestination;
+
+
+private int timeAtTarget;
+
+private boolean hasToPee;
+private int blather;
+private int maxBlather;
+
+private boolean isThirsty;
+
+private CurrentAction currentAction;
+
+public enum CurrentAction {
+        IDLE,PEEING,WATCHING,BUYINGDRINKS,
     }
 
-    public void setxDestination(double xDestination) {
-        this.xDestination = xDestination;
+public static java.util.List<BufferedImage> images;
+    public static void getImages() {
+        images = new ArrayList<>();
+        try {
+
+            for (int i = 0; i < 9; i++) {
+                BufferedImage image = ImageIO.read(Visitor.class.getResource("/visitors/visitor" + i + ".png"));
+                images.add(image);
+            }
+        }catch (Exception e) {
+            e.printStackTrace();
+        }
+
     }
 
-    public double getyDestination() {
-        return yDestination;
-    }
 
-    public void setyDestination(double yDestination) {
-        this.yDestination = yDestination;
-    }
 
     public Visitor(double speed, Point2D position) {
         this.speed = speed;
-        size = 10;
-        //this.look = look;
-        this.angle = 0.0;
+        angle = 0.0;
         this.position = position;
-        this.yDestination = 0;
-        this.xDestination = 0;
+        destination = new Point2D.Double(500,500);
+        radius = 10;
+        image = Visitor.images.get((int) (Math.random() * 8));
+
+        currentAction = CurrentAction.IDLE;
+
+        maxBlather = 1000;
+        blather = (int) Math.random() * 500;
+        hasToPee = false;
+
     }
-
-    public double getSpeed() {
-        return speed;
-    }
-
-    public void setSpeed(double speed) {
-        this.speed = speed;
-    }
-
-    public int getSize() {
-        return size;
-    }
-
-    public void setSize(int size) {
-        this.size = size;
-    }
-
-    //public Color getLook() {
-    //    return look;
-//
-   // public void setLook(Color look) {
-     //   this.look = look;
-    //}
-
-    public double getAngle() {
-        return angle;
-    }
-
-    public void setAngle(double angle) {
-        this.angle = angle;
-    }
-
-
 
     public void draw(Graphics2D g)
     {
         g.setColor(Color.RED);
-        Ellipse2D.Double circle = new Ellipse2D.Double(position.getX(),position.getY(),size,size);
-        g.fill(circle);
-
-
-
+        AffineTransform af = new AffineTransform();
+        af.translate(position.getX(),position.getY());
+        af.rotate(angle);
+        g.drawImage(image,af,null);
 
     }
 
@@ -101,8 +91,9 @@ private Point2D newPosition;
 
     public void update()
     {
-        double dx = xDestination - position.getX();
-        double dy = yDestination - position.getY();
+        preferences();
+        double dx = destination.getX() - position.getX();
+        double dy = destination.getY() - position.getY();
 
         double newAngle = Math.atan2(dy, dx);
 
@@ -122,11 +113,50 @@ private Point2D newPosition;
         newPosition = new Point2D.Double(
                 position.getX() + speed * Math.cos(angle),
                 position.getY() + speed * Math.sin(angle));
-        //position = newPosition;
+    }
 
+    private void preferences() {
+        //if blather is full the visitor has to pee
+        if(blather >= maxBlather) {
+            hasToPee = true;
+        }
 
+        // checks howLong a visitor
+        if(isAtTarget()){
+            timeAtTarget++;
+            if(currentAction == CurrentAction.PEEING && timeAtTarget >= 300){
+                pee();
+            }else if(currentAction == CurrentAction.BUYINGDRINKS && timeAtTarget >=  120){
+                drink();
+            }
+        }
+        //checks if the currentaction  = idle. if currentAction = idle then it wil select a random action
+        if(currentAction == CurrentAction.IDLE) {
+            timeAtTarget = 0;
+            int action = (int) Math.random() * 2;
+            switch (action) {
+                case 1:
+                    isThirsty = true;
+                    break;
+                case 2:
+                    currentAction = CurrentAction.WATCHING;
+                    /*currentTarget = random stage check if an performance is on the change
 
+                    if so currentTarget is that stage
+                    if not check rest of the changes else do nothing
 
+                    //currentTarget = targets.get(Math.random * target.size - 1);
+                    */
+            }
+        }
+
+            if (currentAction != CurrentAction.PEEING && hasToPee) {
+                currentAction = CurrentAction.PEEING;
+                //currentTarget = getNearestToilet;
+            } else if (currentAction != CurrentAction.BUYINGDRINKS && isThirsty) {
+                currentAction = CurrentAction.BUYINGDRINKS;
+                //currentTarget = getNearestStand;
+            }
     }
 
     public boolean checkcollision(ArrayList<Visitor> visitors)
@@ -135,23 +165,46 @@ private Point2D newPosition;
 
         for(Visitor v : visitors )
         {
+                if(v == this)
+                    continue;
+                Point2D vPosition = new Point2D.Double(v.position.getX() - 4,v.position.getY() + 8);
+                Point2D newPos = new Point2D.Double(newPosition.getX() - 4,newPosition.getY() + 8);
+                if(vPosition.distance(newPos) < radius){
+                    collision =true;
+                    break; }
 
-
-            if(v.position.distance(newPosition) < size && !v.equals(this)) {
-                collision = true;
-                break;
-            }
 
         }
-
         if(!collision)
         {
         position = newPosition;
-        }
-
-
-    return collision;
+        }else angle += 0.2;
+         return collision;
     }
 
+
+
+
+
+    public void setDestination(Point2D destination) {
+        this.destination = destination;
+    }
+
+    public void drink(){
+        isThirsty = false;
+        blather += 200;
+        currentAction = CurrentAction.IDLE;
+    }
+
+    public void pee(){
+        hasToPee = false;
+        currentAction = CurrentAction.IDLE;
+        blather = 0;
+    }
+
+    public boolean isAtTarget(){
+        //return position.distance(currentTarget.getPosition) < 10;
+        return true;
+    }
 
 }

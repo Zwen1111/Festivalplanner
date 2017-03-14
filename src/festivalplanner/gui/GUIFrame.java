@@ -71,20 +71,6 @@ public class GUIFrame extends JFrame implements Database.OnDataChangedListener{
 		saveas.addActionListener(e ->  fileSystem.saveAs());
 		fileMenu.add(saveas);
 
-		//Create the Add menu
-		JMenu addMenu = new JMenu("Add");
-		menuBar.add(addMenu);
-
-		JMenuItem stageMenuItem = new JMenuItem("Stage");
-		stageMenuItem.addActionListener(e -> new AddStageDialog());
-
-		JMenuItem artistMenuItem = new JMenuItem("Artist");
-		artistMenuItem.addActionListener(e -> new AddArtistDialog());
-
-		addMenu.add(stageMenuItem);
-		addMenu.add(artistMenuItem);
-
-
 		mainPanel.add(menuBar,BorderLayout.NORTH);
 
 		tabs.add(panel2d);

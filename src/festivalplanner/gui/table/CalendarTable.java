@@ -24,12 +24,12 @@ public class CalendarTable extends JPanel implements Database.OnDataChangedListe
     private ArrayList<Performance> performancesSorted;
     private JPanel mainScreen;
     private int index;
-    private JComboBox stageComboBox;
+    private JComboBox<String> stageComboBox;
     private ArrayList<String> comboBoxItems;
 
     public CalendarTable() {
         JTable table = new JTable();
-        stageComboBox = new JComboBox();
+        stageComboBox = new JComboBox<>();
         AddPerformanceButton addButton = new AddPerformanceButton();
         setName("Table");
         index = 0;
@@ -94,6 +94,7 @@ public class CalendarTable extends JPanel implements Database.OnDataChangedListe
         });
 
         fillComboBox();
+        Database.addOnDataChangedListener(this);
 
         stageComboBox.addActionListener(e -> {
             index = stageComboBox.getSelectedIndex();

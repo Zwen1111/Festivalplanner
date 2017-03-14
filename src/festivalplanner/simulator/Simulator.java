@@ -27,8 +27,9 @@ public class Simulator {
 			v.update();
 			v.checkcollision((ArrayList<Visitor>) visitors);
 			if (v.getTarget() != null) {
-				if (!v.isTargetSet() || v.getPosition().distance(v.getxDestination(), v.getyDestination()) < 15) {
-					Point2D newDest = getNextWayPoint(v.getPosition(), v.getTarget());
+				Point2D destiny = new Point2D.Double(v.getxDestination(), v.getyDestination());
+				if (!v.isTargetSet() || v.getPosition().distance(destiny) < 20) {
+					Point2D newDest = getNextWayPoint(destiny, v.getTarget());
 					if (newDest != null) {
 						v.setTargetSet(true);
 						v.setxDestination(newDest.getX());

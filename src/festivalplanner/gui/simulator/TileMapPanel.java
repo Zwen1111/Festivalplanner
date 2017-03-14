@@ -6,6 +6,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.awt.geom.Point2D;
+import java.util.ArrayList;
 
 /**
  * The TileMapPanel displays a TileMap. The map can be dragged and zoomed using mouse
@@ -27,6 +28,7 @@ public class TileMapPanel extends JPanel implements MouseMotionListener, MouseWh
 	private double translateX;
 	private double translateY;
 	private boolean init;
+	private ArrayList<Visitor> visitors;
 
 	public TileMapPanel() {
 		super(null);
@@ -35,27 +37,64 @@ public class TileMapPanel extends JPanel implements MouseMotionListener, MouseWh
 		map.buildMap(6);
 		scale = 0.65;
 		mousePosition = new Point2D.Double(0, 0);
+		visitors = new ArrayList<>();
+		for(int index = 0; index < 50; index++) {
+			Point2D.Double posistion = new  Point2D.Double(Math.random() * 1000, Math.random() * 1000);
+			Visitor visitor = new Visitor(1.0, posistion );
+			visitors.add(visitor);
+		}
 		addMouseMotionListener(this);
 		addMouseListener(this);
 		addMouseWheelListener(this);
+
+		System.out.println("Height: " + map.getMapHeight() + " | Width: " + map.getMapWidth());
 	}
 
 	public void update() {
+		for (Visitor v : visitors) {
+			v.update();
+			if (v.getPosition().getX() > map.getMapWidth()) {
+				v.setPosition(new Point2D.Double(map.getMapWidth(), v.getPosition().getY()));
+			} else {
+				if (v.getPosition().getX() < 0) {
+					v.setPosition(new Point2D.Double(0, v.getPosition().getY()));
+				}
 
+				if (v.getPosition().getY() > map.getMapHeight()) {
+					v.setPosition(new Point2D.Double(v.getPosition().getX(), map.getMapHeight()));
+				} else {
+					if (v.getPosition().getY() < 0) {
+						v.setPosition(new Point2D.Double(v.getPosition().getX(), 0));
+					}
+
+				}
+
+				v.checkcollision(visitors);
+			}
+		}
 	}
+
 
 	public void paintComponent(Graphics g) {
 		super.paintComponent(g);
 		Graphics2D g2d = (Graphics2D) g;
 		//The width and height of the panel are only known on the first layout.
 		//The smart-scaling can only be done once panel size is known (= paintComponent being called).
+
 		if (!init) {
 			smartScale();
 			init = true;
 		}
+
 		g2d.translate(translateX, translateY);
 		g2d.scale(scale, scale);
+
 		g2d.drawImage(map.getMapImage(), null, null);
+		for(Visitor v : visitors)
+		{
+			v.draw(g2d);
+		}
+
 	}
 
 	private void smartScale() {
@@ -127,7 +166,11 @@ public class TileMapPanel extends JPanel implements MouseMotionListener, MouseWh
 
 	@Override
 	public void mouseClicked(MouseEvent e) {
-
+	for (Visitor v : visitors)
+	{
+	v.setxDestination(e.getX());
+	v.setyDestination(e.getY());
+	}
 	}
 
 	@Override

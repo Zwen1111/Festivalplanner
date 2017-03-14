@@ -20,14 +20,12 @@ public class CalendarTable2D extends JPanel implements Database.OnDataChangedLis
     private int hour;
     private int tableWidth;
     private ArrayList<CheckPerformanceButton> buttons;
-    private Database database;
     private AddPerformanceButton addPerformance;
 
-    public CalendarTable2D(Database database) {
+    public CalendarTable2D() {
         setName("2D Table");
 
         //sets the variable begin coords of the agenda
-        this.database = database;
         beginTableX = 10;
         beginTableY = 30;
         widthTimeColum = beginTableX + 40;
@@ -36,14 +34,14 @@ public class CalendarTable2D extends JPanel implements Database.OnDataChangedLis
         buttons = new ArrayList<>();
 
         //adds a a arrayList of buttons with the size of the amount of performances.
-        for (int i = 0; i < database.getPerformances().size(); i++) {
-            CheckPerformanceButton button = new CheckPerformanceButton(database.getPerformances().get(i), database);
+        for (int i = 0; i < Database.getPerformances().size(); i++) {
+            CheckPerformanceButton button = new CheckPerformanceButton(Database.getPerformances().get(i));
             add(button);
             buttons.add(button);
         }
 
         //add's a button from wich you can add perfromance's
-        addPerformance = new AddPerformanceButton(database);
+        addPerformance = new AddPerformanceButton();
 
         add(addPerformance);
     }
@@ -57,10 +55,6 @@ public class CalendarTable2D extends JPanel implements Database.OnDataChangedLis
         columHeigth = tableHeight + 10;
         tableWidth = getWidth() - beginTableX;
 
-
-        int amountOfStages = database.getStages().size();
-        int stageWidth = ((tableWidth - widthTimeColum) / amountOfStages) ;
-        tableWidth = (tableWidth / amountOfStages) * amountOfStages;
 
         /*makes the background of the agenda excluding the border*/
         int heightRow = (int) Math.floor(tableHeight / hour);
@@ -107,12 +101,13 @@ public class CalendarTable2D extends JPanel implements Database.OnDataChangedLis
 
             g2d.setFont(new Font(Font.SERIF, Font.BOLD, 20));
 
+        int amountOfStages = Database.getStages().size();
         for (int i = 0; i < amountOfStages; i++) {
 
             g2d.setColor(Color.WHITE);
 
-
-            String nameStage = database.getStages().get(i).getName();
+            int stageWidth = ((tableWidth - widthTimeColum) / amountOfStages) ;
+            String nameStage = Database.getStages().get(i).getName();
             String croppedNameStage = "";
             if(nameStage.length() < stageWidth / 12)
             {
@@ -129,26 +124,26 @@ public class CalendarTable2D extends JPanel implements Database.OnDataChangedLis
         }
 
 
-        while (database.getPerformances().size() > buttons.size())
+        while (Database.getPerformances().size() > buttons.size())
         {
-            CheckPerformanceButton button = new CheckPerformanceButton(database.getPerformances().get(buttons.size()), database);
+            CheckPerformanceButton button = new CheckPerformanceButton(Database.getPerformances().get(buttons.size()));
             add(button);
             buttons.add(button);
         }
         //sets the button on the right place of a performances
-        for (int i = 0; i < database.getPerformances().size(); i++) {
+        for (int i = 0; i < Database.getPerformances().size(); i++) {
 
             JButton button = buttons.get(i);
             button.setForeground(Color.white);
 
 
-            Performance perf = database.getPerformances().get(i);
+            Performance perf = Database.getPerformances().get(i);
             button.setText(perf.getArtistNames());
 
 
-            int colIndex = database.getStages().indexOf(perf.getStage());
+            int colIndex = Database.getStages().indexOf(perf.getStage());
 
-            Performance performance = database.getPerformances().get(i);
+            Performance performance = Database.getPerformances().get(i);
 
             button.setBackground(Color.DARK_GRAY);
 

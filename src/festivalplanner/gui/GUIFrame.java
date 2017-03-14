@@ -1,13 +1,12 @@
 package festivalplanner.gui;
 
-import festivalplanner.Main;
 import festivalplanner.data.Database;
 import festivalplanner.gui.dialog.AddArtistDialog;
 import festivalplanner.gui.dialog.AddStageDialog;
 import festivalplanner.gui.simulator.SimulatorPanel;
-import festivalplanner.util.FileSystem;
 import festivalplanner.gui.table.CalendarTable;
 import festivalplanner.gui.table2d.CalendarTable2D;
+import festivalplanner.util.FileSystem;
 
 import javax.swing.*;
 import java.awt.*;
@@ -22,98 +21,55 @@ public class GUIFrame extends JFrame implements Database.OnDataChangedListener{
 	public static final String APP_NAME = "Festivalplanner";
 	public static final String APP_VERSION = "0.1";
 
-	private Database database;
 	private FileSystem fileSystem;
 
-	@Override
-	public void onDataChanged() {
-		setTitle(fileSystem.getFileName() + " - " + APP_NAME + " v" + APP_VERSION);
-		repaint();
-	}
-
 	public GUIFrame() {
-		database = new Database();
+		setTitle(APP_NAME + " v" + APP_VERSION);
 
-		fileSystem = new FileSystem(database);
-		setTitle(fileSystem.getFileName() + " - " + APP_NAME + " v" + APP_VERSION);
-
-		Main.test(database);
+		//Main.test(Database);
 		JTabbedPane tabs = new JTabbedPane(JTabbedPane.SCROLL_TAB_LAYOUT);
 
 		JPanel mainPanel = new JPanel(new BorderLayout());
 
-
-
-		CalendarTable2D panel2d = new CalendarTable2D(database);
-
-		CalendarTable panelTable = new CalendarTable(database);
-
+		CalendarTable2D panel2d = new CalendarTable2D();
+		CalendarTable panelTable = new CalendarTable();
 		JPanel simulator = new SimulatorPanel();
+
+		fileSystem = new FileSystem();
 
 		tabs.addChangeListener(e -> {
             Component p = ((JTabbedPane) e.getSource()).getSelectedComponent();
-            if(p.equals(simulator)) {
-
+            if (p instanceof SimulatorPanel) {
                 setExtendedState(JFrame.MAXIMIZED_BOTH);
-                
-                //size of simulator = 1915 ,950
-                setVisible(true);
-            }else {
-                setResizable(true);
             }
         });
 
-		database.addOnDataChangedListener(this);
-		database.addOnDataChangedListener(panel2d);
-		database.addOnDataChangedListener(panelTable);
+		Database.addOnDataChangedListener(this);
+		Database.addOnDataChangedListener(panel2d);
+		Database.addOnDataChangedListener(panelTable);
 
 		mainPanel.add(tabs,BorderLayout.CENTER);
 
+		//Create the File menu
 		JMenuBar menuBar = new JMenuBar();
 		JMenu fileMenu = new JMenu("File");
 		menuBar.add(fileMenu);
 
 		JMenuItem newAgenda = new JMenuItem("New");
-		newAgenda.addActionListener(e -> {
-			database.notifyDataChanged();
-			fileSystem.newCalendar();
-			repaint();
-		});
+		newAgenda.addActionListener(e -> fileSystem.newCalendar());
 		fileMenu.add(newAgenda);
 
 		JMenuItem open = new JMenuItem("Open");
-		open.addActionListener(e -> {
-			fileSystem.open();
-			repaint();
-		});
+		open.addActionListener(e -> fileSystem.open());
 		fileMenu.add(open);
 
 		JMenuItem save = new JMenuItem("Save");
-		save.addActionListener(e -> {
-			fileSystem.save();
-		});
+		save.addActionListener(e -> fileSystem.save());
 		fileMenu.add(save);
 
 		JMenuItem saveas = new JMenuItem("Save as");
 		saveas.addActionListener(e ->  fileSystem.saveAs());
 		fileMenu.add(saveas);
-
-
-
-		JMenu addMenu = new JMenu("Add");
-		menuBar.add(addMenu);
-
-		JMenuItem stageMenuItem = new JMenuItem("Stage");
-		stageMenuItem.addActionListener(e -> {
-			new AddStageDialog(database);
-		});
-		JMenuItem artistMenuItem = new JMenuItem("Artist");
-		artistMenuItem.addActionListener(e -> {
-			new AddArtistDialog(database);
-		});
-		addMenu.add(stageMenuItem);
-		addMenu.add(artistMenuItem);
-
 
 		mainPanel.add(menuBar,BorderLayout.NORTH);
 
@@ -127,7 +83,11 @@ public class GUIFrame extends JFrame implements Database.OnDataChangedListener{
 		setSize(800, 600);
 		setMinimumSize(new Dimension(600,650));
 		setVisible(true);
+	}
 
-
+	@Override
+	public void onDataChanged() {
+		setTitle(fileSystem.getFileName() + " - " + APP_NAME + " v" + APP_VERSION);
+		repaint();
 	}
 }

@@ -10,12 +10,12 @@ import javax.swing.*;
  */
 public class AddPerformanceButton extends JButton {
 
-    public AddPerformanceButton(Database database) {
+    public AddPerformanceButton() {
         setOpaque(false);
         setContentAreaFilled(false);
         setBorderPainted(false);
         setIcon(new ImageIcon(getClass().getResource("/icon's/addIcon.png")));
-        addActionListener(e -> new PerformanceDialog(database, null, null));
+        addActionListener(e -> new PerformanceDialog(null, null));
     }
 }
 

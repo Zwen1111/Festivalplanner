@@ -17,19 +17,18 @@ public class FileSystem implements Database.OnDataChangedListener {
 	private static final String DATABASE_EXTENSION = "fd";
 
     private File file;
-    private Database database;
     private boolean hasDataChanged;
 
-    public FileSystem(Database database) {
+    public FileSystem() {
         hasDataChanged = false;
-        this.database = database;
+        Database.addOnDataChangedListener(this);
     }
 
     public void newCalendar() {
         if(closeCurrentCalendar()) {
             file = null;
-            database.clear();
-            database.notifyDataChanged();
+            Database.clearPerformances();
+            hasDataChanged = false;
         }
     }
 
@@ -39,7 +38,7 @@ public class FileSystem implements Database.OnDataChangedListener {
             return saveAs();
         } else {
             try (ObjectOutputStream output = new ObjectOutputStream(new FileOutputStream(this.file))) {
-                output.writeObject(database.getPerformances());
+                output.writeObject(Database.getPerformances());
                 return true;
             } catch (Exception e) {
                 e.printStackTrace();
@@ -77,7 +76,7 @@ public class FileSystem implements Database.OnDataChangedListener {
                 betterFile = new File(file.getAbsolutePath());
             }
             try (ObjectOutputStream output = new ObjectOutputStream(new FileOutputStream(betterFile))) {
-                output.writeObject(database.getPerformances());
+                output.writeObject(Database.getPerformances());
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -94,17 +93,19 @@ public class FileSystem implements Database.OnDataChangedListener {
 
             int returnVal = fc.showOpenDialog(null);
             if (returnVal == JFileChooser.APPROVE_OPTION) {
-                this.file = fc.getSelectedFile();
                 try (ObjectInputStream input = new ObjectInputStream(new FileInputStream(fc.getSelectedFile()))) {
-                    database.clear();
                     try {
-						database.addPerformances((Collection<Performance>) input.readObject());
+						Collection<Performance> newPerformances = (Collection<Performance>) input.readObject();
+						//Successful read. Only now replace the performances.
+						this.file = fc.getSelectedFile();
+						Database.clearPerformances();
+						Database.addPerformances(newPerformances);
+						hasDataChanged = false;
 					} catch (InvalidClassException e) {
 						JOptionPane.showMessageDialog(null, "There seems to be a mismatch" +
 										" of versions between the software. Sadly, we cannot recover the data.",
 								"Could not read file", JOptionPane.ERROR_MESSAGE);
 					}
-                    database.notifyDataChanged();
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -134,8 +135,10 @@ public class FileSystem implements Database.OnDataChangedListener {
 			int confirmCode = JOptionPane.showConfirmDialog(null, "Do want to save changes?");
 			switch (confirmCode) {
 				case JOptionPane.OK_OPTION: //Yes, save.
-					return save();
+					hasDataChanged = !save();
+					return !hasDataChanged;
 				case JOptionPane.NO_OPTION: //No, don't save.
+					hasDataChanged = false;
 					return true;
 				case JOptionPane.CANCEL_OPTION:
 				case JOptionPane.CLOSED_OPTION: //No decision made.

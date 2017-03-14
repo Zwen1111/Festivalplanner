@@ -16,70 +16,74 @@ import java.util.List;
  */
 public class Database implements Serializable {
 
-	private List<Performance> performances;
-	private List<Artist> artists;
-	private List<Stage> stages;
-	private List<OnDataChangedListener> listeners;
-	private LocalTime nextTime;
+	private static final List<Performance> performances = new ArrayList<>();
+	private static final List<Artist> artists = new ArrayList<>();
+	private static final List<Stage> stages = new ArrayList<>();
+	private static final List<OnDataChangedListener> listeners = new ArrayList<>();
 
 	/**
 	 * Creates a new database.
+	 *
+	 * @deprecated Database now is static. Lists are created automagically.
 	 */
+	@Deprecated
 	public Database() {
-		performances = new ArrayList<>();
-		artists = new ArrayList<>();
-		stages = new ArrayList<>();
-		listeners = new ArrayList<>();
+
 	}
 
-	public void addArtist(Artist artist) {
+	public static void addArtist(Artist artist) {
 		if (!artists.contains(artist)) {
 			artists.add(artist);
-			notifyDataChanged();
+			notifyDataChanged("Added Artist: " + artist);
 		}
 	}
 
-	public void addArtists(Collection<Artist> artists) {
-		artists.forEach(this::addArtist);
+	public static void addArtists(Collection<Artist> artists) {
+		artists.forEach(Database::addArtist);
 	}
 
-	public void addOnDataChangedListener(OnDataChangedListener l) {
+	public static void addOnDataChangedListener(OnDataChangedListener l) {
 		listeners.add(l);
 	}
 
-	public void addPerformance(Performance performance) {
+	public static void addPerformance(Performance performance) {
 		performances.add(performance);
 		addArtists(performance.getArtists());
 		addStage(performance.getStage());
-		notifyDataChanged();
+		notifyDataChanged("Added Performance: " + performance);
 	}
 
-	public void addPerformances(Collection<Performance> performances) {
-		performances.forEach(this::addPerformance);
+	public static void addPerformances(Collection<Performance> performances) {
+		performances.forEach(Database::addPerformance);
 	}
 
-	public void addStage(Stage stage) {
+	public static void addStage(Stage stage) {
 		if (!stages.contains(stage)) {
 			stages.add(stage);
-			notifyDataChanged();
+			notifyDataChanged("Added Stage: " + stage);
 		}
 	}
 
-	public void addStages(Collection<Stage> stages) {
-		stages.forEach(this::addStage);
+	public static void addStages(Collection<Stage> stages) {
+		stages.forEach(Database::addStage);
 	}
 
-	public void clear() {
+	public static void clearPerformances() {
 		performances.clear();
-		stages.clear();
 		artists.clear();
+		notifyDataChanged("Cleared all Performances and Artists");
 	}
 
-	public List<Artist> getArtists() {
+	public static void clearStages() {
+		stages.clear();
+		notifyDataChanged("Cleared all stages");
+	}
+
+	public static List<Artist> getArtists() {
 		return Collections.unmodifiableList(artists);
 	}
 
-	public List<Performance> getPerformances() {
+	public static List<Performance> getPerformances() {
 		return Collections.unmodifiableList(performances);
 	}
 
@@ -87,7 +91,7 @@ public class Database implements Serializable {
 	 *
 	 * @return a list of all stages.
 	 */
-	public List<Stage> getStages() {
+	public static List<Stage> getStages() {
 		return Collections.unmodifiableList(stages);
 	}
 
@@ -100,23 +104,25 @@ public class Database implements Serializable {
 	 * @return the start time of a space matching the requirements, or null if no space
 	 * could be found on this Stage.
 	 */
-	public LocalTime findNextEmptyStageTime(Stage stage, Duration duration) {
-		nextTime = LocalTime.MIDNIGHT;
-		performances.stream().filter(perf -> perf.getStage().equals(stage)).forEach(perf -> {
-			if (perf.getStartTime().isBefore(nextTime.plus(duration)))
-				nextTime = perf.getEndTime();
-		});
+	public static LocalTime findNextEmptyStageTime(Stage stage, Duration duration) {
+		LocalTime nextTime = LocalTime.MIDNIGHT;
+		for (Performance perf : performances) {
+			if (perf.getStage().equals(stage)) {
+				if (perf.getStartTime().isBefore(nextTime.plus(duration)))
+					nextTime = perf.getEndTime();
+			}
+		}
 		return nextTime;
 	}
 
-	public boolean isStageInUse(Stage stage, LocalTime start, LocalTime end, Performance ignore) {
+	public static boolean isStageInUse(Stage stage, LocalTime start, LocalTime end, Performance ignore) {
 		return performances.stream().anyMatch(perf -> (ignore == null || !perf.equals(ignore)) &&
 				perf.getStage().equals(stage) &&
 				((perf.getStartTime().isAfter(start) && perf.getStartTime().isBefore(end)) ||
 						(perf.getEndTime().isAfter(start) && perf.getEndTime().isBefore(end))));
 	}
 
-	public void removeOnDataChangedListener(OnDataChangedListener l) {
+	public static void removeOnDataChangedListener(OnDataChangedListener l) {
 		listeners.remove(l);
 	}
 
@@ -126,13 +132,13 @@ public class Database implements Serializable {
 	 * @param performance the performance that needs to be removed
 	 * @return returns true if the performance is removed else it wil return false
 	 */
-	public boolean removePerformance(Performance performance) {
-		int numerOfPerformance =performances.indexOf(performance);
-		if(performances.get(numerOfPerformance).equals(performance)) {
+	public static boolean removePerformance(Performance performance) {
+		int numerOfPerformance = performances.indexOf(performance);
+		if (performances.get(numerOfPerformance).equals(performance)) {
 			performances.remove(numerOfPerformance);
-			notifyDataChanged();
+			notifyDataChanged("Removed Performance: " + performance);
 			return true;
-		}else return false;
+		} else return false;
 	}
 
 
@@ -140,7 +146,16 @@ public class Database implements Serializable {
 	/**
 	 * Notify all listeners that data in the database has changed.
 	 */
-	public void notifyDataChanged() {
+	public static void notifyDataChanged() {
+		notifyDataChanged(null);
+	}
+
+	/**
+	 * Notify all listeners that data in the database has changed.
+	 *
+	 */
+	public static void notifyDataChanged(String message) {
+		System.out.println("Data changed: " + message);
 		listeners.forEach(OnDataChangedListener::onDataChanged);
 	}
 

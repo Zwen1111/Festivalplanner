@@ -11,7 +11,7 @@ import java.awt.*;
  */
 public class AddArtistDialog extends JDialog {
 
-    public AddArtistDialog(Database database) {
+    public AddArtistDialog() {
         super(null, ModalityType.APPLICATION_MODAL);
         setSize(300, 400);
         setResizable(false);
@@ -54,7 +54,7 @@ public class AddArtistDialog extends JDialog {
         JButton confirm = new JButton("Confirm");
         confirm.setBounds(30,getHeight() - 100, 100,50);
         confirm.addActionListener(e -> {
-            database.addArtist(new Artist(naam.getText(),genre.getText(), (int) popularity.getValue()));
+            Database.addArtist(new Artist(naam.getText(),genre.getText(), (int) popularity.getValue()));
             dispose();
         });
         add(confirm);

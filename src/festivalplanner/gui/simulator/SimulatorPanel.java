@@ -13,13 +13,13 @@ public class SimulatorPanel extends JPanel implements ActionListener {
 
     private ArrayList<JButton> buttonArrayList;
     private TileMapPanel tileMapPanel;
+    private ArrayList<Visitor> vistors;
 
     public SimulatorPanel() {
     	setName("TileMapPanel");
         buttonArrayList = new ArrayList<>();
         tileMapPanel = new TileMapPanel();
         tileMapPanel.setBackground(Color.black);
-
 
 
         SpringLayout springLayout = new SpringLayout();
@@ -85,7 +85,7 @@ public class SimulatorPanel extends JPanel implements ActionListener {
 
 
         int fps = 60;
-        new Timer(fps/1000,this).start();
+        new Timer(1000/fps,this).start();
     }
 
     public void loadButtons() {
@@ -101,6 +101,7 @@ public class SimulatorPanel extends JPanel implements ActionListener {
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		tileMapPanel.update();
+
 		repaint();
 	}
 }

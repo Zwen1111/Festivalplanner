@@ -9,9 +9,9 @@ import javax.json.JsonObject;
  */
 public class CollisionLayer extends TileLayer {
 
-	public static final int WALL_TILE = 1;
-	public static final int PATH_TILE = 2;
-	public static final int STAGE_TILE = 3;
+	public static final int WALL_TILE = 2049;
+	public static final int PATH_TILE = 2050;
+	public static final int STAGE_TILE = 2051;
 
 	public CollisionLayer(JsonObject layerJson) {
 		super(layerJson);

@@ -34,7 +34,14 @@ public class Simulator {
 	public void runSimulation() {
 		for (Visitor v : visitors) {
 			v.update();
-			v.checkcollision((ArrayList<Visitor>) visitors);
+			boolean collided = v.checkcollision((ArrayList<Visitor>) visitors);
+			if (collided) {
+				Point2D newDest = getNextWayPoint(v.getPosition(), v.getTarget());
+				if (newDest != null) {
+					v.setxDestination(newDest.getX());
+					v.setyDestination(newDest.getY());
+				}
+			}
 			if (v.isTargetSet()) {
 				Point2D destiny = new Point2D.Double(v.getxDestination(), v.getyDestination());
 				if (v.getPosition().distance(destiny) < 20) {
@@ -63,11 +70,6 @@ public class Simulator {
 				}
 			}*/
 		}
-	}
-
-	public boolean collidesWithWall(Point2D futurePosition, Target target) {
-		Target.Distance dist = target.getDistances(futurePosition);
-		return dist.getCenter() < 0;
 	}
 
 	public Point2D getNextWayPoint(Point2D currentPosition, Target target) {

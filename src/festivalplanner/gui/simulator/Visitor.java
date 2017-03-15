@@ -144,9 +144,9 @@ private Target target;
 
     }
 
-    public void checkcollision(ArrayList<Visitor> visitors)
+    public boolean checkcollision(ArrayList<Visitor> visitors)
     {
-        if (target == null) return;
+        if (target == null) return false;
         boolean collision = false;
 
         if (target.getDistances(newPosition).getCenter() < 0 || !target.isAdjacent(position, newPosition)) {
@@ -171,9 +171,7 @@ private Target target;
         } else {
             angle += 0.2;
         }
-
-
-
+        return collision;
     }
 
 

@@ -32,9 +32,16 @@ private int maxBlather;
 
 private boolean isThirsty;
 
+    private boolean remove;
+
 private CurrentAction currentAction;
 
-public enum CurrentAction {
+    public boolean getRemove() {
+        return remove;
+    }
+
+
+    public enum CurrentAction {
         IDLE,PEEING,WATCHING,BUYINGDRINKS,
     }
 
@@ -69,6 +76,7 @@ public static java.util.List<BufferedImage> images;
         blather = (int) Math.random() * 500;
         hasToPee = false;
 
+        currentAction = CurrentAction.IDLE;
     }
 
     public void draw(Graphics2D g)
@@ -91,7 +99,7 @@ public static java.util.List<BufferedImage> images;
 
     public void update()
     {
-        preferences();
+
         double dx = destination.getX() - position.getX();
         double dy = destination.getY() - position.getY();
 
@@ -113,6 +121,7 @@ public static java.util.List<BufferedImage> images;
         newPosition = new Point2D.Double(
                 position.getX() + speed * Math.cos(angle),
                 position.getY() + speed * Math.sin(angle));
+        preferences();
     }
 
     private void preferences() {
@@ -124,22 +133,28 @@ public static java.util.List<BufferedImage> images;
         // checks howLong a visitor
         if(isAtTarget()){
             timeAtTarget++;
-            if(currentAction == CurrentAction.PEEING && timeAtTarget >= 300){
+            if(destination.equals(new Point2D.Double(200,900)))
+                remove = true;
+            if(currentAction == CurrentAction.PEEING && timeAtTarget >= 30){
                 pee();
-            }else if(currentAction == CurrentAction.BUYINGDRINKS && timeAtTarget >=  120){
+            }else if(currentAction == CurrentAction.BUYINGDRINKS && timeAtTarget >=  12){
                 drink();
-            }
+            }else if(currentAction == CurrentAction.WATCHING && timeAtTarget >= 30){
+                currentAction = CurrentAction.IDLE;
+            }else if(currentAction != CurrentAction.IDLE)
+                newPosition = position;
         }
         //checks if the currentaction  = idle. if currentAction = idle then it wil select a random action
         if(currentAction == CurrentAction.IDLE) {
             timeAtTarget = 0;
-            int action = (int) Math.random() * 2;
+            int action = (int) (Math.random() * 2);
             switch (action) {
-                case 1:
+                case 0:
                     isThirsty = true;
                     break;
-                case 2:
+                case 1:
                     currentAction = CurrentAction.WATCHING;
+                    destination = new Point2D.Double(100,100);
                     /*currentTarget = random stage check if an performance is on the change
 
                     if so currentTarget is that stage
@@ -153,8 +168,10 @@ public static java.util.List<BufferedImage> images;
             if (currentAction != CurrentAction.PEEING && hasToPee) {
                 currentAction = CurrentAction.PEEING;
                 //currentTarget = getNearestToilet;
+                destination = new Point2D.Double(1000,200);
             } else if (currentAction != CurrentAction.BUYINGDRINKS && isThirsty) {
                 currentAction = CurrentAction.BUYINGDRINKS;
+                destination = new Point2D.Double(800,800);
                 //currentTarget = getNearestStand;
             }
     }
@@ -178,7 +195,7 @@ public static java.util.List<BufferedImage> images;
         if(!collision)
         {
         position = newPosition;
-        }else angle += 0.2;
+        } else angle += 0.2;
          return collision;
     }
 
@@ -198,13 +215,14 @@ public static java.util.List<BufferedImage> images;
 
     public void pee(){
         hasToPee = false;
-        currentAction = CurrentAction.IDLE;
+        //currentAction = CurrentAction.IDLE;
         blather = 0;
+        destination = new Point2D.Double(200,900);
     }
 
     public boolean isAtTarget(){
-        //return position.distance(currentTarget.getPosition) < 10;
-        return true;
+        return position.distance(destination/*currentTarget.getPosition*/) < 50;
+        //return true;
     }
 
 }

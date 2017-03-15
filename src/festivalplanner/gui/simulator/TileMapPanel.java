@@ -7,6 +7,7 @@ import java.awt.*;
 import java.awt.event.*;
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
+import java.util.Iterator;
 
 /**
  * The TileMapPanel displays a TileMap. The map can be dragged and zoomed using mouse
@@ -30,6 +31,8 @@ public class TileMapPanel extends JPanel implements MouseMotionListener, MouseWh
 	private boolean init;
 	private ArrayList<Visitor> visitors;
 
+
+
 	public TileMapPanel() {
 		super(null);
 		init = false;
@@ -39,13 +42,8 @@ public class TileMapPanel extends JPanel implements MouseMotionListener, MouseWh
 		mousePosition = new Point2D.Double(0, 0);
 		visitors = new ArrayList<>();
 		Visitor.getImages();
-		for(int index = 0; index < 2000; index++) {
-			Point2D.Double position = new  Point2D.Double(Math.random() * 1000, Math.random() * 900);
-			Visitor visitor = new Visitor(3, position );
-			if(canSpawn(visitor)) {
-                visitors.add(visitor);
-            }
-		}
+
+
 
 		addMouseMotionListener(this);
 		addMouseListener(this);
@@ -60,9 +58,24 @@ public class TileMapPanel extends JPanel implements MouseMotionListener, MouseWh
     }
 
     public void update() {
-		for (Visitor v : visitors) {
-			v.update();
+		if (visitors.size() <= 200) {
+			Point2D.Double position = new  Point2D.Double(1800, 900);
+			Visitor visitor = new Visitor(1, position );
+			if(canSpawn(visitor)) {
+				visitors.add(visitor);
+			}
 		}
+
+		Iterator<Visitor> visitorIterator = visitors.iterator();
+		while (visitorIterator.hasNext())
+		{
+			Visitor v = visitorIterator.next();
+			v.update();
+			if(v.getRemove()){
+				visitorIterator.remove();
+			}
+		}
+
 		for (Visitor v : visitors) {
 			v.checkcollision(visitors);
             if (v.getPosition().getX() > map.getMapWidth()) {

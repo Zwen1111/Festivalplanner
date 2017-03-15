@@ -4,6 +4,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.time.LocalTime;
 import java.util.ArrayList;
 
 /**
@@ -13,6 +14,10 @@ public class SimulatorPanel extends JPanel implements ActionListener {
 
     private ArrayList<JButton> buttonArrayList;
     private TileMapPanel tileMapPanel;
+
+    private LocalTime time;
+    private JLabel timeLabel;
+    private Long startTime;
 
     public SimulatorPanel() {
     	setName("TileMapPanel");
@@ -24,10 +29,11 @@ public class SimulatorPanel extends JPanel implements ActionListener {
         SpringLayout springLayout = new SpringLayout();
         this.setLayout(springLayout);
 
-        JButton playButton = new JButton(new ImageIcon(getClass().getResource("/icon's/playIcon.png")));
+        JButton playButton = new JButton(new ImageIcon(getClass().getResource("/icon's/pauseIcon.png")));
         JButton zoomInButton = new JButton(new ImageIcon(getClass().getResource("/icon's/zoomInIcon.png")));
         JButton zoomOutButton = new JButton(new ImageIcon(getClass().getResource("/icon's/zoomOutIcon.png")));
-        JLabel timeLabel = new JLabel("10:31");
+        time = LocalTime.of(7,0);
+        timeLabel = new JLabel(time.getHour() + ":" + time.getMinute());
 
 
 
@@ -35,7 +41,7 @@ public class SimulatorPanel extends JPanel implements ActionListener {
         buttonArrayList.add(zoomInButton);
         buttonArrayList.add(zoomOutButton);
 
-        playButton.setName("Play");
+        playButton.setName("Pause");
 
         playButton.addActionListener(e -> {
 
@@ -82,7 +88,7 @@ public class SimulatorPanel extends JPanel implements ActionListener {
         add(tileMapPanel);
 
 
-
+        startTime = System.currentTimeMillis();
         int fps = 60;
         new Timer(1000/fps,this).start();
     }
@@ -99,8 +105,15 @@ public class SimulatorPanel extends JPanel implements ActionListener {
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
-        if(buttonArrayList.get(0).getName().equals("Play"))
-		tileMapPanel.update();
+        long elapsed = System.currentTimeMillis() - startTime;
+        if(buttonArrayList.get(0).getName().equals("Play")) {
+            if(elapsed >= 200) {
+                timeLabel.setText(time.toString());
+                time = time.plusMinutes(1);
+                startTime = System.currentTimeMillis();
+            }
+            tileMapPanel.update();
+        }
 
 		repaint();
 	}

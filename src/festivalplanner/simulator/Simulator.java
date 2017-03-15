@@ -22,34 +22,76 @@ public class Simulator {
 		}
 	}
 
+	public void setVisitorTarget(Visitor v, Target t) {
+		Point2D newDest = getNextWayPoint(v.getPosition(), t);
+		if (newDest != null) {
+			v.setTarget(t);
+			v.setxDestination(newDest.getX());
+			v.setyDestination(newDest.getY());
+		}
+	}
+
 	public void runSimulation() {
 		for (Visitor v : visitors) {
 			v.update();
 			v.checkcollision((ArrayList<Visitor>) visitors);
-			if (v.getTarget() != null) {
+			if (v.isTargetSet()) {
+				Point2D destiny = new Point2D.Double(v.getxDestination(), v.getyDestination());
+				if (v.getPosition().distance(destiny) < 20) {
+					Point2D newDest = getNextWayPoint(destiny, v.getTarget());
+					if (newDest != null) {
+						v.setxDestination(newDest.getX());
+						v.setyDestination(newDest.getY());
+					}
+				}
+			}
+			/*if (v.getTarget() != null) {
 				Point2D destiny = new Point2D.Double(v.getxDestination(), v.getyDestination());
 				if (!v.isTargetSet() || v.getPosition().distance(destiny) < 20) {
-					Point2D newDest = getNextWayPoint(destiny, v.getTarget());
+					Point2D newDest = getNextWayPoint(v.isTargetSet() ? destiny : v.getTarget().getPosition(), v.getTarget());
 					if (newDest != null) {
 						v.setTargetSet(true);
 						v.setxDestination(newDest.getX());
 						v.setyDestination(newDest.getY());
 					} else {
-						v.setTargetSet(false);
-						v.setxDestination(v.getTarget().getPosition().getX());
-						v.setyDestination(v.getTarget().getPosition().getY());
+						if (v.isTargetSet()) {
+							v.setxDestination(v.getTarget().getPosition().getX());
+							v.setyDestination(v.getTarget().getPosition().getY());
+						}
+						//v.setTargetSet(false);
 					}
 				}
-			}
+			}*/
 		}
 	}
 
+	public boolean collidesWithWall(Point2D futurePosition, Target target) {
+		Target.Distance dist = target.getDistances(futurePosition);
+		return dist.getCenter() < 0;
+	}
+
 	public Point2D getNextWayPoint(Point2D currentPosition, Target target) {
+		if (currentPosition == null || target == null) return null;
 		Target.Distance distance = target.getDistances(currentPosition);
 		//System.out.println("Current: " + currentPosition);
-		if (distance.getCenter() <= 0) return null;
+		if (distance.getCenter() < 0) return null;
+		List<Point2D> possibleDirections = new ArrayList<>();
 		int c = distance.getCenter();
 		int n = distance.getNorth();
+		int e = distance.getEast();
+		int s = distance.getSouth();
+		int w = distance.getWest();
+		if ((n == 0 || n == c - 1) && n >= 0)
+			possibleDirections.add(distance.getNorthPoint());
+		if ((e == 0 || e == c - 1) && e >= 0)
+			possibleDirections.add(distance.getEastPoint());
+		if ((s == 0 || s == c - 1) && s >= 0)
+			possibleDirections.add(distance.getSouthPoint());
+		if ((w == 0 || w == c - 1) && w >= 0)
+			possibleDirections.add(distance.getWestPoint());
+		if (possibleDirections.isEmpty()) return null;
+		else return possibleDirections.get((int) Math.floor(Math.random() * possibleDirections.size()));
+		/*int n = distance.getNorth();
 		int e = distance.getEast();
 		int s = distance.getSouth();
 		int w = distance.getWest();
@@ -60,7 +102,7 @@ public class Simulator {
 				case 2: if (s == c - 1) return distance.getSouthPoint();
 				case 3: if (w == c - 1) return distance.getWestPoint();
 			}
-		}
+		}*/
 		/*if (distance.getNorth() == distance.getCenter() - 1) {
 			System.out.println("North: " + distance.getNorthPoint());
 			return distance.getNorthPoint();

@@ -21,7 +21,6 @@ private double xDestination;
 private double yDestination;
 private Point2D newPosition;
 private Target target;
-private boolean targetSet;
 
 
     public double getxDestination() {
@@ -67,16 +66,11 @@ private boolean targetSet;
     }
 
     public void setTarget(Target newTarget) {
-        targetSet = false;
         target = newTarget;
     }
 
-    public void setTargetSet(boolean value) {
-        targetSet = value;
-    }
-
     public boolean isTargetSet() {
-        return targetSet;
+        return target != null;
     }
 
     public Target getTarget() {
@@ -103,7 +97,7 @@ private boolean targetSet;
     public void draw(Graphics2D g)
     {
         g.setColor(Color.RED);
-        Ellipse2D.Double circle = new Ellipse2D.Double(position.getX(),position.getY(),size,size);
+        Ellipse2D.Double circle = new Ellipse2D.Double(position.getX() - size/2,position.getY() - size/2,size,size);
         g.fill(circle);
 
 
@@ -121,6 +115,7 @@ private boolean targetSet;
 
     public void update()
     {
+        if (target == null) return;
         double dx = xDestination - position.getX();
         double dy = yDestination - position.getY();
 
@@ -149,28 +144,36 @@ private boolean targetSet;
 
     }
 
-    public boolean checkcollision(ArrayList<Visitor> visitors)
+    public void checkcollision(ArrayList<Visitor> visitors)
     {
+        if (target == null) return;
         boolean collision = false;
 
-        for(Visitor v : visitors )
-        {
+        if (target.getDistances(newPosition).getCenter() < 0 || !target.isAdjacent(position, newPosition)) {
+            collision = true;
+        } else {
+            for (Visitor v : visitors) {
 
 
-            if(v.position.distance(newPosition) < size && !v.equals(this)) {
-                collision = true;
-                break;
+                if (v.position.distance(newPosition) < size && !v.equals(this)) {
+                    collision = true;
+                    break;
+                }
+
             }
-
         }
 
-        if(!collision)
-        {
-        position = newPosition;
-        }else angle += 0.2;
+        if(!collision) {
+            position = newPosition;
+        } else if (target.getDistances(position).getCenter() < 0) {
+            //Respawn!
+            setTarget(null);
+        } else {
+            angle += 0.2;
+        }
 
 
-    return collision;
+
     }
 
 

@@ -66,7 +66,14 @@ public class SimulatorPanel extends JPanel implements MouseMotionListener, Mouse
 		if (target != null) {
 			for (int x = 0; x < target.getLayer().getWidth(); x++) {
 				for (int y = 0; y < target.getLayer().getHeight(); y++) {
-					g2d.drawString(String.valueOf(target.getDistance(x, y)),
+					int dist = target.getDistance(x, y);
+	/*				//g2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_ATOP, 0.2f));
+					g2d.setPaint(dist < 0 ? Color.blue : Color.yellow);
+					g2d.fillRect(x * map.getTileWidth(), y * map.getTileHeight(),
+							map.getTileWidth(), map.getTileHeight());
+					g2d.setPaint(Color.black);
+					//g2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC, 1.0f));*/
+					g2d.drawString(String.valueOf(dist),
 							x * map.getTileWidth(),
 							y * map.getTileHeight() + 10);
 				}
@@ -75,6 +82,11 @@ public class SimulatorPanel extends JPanel implements MouseMotionListener, Mouse
 		for(Visitor v : simulator.getVisitors())
 		{
 			v.draw(g2d);
+			if (target != null && !v.isTargetSet()) {
+				v.setPosition(new Point2D.Double(Math.random() * map.getMapWidth(),
+						Math.random() * map.getMapHeight()));
+				simulator.setVisitorTarget(v, target);
+			}
 		}
 
 	}
@@ -153,7 +165,8 @@ public class SimulatorPanel extends JPanel implements MouseMotionListener, Mouse
 				e.getY() / scale - translateY / scale), map){};
 		System.out.println("took " + (System.currentTimeMillis() - mil) + " ms");
 		for (Visitor v : simulator.getVisitors()) {
-			v.setTarget(target);
+			simulator.setVisitorTarget(v, target);
+			//v.setTarget(target);
 			//v.setxDestination(e.getX() / scale - translateX / scale);
 			//v.setyDestination(e.getY() / scale - translateY / scale);
 		}

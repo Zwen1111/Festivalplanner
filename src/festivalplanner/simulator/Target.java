@@ -4,10 +4,7 @@ import festivalplanner.simulator.data.CollisionLayer;
 import festivalplanner.simulator.map.TileMap;
 
 import java.awt.geom.Point2D;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.LinkedList;
-import java.util.Queue;
+import java.util.*;
 
 /**
  * @author Coen Boelhouwers
@@ -26,6 +23,9 @@ public abstract class Target {
 		this.map = map;
 		this.data = map.getCollisionLayer();
 		destinations = new int[data.getWidth()][data.getHeight()];
+		for (int i = 0; i < destinations.length; i++) {
+			Arrays.fill(destinations[i], -5);
+		}
 		startIndex = data.getIndex((int) Math.floor(position.getX() / map.getTileWidth()),
 				(int) Math.floor(position.getY() / map.getTileHeight()));
 		bfs();
@@ -33,6 +33,19 @@ public abstract class Target {
 
 	private void setCell(int index, int value) {
 		destinations[index % data.getWidth()][Math.floorDiv(index, data.getWidth())] = value;
+	}
+
+	public boolean isAdjacent(Point2D base, Point2D other) {
+		int baseX = (int) Math.floor(base.getX() / map.getTileWidth());
+		int baseY = (int) Math.floor(base.getY() / map.getTileHeight());
+		int otherX = (int) Math.floor(other.getX() / map.getTileWidth());
+		int otherY = (int) Math.floor(other.getY() / map.getTileHeight());
+		return Math.abs(baseX - otherX) + Math.abs(baseY - otherY) <= 1;
+		/*return (otherX == baseX && otherY == baseY) ||
+				(otherX == baseX && otherY == baseY - 1) ||
+				(otherX == baseX + 1 && otherY == baseY) ||
+				(otherX == baseX && otherY == baseY + 1) ||
+				(otherX == baseX - 1 && otherY == baseY);*/
 	}
 
 	public Distance getDistances(Point2D position) {
@@ -63,7 +76,7 @@ public abstract class Target {
 		Queue<Integer> queue = new LinkedList<>();
 		Collection<Integer> checked = new ArrayList<>();
 
-		logic(queue, checked, -1, startIndex, data.getData(startIndex));
+		logic(queue, checked, 0, startIndex, data.getData(startIndex));
 		bfs(queue, checked, startIndex);
 		System.out.println("Starting index's value: " + data.getData(startIndex));
 
@@ -111,6 +124,11 @@ public abstract class Target {
 			case CollisionLayer.WALL_TILE:
 				setCell(cellIndex, -1);
 				//System.out.println(-1);
+				break;
+			case CollisionLayer.STAGE_TILE:
+				if (fromDistance == 0) setCell(cellIndex, fromDistance);
+				else setCell(cellIndex, fromDistance + 1);
+				q.offer(cellIndex);
 				break;
 			default:
 				//System.out.println("x");

@@ -1,10 +1,9 @@
 package festivalplanner.gui;
 
-import festivalplanner.Main;
 import festivalplanner.data.Database;
 import festivalplanner.gui.dialog.AddArtistDialog;
 import festivalplanner.gui.dialog.AddStageDialog;
-import festivalplanner.gui.simulator.SimulatorPanel;
+import festivalplanner.gui.simulator.SimulatorTabGUI;
 import festivalplanner.util.FileSystem;
 import festivalplanner.gui.table.CalendarTable;
 import festivalplanner.gui.table2d.CalendarTable2D;
@@ -46,7 +45,7 @@ public class GUIFrame extends JFrame implements Database.OnDataChangedListener{
 
 		CalendarTable panelTable = new CalendarTable();
 
-		JPanel simulator = new SimulatorPanel();
+		JPanel simulator = new SimulatorTabGUI();
 
 		tabs.addChangeListener(e -> {
             Component p = ((JTabbedPane) e.getSource()).getSelectedComponent();

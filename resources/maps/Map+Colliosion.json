@@ -84,7 +84,7 @@
                      "capacity":"int"
                     },
                  "rotation":0,
-                 "type":"",
+                 "type":"stage",
                  "visible":true,
                  "width":252,
                  "x":641.333,
@@ -103,7 +103,7 @@
                      "capacity":"int"
                     },
                  "rotation":0,
-                 "type":"",
+                 "type":"stage",
                  "visible":true,
                  "width":74.6667,
                  "x":194.667,
@@ -114,7 +114,7 @@
                  "id":3,
                  "name":"MainStage",
                  "rotation":0,
-                 "type":"",
+                 "type":"stage",
                  "visible":true,
                  "width":285.333,
                  "x":1313.33,
@@ -133,7 +133,7 @@
                      "capacity":"int"
                     },
                  "rotation":0,
-                 "type":"",
+                 "type":"toilet",
                  "visible":true,
                  "width":31,
                  "x":288,
@@ -144,7 +144,7 @@
                  "id":14,
                  "name":"Gate",
                  "rotation":0,
-                 "type":"",
+                 "type":"gate",
                  "visible":true,
                  "width":123,
                  "x":1699,
@@ -163,7 +163,7 @@
                      "capacity":"int"
                     },
                  "rotation":0,
-                 "type":"",
+                 "type":"toilet",
                  "visible":true,
                  "width":31,
                  "x":320.5,
@@ -182,7 +182,7 @@
                      "capacity":"int"
                     },
                  "rotation":0,
-                 "type":"",
+                 "type":"toilet",
                  "visible":true,
                  "width":31,
                  "x":352.5,
@@ -201,7 +201,7 @@
                      "capacity":"int"
                     },
                  "rotation":0,
-                 "type":"",
+                 "type":"toilet",
                  "visible":true,
                  "width":31,
                  "x":384.5,
@@ -220,7 +220,7 @@
                      "capacity":"int"
                     },
                  "rotation":0,
-                 "type":"",
+                 "type":"toilet",
                  "visible":true,
                  "width":31,
                  "x":1759.25,
@@ -239,7 +239,7 @@
                      "capacity":"int"
                     },
                  "rotation":0,
-                 "type":"",
+                 "type":"toilet",
                  "visible":true,
                  "width":31,
                  "x":1823.75,
@@ -258,7 +258,7 @@
                      "capacity":"int"
                     },
                  "rotation":0,
-                 "type":"",
+                 "type":"toilet",
                  "visible":true,
                  "width":31,
                  "x":1791.75,
@@ -277,7 +277,7 @@
                      "capacity":"int"
                     },
                  "rotation":0,
-                 "type":"",
+                 "type":"toilet",
                  "visible":true,
                  "width":31,
                  "x":1855.75,
@@ -311,7 +311,7 @@
         {
          "columns":32,
          "firstgid":1,
-         "image":"terrain.png",
+         "image":"..\/tilesets\/terrain.png",
          "imageheight":1024,
          "imagewidth":1024,
          "margin":0,
@@ -620,7 +620,7 @@
         {
          "columns":32,
          "firstgid":1025,
-         "image":"terrain_atlas.png",
+         "image":"..\/tilesets\/terrain_atlas.png",
          "imageheight":1024,
          "imagewidth":1024,
          "margin":0,
@@ -693,7 +693,7 @@
         {
          "columns":3,
          "firstgid":2049,
-         "image":"Collision.png",
+         "image":"..\/tilesets\/Collision.png",
          "imageheight":32,
          "imagewidth":96,
          "margin":0,
@@ -706,7 +706,7 @@
         {
          "columns":32,
          "firstgid":2052,
-         "image":"build_atlas.png",
+         "image":"..\/tilesets\/build_atlas.png",
          "imageheight":1024,
          "imagewidth":1024,
          "margin":0,
@@ -719,7 +719,7 @@
         {
          "columns":32,
          "firstgid":3076,
-         "image":"obj_misk_atlas.png",
+         "image":"..\/tilesets\/obj_misk_atlas.png",
          "imageheight":1024,
          "imagewidth":1024,
          "margin":0,
@@ -744,7 +744,7 @@
         {
          "columns":20,
          "firstgid":4100,
-         "image":"..\/..\/Downloads\/Market-Preset-byLunarea.png",
+         "image":"..\/tilesets\/Market-Preset-byLunarea.png",
          "imageheight":480,
          "imagewidth":640,
          "margin":0,

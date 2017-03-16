@@ -11,7 +11,7 @@ import java.util.*;
  */
 public abstract class Target {
 
-	private int capacity;
+	protected int capacity;
 	private Point2D position;
 	private int[][] destinations;
 	private TileMap map;

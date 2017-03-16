@@ -1,5 +1,6 @@
 package festivalplanner.gui.simulator;
 
+import festivalplanner.data.Database;
 import festivalplanner.simulator.Target;
 import festivalplanner.simulator.map.SimpleTarget;
 import festivalplanner.simulator.map.TileMap;
@@ -36,16 +37,17 @@ public class SimulatorPanel extends JPanel implements MouseMotionListener, Mouse
 	public SimulatorPanel() {
 		super(null);
 		init = false;
-		simulator = new Simulator();
+
 		map = new TileMap(getClass().getResource("/maps/Map+Colliosion.json").getPath());
 		map.buildMap(6);
+		simulator = new Simulator(map);
+		Database.addTargetsFromLayer(map.getObjectLayer(),map);
 		scale = 0.65;
 		mousePosition = new Point2D.Double(0, 0);
 
 		addMouseMotionListener(this);
 		addMouseListener(this);
 		addMouseWheelListener(this);
-
 	}
 
 

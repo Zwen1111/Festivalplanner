@@ -1,8 +1,9 @@
 package festivalplanner.gui.simulator;
 
+import festivalplanner.simulator.Simulator;
 import festivalplanner.simulator.Target;
+import festivalplanner.simulator.map.ToiletTarget;
 
-import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
@@ -32,12 +33,15 @@ public class Visitor {
 	private boolean hasToPee;
 	private int blather;
 	private int maxBlather;
+	private List<ToiletTarget> fullToilets;
 
 	private boolean isThirsty;
 
 	private boolean remove;
 
 	private CurrentAction currentAction;
+	private Target currentTarget;
+	private Simulator simulator;
 
 	public boolean getRemove() {
 		return remove;
@@ -49,8 +53,10 @@ public class Visitor {
 	}
 
 
-	public Visitor(double speed, Point2D position, BufferedImage image) {
+	public Visitor(double speed, Point2D position, BufferedImage image, Simulator simulator) {
+		fullToilets = new ArrayList<>();
 		this.speed = speed;
+		this.simulator = simulator;
 		angle = 0.0;
 		this.position = position;
 		destination = new Point2D.Double(500, 500);
@@ -59,11 +65,15 @@ public class Visitor {
 
 		currentAction = CurrentAction.IDLE;
 
+
 		maxBlather = 1000;
 		blather = (int) Math.random() * 500;
 		hasToPee = false;
 
-		currentAction = CurrentAction.IDLE;
+		//blather = maxBlather;
+
+
+
 	}
 
 	public void draw(Graphics2D g) {
@@ -126,12 +136,42 @@ public class Visitor {
 			hasToPee = true;
 		}
 
+		if (currentAction != CurrentAction.PEEING && hasToPee) {
+			currentAction = CurrentAction.PEEING;
+			currentTarget = simulator.getNearestToilet(position);
+			destination = currentTarget.getPosition();
+		} else if (currentAction != CurrentAction.BUYINGDRINKS && isThirsty) {
+			currentAction = CurrentAction.BUYINGDRINKS;
+			destination = new Point2D.Double(1200, 900);
+			//currentTarget = getNearestStand;
+		}
+
 		// checks howLong a visitor
 		if (isAtTarget()) {
 			timeAtTarget++;
 			if (destination.equals(new Point2D.Double(200, 900)))
 				remove = true;
-			if (currentAction == CurrentAction.PEEING && timeAtTarget >= 30) {
+			//peeing
+			ToiletTarget currentToilet = (ToiletTarget) simulator.getNearestToilet(position);;
+			if(currentAction == CurrentAction.PEEING) {
+				/*while (currentToilet != null && currentToilet.isFull() ) {
+					if(currentToilet.isFull()) {
+						fullToilets.add(currentToilet);
+					}
+					currentToilet = simulator.getNearestToiletExcept(position, fullToilets);
+				}*/
+
+
+				if(currentToilet !=  null) {
+					currentToilet.use();
+					currentTarget = currentToilet;
+					destination = currentTarget.getPosition();
+				}else {
+					currentAction = CurrentAction.IDLE;
+				}
+			}
+
+			if (currentAction == CurrentAction.PEEING && timeAtTarget >= 30 ) {
 				pee();
 			} else if (currentAction == CurrentAction.BUYINGDRINKS && timeAtTarget >= 12) {
 				drink();
@@ -150,7 +190,7 @@ public class Visitor {
 					break;
 				case 1:
 					currentAction = CurrentAction.WATCHING;
-					destination = new Point2D.Double(100, 100);
+					destination = new Point2D.Double(1000, 100);
                     /*currentTarget = random stage check if an performance is on the change
 
                     if so currentTarget is that stage
@@ -161,15 +201,7 @@ public class Visitor {
 			}
 		}
 
-		if (currentAction != CurrentAction.PEEING && hasToPee) {
-			currentAction = CurrentAction.PEEING;
-			//currentTarget = getNearestToilet;
-			destination = new Point2D.Double(1000, 200);
-		} else if (currentAction != CurrentAction.BUYINGDRINKS && isThirsty) {
-			currentAction = CurrentAction.BUYINGDRINKS;
-			destination = new Point2D.Double(800, 800);
-			//currentTarget = getNearestStand;
-		}
+
 	}
 
 	public boolean checkcollision(List<Visitor> visitors) {
@@ -220,6 +252,9 @@ public class Visitor {
         hasToPee = false;
         //currentAction = CurrentAction.IDLE;
         blather = 0;
+        ToiletTarget currentToilet = (ToiletTarget) currentTarget;
+        currentToilet.done();
+        fullToilets = new ArrayList<>();
         destination = new Point2D.Double(200,900);
     }
 

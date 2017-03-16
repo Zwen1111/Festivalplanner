@@ -26,6 +26,7 @@ public class TileMap {
 	private TilesetManager tilesetManager;
 	private List<TileLayer> layers;
 	private CollisionLayer collisionLayer;
+	private ObjectLayer objectLayer;
 	private BufferedImage currentMap;
 	private int mapHeight;
 	private int mapWidth;
@@ -54,15 +55,17 @@ public class TileMap {
 					} else if (layer instanceof TileLayer) {
 						layers.add((TileLayer) layer);
 					} else if (layer instanceof ObjectLayer) {
-						if (layer.getTitle().equals("Objects"))
+						if (layer.getTitle().equals("Objects")) {
 							Database.addStages(((ObjectLayer) layer).parseAsStagesLayer());
+
+						}
+						objectLayer = (ObjectLayer) layer;
 					}
 				} catch (TileLayer.UnsupportedLayerTypeException e) {
 					System.out.println("Some layer was of the wrong type:");
 					e.printStackTrace();
 				}
 			}
-
 
 
 		} catch (FileNotFoundException e) {
@@ -130,7 +133,12 @@ public class TileMap {
 		return tileWidth;
 	}
 
-    public int getTileHeight() {
-        return tileHeight;
-    }
+
+	public int getTileHeight() {
+		return tileHeight;
+	}
+
+	public ObjectLayer getObjectLayer() {
+		return objectLayer;
+	}
 }

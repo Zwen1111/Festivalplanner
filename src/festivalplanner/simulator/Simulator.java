@@ -60,7 +60,7 @@ public class Simulator {
 
 	public void runSimulation() {
 		if (visitors.size() <= maxVisitors) {
-			Point2D.Double position = new  Point2D.Double(1800, 900);
+			Point2D.Double position = new  Point2D.Double(1710, 750);
 			Visitor visitor = new Visitor(3, position, images.get((int) (Math.random() * 8)));
 			if(canSpawn(visitor)) {
 				visitors.add(visitor);
@@ -85,11 +85,16 @@ public class Simulator {
 				}
 			}
 			if (v.isTargetSet()) {
-				Point2D destiny = v.getDestination();
-				if (v.getPosition().distance(destiny) < 20) {
-					Point2D newDest = getNextWayPoint(destiny, v.getTarget());
-					if (newDest != null) {
-						v.setDestination(newDest);
+				if (!v.isDestinationSet()) {
+					//Visitor's target has changed, but the first way-point isn't set yet.
+					v.setDestination(getNextWayPoint(v.getPosition(), v.getTarget()));
+				} else {
+					Point2D destiny = v.getDestination();
+					if (v.getPosition().distance(destiny) < 30) {
+						Point2D newDest = getNextWayPoint(destiny, v.getTarget());
+						if (newDest != null) {
+							v.setDestination(newDest);
+						}
 					}
 				}
 			}

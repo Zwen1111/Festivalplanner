@@ -41,7 +41,6 @@ public class Visitor {
 	private boolean remove;
 
 	private CurrentAction currentAction;
-	private Target currentTarget;
 
 	public boolean getRemove() {
 		return remove;
@@ -58,7 +57,8 @@ public class Visitor {
 		this.speed = speed;
 		angle = 0.0;
 		this.position = position;
-		destination = new Point2D.Double(500, 500);
+		//destination = new Point2D.Double(500, 500);
+		//setTarget(Navigator.getDummyStage());
 		radius = 10;
 		this.image = image;
 
@@ -104,6 +104,10 @@ public class Visitor {
 	}
 
 	public void update() {
+		if (destination == null) {
+			newPosition = position;
+			return;
+		}
 
 		double dx = destination.getX() - position.getX();
 		double dy = destination.getY() - position.getY();
@@ -137,21 +141,22 @@ public class Visitor {
 
 		if (currentAction != CurrentAction.PEEING && hasToPee) {
 			currentAction = CurrentAction.PEEING;
-			currentTarget = Navigator.getNearestToilet(position);
-			destination = currentTarget.getPosition();
+			//setTarget(Navigator.getNearestToilet(position));
+			//destination = currentTarget.getPosition();
 		} else if (currentAction != CurrentAction.BUYINGDRINKS && isThirsty) {
 			currentAction = CurrentAction.BUYINGDRINKS;
-			destination = new Point2D.Double(1200, 900);
+			//setTarget(Navigator.getDummyStage());
+			//destination = new Point2D.Double(1200, 900);
 			//currentTarget = getNearestStand;
 		}
 
 		// checks howLong a visitor
 		if (isAtTarget()) {
 			timeAtTarget++;
-			if (destination.equals(new Point2D.Double(200, 900)))
-				remove = true;
+			//if (destination.equals(new Point2D.Double(200, 900)))
+			//	remove = true;
 			//peeing
-			ToiletTarget currentToilet = (ToiletTarget) Navigator.getNearestToilet(position);
+			//ToiletTarget currentToilet = Navigator.getNearestToilet(position);
 			if(currentAction == CurrentAction.PEEING) {
 				/*while (currentToilet != null && currentToilet.isFull() ) {
 					if(currentToilet.isFull()) {
@@ -160,11 +165,11 @@ public class Visitor {
 					currentToilet = simulator.getNearestToiletExcept(position, fullToilets);
 				}*/
 
-
-				if(currentToilet !=  null) {
-					currentToilet.use();
-					currentTarget = currentToilet;
-					destination = currentTarget.getPosition();
+				Target currentToilet = getTarget();
+				if(currentToilet !=  null && currentToilet instanceof ToiletTarget) {
+					((ToiletTarget) currentToilet).use();
+					//currentTarget = currentToilet;
+					//destination = currentTarget.getPosition();
 				}else {
 					currentAction = CurrentAction.IDLE;
 				}
@@ -189,7 +194,8 @@ public class Visitor {
 					break;
 				case 1:
 					currentAction = CurrentAction.WATCHING;
-					destination = new Point2D.Double(1000, 100);
+					//setTarget(Navigator.getDummyStage());
+					//destination = new Point2D.Double(1000, 100);
                     /*currentTarget = random stage check if an performance is on the change
 
                     if so currentTarget is that stage
@@ -204,37 +210,44 @@ public class Visitor {
 	}
 
 	public boolean checkcollision(List<Visitor> visitors) {
-		//if (target == null) return false;
 		boolean collision = false;
 
-		/*if (target.getDistances(newPosition).getCenter() < 0 || !target.isAdjacent(position, newPosition)) {
-			collision = true;
-		} else {*/
+		if (target != null) {
+			if (target.getDistance(newPosition) < 0 || !target.isAdjacent(position, newPosition)) {
+				collision = true;
+			}
+		}
+		if (!collision) {
 			for (Visitor v : visitors) {
 				if (v == this)
 					continue;
 
-				if (v.position.distance(newPosition) < radius && !v.equals(this)) {
+				if (v.position.distance(newPosition) < radius) {
 					collision = true;
 					break;
 				}
 
 			}
+		}
 
-			if (!collision) {
-				position = newPosition;
+		if (!collision) {
+			position = newPosition;
 //			} else if (target.getDistances(position).getCenter() < 0) {
-				//Respawn!
+			//Respawn!
 //				remove = true;
-			} else {
-				angle += 0.2;
-			}
+		} else {
+			angle += 0.2;
+		}
 		//}
 		return collision;
 	}
 
 	public Point2D getDestination() {
 		return destination;
+	}
+
+	public boolean isDestinationSet() {
+		return destination != null;
 	}
 
     public void setDestination(Point2D destination) {
@@ -249,17 +262,17 @@ public class Visitor {
 
     public void pee(){
         hasToPee = false;
-        //currentAction = CurrentAction.IDLE;
+        currentAction = CurrentAction.IDLE;
         blather = 0;
-        ToiletTarget currentToilet = (ToiletTarget) currentTarget;
+        ToiletTarget currentToilet = (ToiletTarget) getTarget();
         currentToilet.done();
         fullToilets = new ArrayList<>();
-        destination = new Point2D.Double(200,900);
+        setTarget(null);
+        //destination = new Point2D.Double(200,900);
     }
 
     public boolean isAtTarget(){
-        return position.distance(destination/*currentTarget.getPosition*/) < 50;
-        //return true;
+        return position.distance(destination) < 50;
     }
 
 }

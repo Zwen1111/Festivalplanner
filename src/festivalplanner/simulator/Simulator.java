@@ -1,15 +1,15 @@
 package festivalplanner.simulator;
 
-import festivalplanner.data.Database;
 import festivalplanner.gui.simulator.Visitor;
-import festivalplanner.simulator.map.SimpleTarget;
 import festivalplanner.simulator.map.TileMap;
-import festivalplanner.simulator.map.ToiletTarget;
+import festivalplanner.simulator.target.ToiletTarget;
+import festivalplanner.simulator.target.Target;
 
 import javax.imageio.ImageIO;
 import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 
@@ -19,20 +19,16 @@ import java.util.List;
 public class Simulator {
 
 	private List<Visitor> visitors;
-	private List<ToiletTarget> toiletTargets;
-	private List<SimpleTarget> stageTargets;
 	private int maxVisitors;
 
 	public static java.util.List<BufferedImage> images;
 
 	public Simulator(TileMap map) {
+		Navigator.clearTargets();
+		Navigator.addTargets(map.getTargets());
 		visitors = new ArrayList<>();
-		toiletTargets = new ArrayList<>();
-		stageTargets = new ArrayList<>();
-
 		maxVisitors = 200;
 		getImages();
-
 	}
 
 	public static void getImages() {
@@ -63,19 +59,9 @@ public class Simulator {
 	}
 
 	public void runSimulation() {
-		if(stageTargets.size() == 0) {
-			List<Target> targets = Database.getTargets();
-			for (Target target : targets) {
-				if(target instanceof  ToiletTarget){
-					toiletTargets.add((ToiletTarget) target);
-				}else if(target instanceof  SimpleTarget) {
-					stageTargets.add((SimpleTarget) target);
-				}
-			}
-		}
 		if (visitors.size() <= maxVisitors) {
 			Point2D.Double position = new  Point2D.Double(1800, 900);
-			Visitor visitor = new Visitor(3, position, images.get((int) (Math.random() * 8)),this);
+			Visitor visitor = new Visitor(3, position, images.get((int) (Math.random() * 8)));
 			if(canSpawn(visitor)) {
 				visitors.add(visitor);
 			}
@@ -138,40 +124,40 @@ public class Simulator {
 	}
 
 
-	public ToiletTarget getNearestToilet(Point2D position) {
-		ToiletTarget nearestTarget = null;
-		for (ToiletTarget toiletTarget : toiletTargets) {
-			//int distance = toiletTarget.getDistances((int) position.getX(), (int) position.getY()).getCenter();
-			//if (nearestTarget == null || (nearestTarget.getDistances((int) position.getX(), (int) position.getY()).getCenter() > distance)) {
-			//	nearestTarget = toiletTarget;
-			//}
-			int distance = (int) toiletTarget.getPosition().distance(position);
-			if (nearestTarget == null || (nearestTarget.getPosition().distance(position) > distance)) {
-				nearestTarget = toiletTarget;
-			}
-		}
-		return nearestTarget;
-	}
+//	public ToiletTarget getNearestToilet(Point2D position) {
+//		return (ToiletTarget) targets.stream()
+//				.filter(target -> target instanceof ToiletTarget)
+//				.sorted(Comparator.comparing(target -> target.getDistance(position)))
+//				.findFirst().orElse(null);
+//		ToiletTarget nearestTarget = null;
+//		for (ToiletTarget toiletTarget : toiletTargets) {
+//			int distance = (int) toiletTarget.getPosition().distance(position);
+//			if (nearestTarget == null || (nearestTarget.getPosition().distance(position) > distance)) {
+//				nearestTarget = toiletTarget;
+//			}
+//		}
+//		return nearestTarget;
+//	}
+//
+//	public ToiletTarget getNearestToiletExcept(Point2D position, List<ToiletTarget> fullToilets){
+//		ToiletTarget nearestTarget = null;
+//
+//		for (ToiletTarget fullToilet : fullToilets) {
+//			for (ToiletTarget toiletTarget : toiletTargets) {
+//				if(!fullToilet.equals(toiletTarget)) {
+//					int distance = toiletTarget.getDistances((int) position.getX(), (int) position.getY()).getCenter();
+//					if (nearestTarget == null || (nearestTarget.getDistances((int) position.getX(), (int) position.getY()).getCenter() < distance)) {
+//						nearestTarget = toiletTarget;
+//					}
+//				}
+//			}
+//		}
+//
+//		return nearestTarget;
+//	}
 
-	public ToiletTarget getNearestToiletExcept(Point2D position, List<ToiletTarget> fullToilets){
-		ToiletTarget nearestTarget = null;
-
-		for (ToiletTarget fullToilet : fullToilets) {
-			for (ToiletTarget toiletTarget : toiletTargets) {
-				if(!fullToilet.equals(toiletTarget)) {
-					int distance = toiletTarget.getDistances((int) position.getX(), (int) position.getY()).getCenter();
-					if (nearestTarget == null || (nearestTarget.getDistances((int) position.getX(), (int) position.getY()).getCenter() < distance)) {
-						nearestTarget = toiletTarget;
-					}
-				}
-			}
-		}
-
-		return nearestTarget;
-	}
-
-	public int getToiletsSize() {
-		return toiletTargets.size();
-	}
+//	public int getToiletsSize() {
+//		return toiletTargets.size();
+//	}
 
 }

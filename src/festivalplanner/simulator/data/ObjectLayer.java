@@ -1,10 +1,10 @@
 package festivalplanner.simulator.data;
 
 import festivalplanner.data.Stage;
-import festivalplanner.simulator.Target;
-import festivalplanner.simulator.map.SimpleTarget;
+import festivalplanner.simulator.target.StageTarget;
+import festivalplanner.simulator.target.Target;
 import festivalplanner.simulator.map.TileMap;
-import festivalplanner.simulator.map.ToiletTarget;
+import festivalplanner.simulator.target.ToiletTarget;
 
 import javax.json.JsonArray;
 import javax.json.JsonObject;
@@ -18,6 +18,9 @@ import java.util.List;
  * @author Coen Boelhouwers, Zwen van Erkelens
  */
 public class ObjectLayer extends Layer {
+
+	public static final String TYPE_STAGE = "stage";
+	public static final String TYPE_TOILET = "toilet";
 
 	private JsonArray objectArray;
 
@@ -46,31 +49,44 @@ public class ObjectLayer extends Layer {
 		return parsedStages;
 	}
 
-	public List<Target> parseAsTargets(TileMap map) {
-		List<Target> targets = new ArrayList<>();
+	/**
+	 * Parses this object-layer as a Target-layer and therefor tries to construct
+	 * specific Targets (Toilets, Stages, ...) from the objects.
+	 *
+	 * @return a list of targets parsed.
+	 * @throws ClassCastException if a expected field is not present.
+	 */
+	public List<Target> parseAsTargetLayer(TileMap map) {
+		List<Target> parsedTargets = new ArrayList<>();
 		for (int i = 0; i < objectArray.size(); i++) {
 			JsonObject object = objectArray.getJsonObject(i);
-			int x = object.getInt("x");
-			int y = object.getInt("y");
-			int width = object.getInt("width");
-			int heigth = object.getInt("height");
-			String stageName = object.getString("name");
-			String stageType = object.getString("type");
+
+			//Basic target values. Width and height used for centering.
+			int targetX = object.getInt("x");
+			int targetY = object.getInt("y");
+			int targetWidth = object.getInt("width");
+			int targetHeigth = object.getInt("height");
+			String targetName = object.getString("name");
+			String targetType = object.getString("type");
+
+			//The capacity of a certain target is hidden in the additional 'properties' object.
 			JsonObject properties = object.getJsonObject("properties");
-			int capacity = 0;
+			int targetCapacity = 0;
 			if (properties != null) {
-				capacity = properties.getInt("capacity");
+				targetCapacity = properties.getInt("capacity");
 			}
 
-			if(stageType.equals("stage")) {
-				SimpleTarget st = new SimpleTarget(new Point2D.Double(x + width/2,y + heigth/2),map);
-				st.setCapacity(capacity);
-				targets.add(st);
-			}else if(stageType.equals("toilet")){
-				targets.add(new ToiletTarget(new Point2D.Double(x + width/2,y + heigth/2),map,capacity));
+			switch (targetType) {
+				case TYPE_STAGE:
+					parsedTargets.add(new StageTarget(new Point2D.Double(targetX + targetWidth / 2,
+							targetY + targetHeigth / 2), new Stage(targetName, targetCapacity)));
+					break;
+				case TYPE_TOILET:
+					parsedTargets.add(new ToiletTarget(new Point2D.Double(targetX + targetWidth / 2,
+							targetY + targetHeigth / 2), targetCapacity));
+					break;
 			}
-
 		}
-		return targets;
+		return parsedTargets;
 	}
 }

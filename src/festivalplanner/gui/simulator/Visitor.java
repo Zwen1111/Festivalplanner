@@ -1,8 +1,9 @@
 package festivalplanner.gui.simulator;
 
+import festivalplanner.simulator.Navigator;
 import festivalplanner.simulator.Simulator;
-import festivalplanner.simulator.Target;
-import festivalplanner.simulator.map.ToiletTarget;
+import festivalplanner.simulator.target.Target;
+import festivalplanner.simulator.target.ToiletTarget;
 
 import java.awt.*;
 import java.awt.geom.AffineTransform;
@@ -41,7 +42,6 @@ public class Visitor {
 
 	private CurrentAction currentAction;
 	private Target currentTarget;
-	private Simulator simulator;
 
 	public boolean getRemove() {
 		return remove;
@@ -53,10 +53,9 @@ public class Visitor {
 	}
 
 
-	public Visitor(double speed, Point2D position, BufferedImage image, Simulator simulator) {
+	public Visitor(double speed, Point2D position, BufferedImage image) {
 		fullToilets = new ArrayList<>();
 		this.speed = speed;
-		this.simulator = simulator;
 		angle = 0.0;
 		this.position = position;
 		destination = new Point2D.Double(500, 500);
@@ -138,7 +137,7 @@ public class Visitor {
 
 		if (currentAction != CurrentAction.PEEING && hasToPee) {
 			currentAction = CurrentAction.PEEING;
-			currentTarget = simulator.getNearestToilet(position);
+			currentTarget = Navigator.getNearestToilet(position);
 			destination = currentTarget.getPosition();
 		} else if (currentAction != CurrentAction.BUYINGDRINKS && isThirsty) {
 			currentAction = CurrentAction.BUYINGDRINKS;
@@ -152,7 +151,7 @@ public class Visitor {
 			if (destination.equals(new Point2D.Double(200, 900)))
 				remove = true;
 			//peeing
-			ToiletTarget currentToilet = (ToiletTarget) simulator.getNearestToilet(position);;
+			ToiletTarget currentToilet = (ToiletTarget) Navigator.getNearestToilet(position);
 			if(currentAction == CurrentAction.PEEING) {
 				/*while (currentToilet != null && currentToilet.isFull() ) {
 					if(currentToilet.isFull()) {

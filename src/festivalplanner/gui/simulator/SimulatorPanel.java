@@ -1,8 +1,7 @@
 package festivalplanner.gui.simulator;
 
-import festivalplanner.data.Database;
-import festivalplanner.simulator.Target;
-import festivalplanner.simulator.map.SimpleTarget;
+import festivalplanner.simulator.target.Target;
+import festivalplanner.simulator.target.SimpleTarget;
 import festivalplanner.simulator.map.TileMap;
 import festivalplanner.simulator.Simulator;
 
@@ -38,10 +37,9 @@ public class SimulatorPanel extends JPanel implements MouseMotionListener, Mouse
 		super(null);
 		init = false;
 
-		map = new TileMap(getClass().getResource("/maps/Map+Colliosion.json").getPath());
-		map.buildMap(6);
+		map = new TileMap("/maps/Map+Colliosion.json");
+		map.buildMap();
 		simulator = new Simulator(map);
-		Database.addTargetsFromLayer(map.getObjectLayer(),map);
 		scale = 0.65;
 		mousePosition = new Point2D.Double(0, 0);
 
@@ -163,7 +161,8 @@ public class SimulatorPanel extends JPanel implements MouseMotionListener, Mouse
 	public void mouseClicked(MouseEvent e) {
 		long mil = System.currentTimeMillis();
 		target = new SimpleTarget(new Point2D.Double(e.getX() / scale - translateX / scale,
-				e.getY() / scale - translateY / scale), map);
+				e.getY() / scale - translateY / scale));
+		target.setupDistances(map);
 		System.out.println("took " + (System.currentTimeMillis() - mil) + " ms");
 		for (Visitor v : simulator.getVisitors()) {
 			simulator.setVisitorTarget(v, target);

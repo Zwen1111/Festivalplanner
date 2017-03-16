@@ -1,4 +1,4 @@
-package festivalplanner.simulator;
+package festivalplanner.simulator.target;
 
 import festivalplanner.simulator.data.CollisionLayer;
 import festivalplanner.simulator.map.TileMap;
@@ -11,15 +11,18 @@ import java.util.*;
  */
 public abstract class Target {
 
-	protected int capacity;
+	private int capacity;
 	private Point2D position;
 	private int[][] destinations;
 	private TileMap map;
 	private CollisionLayer data;
 	private int startIndex;
 
-	public Target(Point2D position, TileMap map) {
+	public Target(Point2D position) {
 		this.position = position;
+	}
+
+	public void setupDistances(TileMap map) {
 		this.map = map;
 		this.data = map.getCollisionLayer();
 		destinations = new int[data.getWidth()][data.getHeight()];
@@ -61,6 +64,11 @@ public abstract class Target {
 				getDistance(x+1, y),
 				getDistance(x, y+1),
 				getDistance(x-1, y));
+	}
+
+	public int getDistance(Point2D position) {
+		return getDistance((int) Math.floor(position.getX() / map.getTileWidth()),
+				(int) Math.floor(position.getY() / map.getTileHeight()));
 	}
 
 	public int getDistance(int x, int y) {

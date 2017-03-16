@@ -1,6 +1,7 @@
-package festivalplanner.simulator.map;
+package festivalplanner.simulator.target;
 
-import festivalplanner.simulator.Target;
+import festivalplanner.simulator.map.TileMap;
+import festivalplanner.simulator.target.Target;
 
 import java.awt.geom.Point2D;
 
@@ -10,9 +11,10 @@ import java.awt.geom.Point2D;
 public class ToiletTarget extends Target{
 
     private int currentCapacity;
-    public ToiletTarget(Point2D position, TileMap map,int capacity) {
-        super(position, map);
-        this.capacity = capacity;
+
+    public ToiletTarget(Point2D position, int capacity) {
+        super(position);
+        setCapacity(capacity);
         currentCapacity = capacity;
     }
 
@@ -25,8 +27,8 @@ public class ToiletTarget extends Target{
 
     public void done() {
         currentCapacity++;
-        if(currentCapacity > capacity) {
-            currentCapacity = capacity;
+        if(currentCapacity > getCapacity()) {
+            currentCapacity = getCapacity();
         }
     }
 

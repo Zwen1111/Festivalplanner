@@ -1,9 +1,5 @@
 package festivalplanner.data;
 
-import festivalplanner.simulator.Target;
-import festivalplanner.simulator.data.ObjectLayer;
-import festivalplanner.simulator.map.TileMap;
-
 import java.io.Serializable;
 import java.time.Duration;
 import java.time.LocalTime;
@@ -169,15 +165,5 @@ public class Database implements Serializable {
 		 * Called when something changed in the data. The type of change is unknown.
 		 */
 		void onDataChanged();
-	}
-
-	private static List<Target> targets;
-
-	public static void addTargetsFromLayer(ObjectLayer layer, TileMap map) {
-		targets = layer.parseAsTargets(map);
-	}
-
-	public static List<Target> getTargets(){
-		return targets;
 	}
 }

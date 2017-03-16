@@ -58,10 +58,22 @@ public class SimulatorPanel extends JPanel implements MouseMotionListener, Mouse
 			init = true;
 		}
 
+    private boolean canSpawn(Visitor visitor) {
+	    visitor.update();
+        return !visitor.checkcollision(visitors);
+    }
 		simulator.runSimulation();
 		g2d.translate(translateX, translateY);
 		g2d.scale(scale, scale);
 
+    public void update() {
+		if (visitors.size() <= visitorAmount) {
+			Point2D.Double position = new  Point2D.Double(1800, 900);
+			Visitor visitor = new Visitor(5, position );
+			if(canSpawn(visitor)) {
+				visitors.add(visitor);
+			}
+		}
 		g2d.drawImage(map.getMapImage(), null, null);
 		if (target != null) {
 			for (int x = 0; x < target.getLayer().getWidth(); x++) {
@@ -89,6 +101,16 @@ public class SimulatorPanel extends JPanel implements MouseMotionListener, Mouse
 			}
 		}
 
+		Iterator<Visitor> visitorIterator = visitors.iterator();
+		while (visitorIterator.hasNext())
+		{
+			Visitor v = visitorIterator.next();
+			v.update();
+			if(v.getRemove()){
+				visitorIterator.remove();
+				visitorAmount--;
+			}
+		}
 	}
 
 	private void smartScale() {
@@ -109,7 +131,25 @@ public class SimulatorPanel extends JPanel implements MouseMotionListener, Mouse
 		//Then, center the map on the screen.
 		translateBy(0, 0);
 	}
+		for (Visitor v : visitors) {
+			v.checkcollision(visitors);
+            if (v.getPosition().getX() > map.getMapWidth()) {
+                v.setPosition(new Point2D.Double(map.getMapWidth(), v.getPosition().getY()));
+            } else {
+                if (v.getPosition().getX() < 0) {
+                    v.setPosition(new Point2D.Double(0, v.getPosition().getY()));
+                }
+            }
 
+            if (v.getPosition().getY() > map.getMapHeight() ) {
+                v.setPosition(new Point2D.Double(v.getPosition().getX(), map.getMapHeight() ));
+            } else {
+                if (v.getPosition().getY() < 0) {
+                    v.setPosition(new Point2D.Double(v.getPosition().getX(), 0));
+                }
+            }
+		}
+	}
 	public void scaleBy(double amount) {
 		setScale(scale + amount);
 	}

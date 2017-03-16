@@ -133,4 +133,8 @@ public class TileMap {
 	public int getTileWidth() {
 		return tileWidth;
 	}
+
+    public int getTileHeight() {
+        return tileHeight;
+    }
 }

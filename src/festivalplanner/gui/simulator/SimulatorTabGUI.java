@@ -4,6 +4,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.time.LocalTime;
 import java.util.ArrayList;
 
 /**
@@ -13,6 +14,11 @@ public class SimulatorTabGUI extends JPanel implements ActionListener {
 
     private ArrayList<JButton> buttonArrayList;
     private SimulatorPanel simulatorPanel;
+    private SimulatorPanel tileMapPanel;
+
+    private LocalTime time;
+    private JLabel timeLabel;
+    private Long startTime;
 
     public SimulatorTabGUI() {
     	setName("SimulatorPanel");
@@ -27,15 +33,15 @@ public class SimulatorTabGUI extends JPanel implements ActionListener {
         JButton playButton = new JButton(new ImageIcon(getClass().getResource("/icon's/playIcon.png")));
         JButton zoomInButton = new JButton(new ImageIcon(getClass().getResource("/icon's/zoomInIcon.png")));
         JButton zoomOutButton = new JButton(new ImageIcon(getClass().getResource("/icon's/zoomOutIcon.png")));
-        JLabel timeLabel = new JLabel("10:31");
-
+		time = LocalTime.of(7,0);
+		timeLabel = new JLabel(time.getHour() + ":" + time.getMinute());
 
 
         buttonArrayList.add(playButton);
         buttonArrayList.add(zoomInButton);
         buttonArrayList.add(zoomOutButton);
 
-        playButton.setName("Play");
+        playButton.setName("Pause");
 
         playButton.addActionListener(e -> {
 
@@ -81,8 +87,7 @@ public class SimulatorTabGUI extends JPanel implements ActionListener {
         add(timeLabel);
         add(simulatorPanel);
 
-
-
+		startTime = System.currentTimeMillis();
         int fps = 60;
         new Timer(1000/fps,this).start();
     }
@@ -99,6 +104,16 @@ public class SimulatorTabGUI extends JPanel implements ActionListener {
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
+        long elapsed = System.currentTimeMillis() - startTime;
+        if(buttonArrayList.get(0).getName().equals("Play")) {
+            if(elapsed >= 200) {
+                timeLabel.setText(time.toString());
+                time = time.plusMinutes(1);
+                startTime = System.currentTimeMillis();
+            }
+            tileMapPanel.update();
+        }
+
 		repaint();
 	}
 }

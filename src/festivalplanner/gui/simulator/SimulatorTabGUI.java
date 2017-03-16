@@ -14,7 +14,6 @@ public class SimulatorTabGUI extends JPanel implements ActionListener {
 
     private ArrayList<JButton> buttonArrayList;
     private SimulatorPanel simulatorPanel;
-    private SimulatorPanel tileMapPanel;
 
     private LocalTime time;
     private JLabel timeLabel;
@@ -111,7 +110,7 @@ public class SimulatorTabGUI extends JPanel implements ActionListener {
                 time = time.plusMinutes(1);
                 startTime = System.currentTimeMillis();
             }
-            tileMapPanel.update();
+            simulatorPanel.update();
         }
 
 		repaint();

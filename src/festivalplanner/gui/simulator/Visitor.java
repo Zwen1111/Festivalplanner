@@ -1,157 +1,156 @@
 package festivalplanner.gui.simulator;
 
+import festivalplanner.simulator.Target;
+
+import javax.imageio.ImageIO;
 import java.awt.*;
-import java.awt.geom.Ellipse2D;
+import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
+import java.awt.image.BufferedImage;
 import java.util.ArrayList;
+import java.util.List;
 
 
 /**
  * Created by Gebruiker on 6-3-2017.
  */
-public class Visitor  {
+public class Visitor {
 
-private double speed;
-private double angle;
-private Point2D position;
-private Point2D destination;
-private Point2D newPosition;
-private Target target;
+	private double speed;
+	private double angle;
+	private Point2D position;
+	private Point2D destination;
+	private Point2D newPosition;
+	private Target target;
 
-private BufferedImage image;
-private int radius;
-
-
-
-private int timeAtTarget;
-
-private boolean hasToPee;
-private int blather;
-private int maxBlather;
-
-private boolean isThirsty;
-
-    private boolean remove;
-
-private CurrentAction currentAction;
-
-    public boolean getRemove() {
-        return remove;
-    }
+	private BufferedImage image;
+	private int radius;
 
 
-    public enum CurrentAction {
-        IDLE,PEEING,WATCHING,BUYINGDRINKS,
-    }
+	private int timeAtTarget;
 
-public static java.util.List<BufferedImage> images;
-    public static void getImages() {
-        images = new ArrayList<>();
-        try {
+	private boolean hasToPee;
+	private int blather;
+	private int maxBlather;
 
-            for (int i = 0; i < 9; i++) {
-                BufferedImage image = ImageIO.read(Visitor.class.getResource("/visitors/visitor" + i + ".png"));
-                images.add(image);
-            }
-        }catch (Exception e) {
-            e.printStackTrace();
-        }
+	private boolean isThirsty;
 
-    }
+	private boolean remove;
 
-    public Visitor(double speed, Point2D position) {
-        this.speed = speed;
-        angle = 0.0;
-        this.position = position;
-        destination = new Point2D.Double(500,500);
-        radius = 10;
-        image = Visitor.images.get((int) (Math.random() * 8));
+	private CurrentAction currentAction;
 
-        currentAction = CurrentAction.IDLE;
+	public boolean getRemove() {
+		return remove;
+	}
 
-        maxBlather = 1000;
-        blather = (int) Math.random() * 500;
-        hasToPee = false;
 
-        currentAction = CurrentAction.IDLE;
-    }
+	public enum CurrentAction {
+		IDLE, PEEING, WATCHING, BUYINGDRINKS,
+	}
 
-    public void draw(Graphics2D g)
-    {
-        g.setColor(Color.RED);
-        AffineTransform af = new AffineTransform();
-        af.translate(position.getX(),position.getY());
-        af.rotate(angle);
-        g.drawImage(image,af,null);
 
-    }
+	public Visitor(double speed, Point2D position, BufferedImage image) {
+		this.speed = speed;
+		angle = 0.0;
+		this.position = position;
+		destination = new Point2D.Double(500, 500);
+		radius = 10;
+		this.image = image;
 
-    public Point2D getPosition() {
-        return position;
-    }
+		currentAction = CurrentAction.IDLE;
 
-    public void setPosition(Point2D position) {
-        this.position = position;
-    }
+		maxBlather = 1000;
+		blather = (int) Math.random() * 500;
+		hasToPee = false;
 
-    public void update()
-    {
+		currentAction = CurrentAction.IDLE;
+	}
 
-        double dx = destination.getX() - position.getX();
-        double dy = destination.getY() - position.getY();
+	public void draw(Graphics2D g) {
+		g.setColor(Color.RED);
+		AffineTransform af = new AffineTransform();
+		af.translate(position.getX(), position.getY());
+		af.rotate(angle);
+		g.drawImage(image, af, null);
+	}
 
-        double newAngle = Math.atan2(dy, dx);
+	public void setTarget(Target newTarget) {
+		target = newTarget;
+	}
 
-        double difference = newAngle - angle;
-        while(difference < -Math.PI)
-            difference += 2 * Math.PI;
-        while(difference > Math.PI)
-            difference -= 2 * Math.PI;
+	public boolean isTargetSet() {
+		return target != null;
+	}
 
-        if(difference > 0.1)
-            angle += 0.1;
-        else if(difference < -0.1)
-            angle -= 0.1;
-        else
-            angle = newAngle;
+	public Target getTarget() {
+		return target;
+	}
 
-        newPosition = new Point2D.Double(
-                position.getX() + speed * Math.cos(angle),
-                position.getY() + speed * Math.sin(angle));
-        preferences();
-    }
+	public Point2D getPosition() {
+		return position;
+	}
 
-    private void preferences() {
-        //if blather is full the visitor has to pee
-        if(blather >= maxBlather) {
-            hasToPee = true;
-        }
+	public void setPosition(Point2D position) {
+		this.position = position;
+	}
 
-        // checks howLong a visitor
-        if(isAtTarget()){
-            timeAtTarget++;
-            if(destination.equals(new Point2D.Double(200,900)))
-                remove = true;
-            if(currentAction == CurrentAction.PEEING && timeAtTarget >= 30){
-                pee();
-            }else if(currentAction == CurrentAction.BUYINGDRINKS && timeAtTarget >=  12){
-                drink();
-            }else if(currentAction == CurrentAction.WATCHING && timeAtTarget >= 30){
-                currentAction = CurrentAction.IDLE;
-            }else if(currentAction != CurrentAction.IDLE)
-                newPosition = position;
-        }
-        //checks if the currentaction  = idle. if currentAction = idle then it wil select a random action
-        if(currentAction == CurrentAction.IDLE) {
-            timeAtTarget = 0;
-            int action = (int) (Math.random() * 2);
-            switch (action) {
-                case 0:
-                    isThirsty = true;
-                    break;
-                case 1:
-                    currentAction = CurrentAction.WATCHING;
-                    destination = new Point2D.Double(100,100);
+	public void update() {
+
+		double dx = destination.getX() - position.getX();
+		double dy = destination.getY() - position.getY();
+
+		double newAngle = Math.atan2(dy, dx);
+
+		double difference = newAngle - angle;
+		while (difference < -Math.PI)
+			difference += 2 * Math.PI;
+		while (difference > Math.PI)
+			difference -= 2 * Math.PI;
+
+		if (difference > 0.1)
+			angle += 0.1;
+		else if (difference < -0.1)
+			angle -= 0.1;
+		else
+			angle = newAngle;
+
+		newPosition = new Point2D.Double(
+				position.getX() + speed * Math.cos(angle),
+				position.getY() + speed * Math.sin(angle));
+		preferences();
+	}
+
+	private void preferences() {
+		//if blather is full the visitor has to pee
+		if (blather >= maxBlather) {
+			hasToPee = true;
+		}
+
+		// checks howLong a visitor
+		if (isAtTarget()) {
+			timeAtTarget++;
+			if (destination.equals(new Point2D.Double(200, 900)))
+				remove = true;
+			if (currentAction == CurrentAction.PEEING && timeAtTarget >= 30) {
+				pee();
+			} else if (currentAction == CurrentAction.BUYINGDRINKS && timeAtTarget >= 12) {
+				drink();
+			} else if (currentAction == CurrentAction.WATCHING && timeAtTarget >= 30) {
+				currentAction = CurrentAction.IDLE;
+			} else if (currentAction != CurrentAction.IDLE)
+				newPosition = position;
+		}
+		//checks if the currentaction  = idle. if currentAction = idle then it wil select a random action
+		if (currentAction == CurrentAction.IDLE) {
+			timeAtTarget = 0;
+			int action = (int) (Math.random() * 2);
+			switch (action) {
+				case 0:
+					isThirsty = true;
+					break;
+				case 1:
+					currentAction = CurrentAction.WATCHING;
+					destination = new Point2D.Double(100, 100);
                     /*currentTarget = random stage check if an performance is on the change
 
                     if so currentTarget is that stage
@@ -159,53 +158,53 @@ public static java.util.List<BufferedImage> images;
 
                     //currentTarget = targets.get(Math.random * target.size - 1);
                     */
-            }
-        }
+			}
+		}
 
-            if (currentAction != CurrentAction.PEEING && hasToPee) {
-                currentAction = CurrentAction.PEEING;
-                //currentTarget = getNearestToilet;
-                destination = new Point2D.Double(1000,200);
-            } else if (currentAction != CurrentAction.BUYINGDRINKS && isThirsty) {
-                currentAction = CurrentAction.BUYINGDRINKS;
-                destination = new Point2D.Double(800,800);
-                //currentTarget = getNearestStand;
-            }
-    }
+		if (currentAction != CurrentAction.PEEING && hasToPee) {
+			currentAction = CurrentAction.PEEING;
+			//currentTarget = getNearestToilet;
+			destination = new Point2D.Double(1000, 200);
+		} else if (currentAction != CurrentAction.BUYINGDRINKS && isThirsty) {
+			currentAction = CurrentAction.BUYINGDRINKS;
+			destination = new Point2D.Double(800, 800);
+			//currentTarget = getNearestStand;
+		}
+	}
 
-    public boolean checkcollision(ArrayList<Visitor> visitors)
-    {
-        if (target == null) return false;
-        boolean collision = false;
+	public boolean checkcollision(List<Visitor> visitors) {
+		//if (target == null) return false;
+		boolean collision = false;
 
-        if (target.getDistances(newPosition).getCenter() < 0 || !target.isAdjacent(position, newPosition)) {
-            collision = true;
-        } else {
-            for (Visitor v : visitors) {
-                if(v == this)
-                    continue;
+		/*if (target.getDistances(newPosition).getCenter() < 0 || !target.isAdjacent(position, newPosition)) {
+			collision = true;
+		} else {*/
+			for (Visitor v : visitors) {
+				if (v == this)
+					continue;
 
-                if (v.position.distance(newPosition) < size && !v.equals(this)) {
-                    collision = true;
-                    break;
-                }
+				if (v.position.distance(newPosition) < radius && !v.equals(this)) {
+					collision = true;
+					break;
+				}
 
-        }
+			}
 
-        if(!collision) {
-            position = newPosition;
-        } else if (target.getDistances(position).getCenter() < 0) {
-            //Respawn!
-            setTarget(null);
-        } else {
-            angle += 0.2;
-        }
-        return collision;
-    }
+			if (!collision) {
+				position = newPosition;
+//			} else if (target.getDistances(position).getCenter() < 0) {
+				//Respawn!
+//				remove = true;
+			} else {
+				angle += 0.2;
+			}
+		//}
+		return collision;
+	}
 
-
-
-
+	public Point2D getDestination() {
+		return destination;
+	}
 
     public void setDestination(Point2D destination) {
         this.destination = destination;

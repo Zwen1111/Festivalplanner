@@ -126,10 +126,6 @@ public class TileMap {
 		return mapWidth * tileWidth;
 	}
 
-	public int getTileHeight() {
-		return tileHeight;
-	}
-
 	public int getTileWidth() {
 		return tileWidth;
 	}

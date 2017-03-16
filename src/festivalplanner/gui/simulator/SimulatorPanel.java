@@ -1,6 +1,7 @@
 package festivalplanner.gui.simulator;
 
 import festivalplanner.simulator.Target;
+import festivalplanner.simulator.map.SimpleTarget;
 import festivalplanner.simulator.map.TileMap;
 import festivalplanner.simulator.Simulator;
 
@@ -18,7 +19,7 @@ import java.awt.geom.Point2D;
  *
  * @author Coen Boelhouwers
  */
-public class SimulatorPanel extends JPanel implements MouseMotionListener, MouseWheelListener, MouseListener {
+public class SimulatorPanel extends JPanel implements MouseMotionListener, MouseWheelListener, MouseListener{
 
 	private static final double MIN_ZOOM = 0.65;
 	private static final double MAX_ZOOM = 5.65;
@@ -44,6 +45,7 @@ public class SimulatorPanel extends JPanel implements MouseMotionListener, Mouse
 		addMouseMotionListener(this);
 		addMouseListener(this);
 		addMouseWheelListener(this);
+
 	}
 
 
@@ -58,41 +60,23 @@ public class SimulatorPanel extends JPanel implements MouseMotionListener, Mouse
 			init = true;
 		}
 
-    private boolean canSpawn(Visitor visitor) {
-	    visitor.update();
-        return !visitor.checkcollision(visitors);
-    }
-		simulator.runSimulation();
+
+		//simulator.runSimulation();
 		g2d.translate(translateX, translateY);
 		g2d.scale(scale, scale);
 
-    public void update() {
-		if (visitors.size() <= visitorAmount) {
-			Point2D.Double position = new  Point2D.Double(1800, 900);
-			Visitor visitor = new Visitor(5, position );
-			if(canSpawn(visitor)) {
-				visitors.add(visitor);
-			}
-		}
 		g2d.drawImage(map.getMapImage(), null, null);
 		if (target != null) {
 			for (int x = 0; x < target.getLayer().getWidth(); x++) {
 				for (int y = 0; y < target.getLayer().getHeight(); y++) {
 					int dist = target.getDistance(x, y);
-	/*				//g2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_ATOP, 0.2f));
-					g2d.setPaint(dist < 0 ? Color.blue : Color.yellow);
-					g2d.fillRect(x * map.getTileWidth(), y * map.getTileHeight(),
-							map.getTileWidth(), map.getTileHeight());
-					g2d.setPaint(Color.black);
-					//g2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC, 1.0f));*/
 					g2d.drawString(String.valueOf(dist),
 							x * map.getTileWidth(),
 							y * map.getTileHeight() + 10);
 				}
 			}
 		}
-		for(Visitor v : simulator.getVisitors())
-		{
+		for (Visitor v : simulator.getVisitors()) {
 			v.draw(g2d);
 			if (target != null && !v.isTargetSet()) {
 				v.setPosition(new Point2D.Double(Math.random() * map.getMapWidth(),
@@ -100,17 +84,10 @@ public class SimulatorPanel extends JPanel implements MouseMotionListener, Mouse
 				simulator.setVisitorTarget(v, target);
 			}
 		}
+	}
 
-		Iterator<Visitor> visitorIterator = visitors.iterator();
-		while (visitorIterator.hasNext())
-		{
-			Visitor v = visitorIterator.next();
-			v.update();
-			if(v.getRemove()){
-				visitorIterator.remove();
-				visitorAmount--;
-			}
-		}
+	public void update() {
+		simulator.runSimulation();
 	}
 
 	private void smartScale() {
@@ -131,25 +108,7 @@ public class SimulatorPanel extends JPanel implements MouseMotionListener, Mouse
 		//Then, center the map on the screen.
 		translateBy(0, 0);
 	}
-		for (Visitor v : visitors) {
-			v.checkcollision(visitors);
-            if (v.getPosition().getX() > map.getMapWidth()) {
-                v.setPosition(new Point2D.Double(map.getMapWidth(), v.getPosition().getY()));
-            } else {
-                if (v.getPosition().getX() < 0) {
-                    v.setPosition(new Point2D.Double(0, v.getPosition().getY()));
-                }
-            }
 
-            if (v.getPosition().getY() > map.getMapHeight() ) {
-                v.setPosition(new Point2D.Double(v.getPosition().getX(), map.getMapHeight() ));
-            } else {
-                if (v.getPosition().getY() < 0) {
-                    v.setPosition(new Point2D.Double(v.getPosition().getX(), 0));
-                }
-            }
-		}
-	}
 	public void scaleBy(double amount) {
 		setScale(scale + amount);
 	}
@@ -201,8 +160,8 @@ public class SimulatorPanel extends JPanel implements MouseMotionListener, Mouse
 	@Override
 	public void mouseClicked(MouseEvent e) {
 		long mil = System.currentTimeMillis();
-		target = new Target(new Point2D.Double(e.getX() / scale - translateX / scale,
-				e.getY() / scale - translateY / scale), map){};
+		target = new SimpleTarget(new Point2D.Double(e.getX() / scale - translateX / scale,
+				e.getY() / scale - translateY / scale), map);
 		System.out.println("took " + (System.currentTimeMillis() - mil) + " ms");
 		for (Visitor v : simulator.getVisitors()) {
 			simulator.setVisitorTarget(v, target);

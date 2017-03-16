@@ -30,6 +30,7 @@ public class TileMapPanel extends JPanel implements MouseMotionListener, MouseWh
 	private double translateY;
 	private boolean init;
 	private ArrayList<Visitor> visitors;
+	private int visitorAmount;
 
 
 
@@ -41,6 +42,7 @@ public class TileMapPanel extends JPanel implements MouseMotionListener, MouseWh
 		scale = 0.65;
 		mousePosition = new Point2D.Double(0, 0);
 		visitors = new ArrayList<>();
+		visitorAmount = 200;
 		Visitor.getImages();
 
 
@@ -58,9 +60,9 @@ public class TileMapPanel extends JPanel implements MouseMotionListener, MouseWh
     }
 
     public void update() {
-		if (visitors.size() <= 200) {
+		if (visitors.size() <= visitorAmount) {
 			Point2D.Double position = new  Point2D.Double(1800, 900);
-			Visitor visitor = new Visitor(1, position );
+			Visitor visitor = new Visitor(5, position );
 			if(canSpawn(visitor)) {
 				visitors.add(visitor);
 			}
@@ -73,6 +75,7 @@ public class TileMapPanel extends JPanel implements MouseMotionListener, MouseWh
 			v.update();
 			if(v.getRemove()){
 				visitorIterator.remove();
+				visitorAmount--;
 			}
 		}
 

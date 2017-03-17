@@ -166,10 +166,7 @@ public class SimulatorPanel extends JPanel implements MouseMotionListener, Mouse
 		target.setupDistances(map);
 		System.out.println("took " + (System.currentTimeMillis() - mil) + " ms");
 		for (Visitor v : simulator.getVisitors()) {
-			simulator.setVisitorTarget(v, target);
-			//v.setTarget(target);
-			//v.setxDestination(e.getX() / scale - translateX / scale);
-			//v.setyDestination(e.getY() / scale - translateY / scale);
+			v.setTarget(target);
 		}
 	}
 

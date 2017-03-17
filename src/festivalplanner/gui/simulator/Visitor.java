@@ -79,7 +79,9 @@ public class Visitor {
 		g.setColor(Color.RED);
 		AffineTransform af = new AffineTransform();
 		af.translate(position.getX(), position.getY());
+		af.translate(image.getWidth() / 2,image.getHeight() / 2);
 		af.rotate(angle);
+		af.translate(- image.getWidth() / 2, - image.getHeight() / 2);
 		g.drawImage(image, af, null);
 	}
 
@@ -181,8 +183,8 @@ public class Visitor {
 				drink();
 			} else if (currentAction == CurrentAction.WATCHING && timeAtTarget >= 30) {
 				currentAction = CurrentAction.IDLE;
-			} else if (currentAction != CurrentAction.IDLE)
-				newPosition = position;
+			}// else if (currentAction != CurrentAction.IDLE)
+			//	newPosition = position;
 		}
 		//checks if the currentaction  = idle. if currentAction = idle then it wil select a random action
 		if (currentAction == CurrentAction.IDLE) {

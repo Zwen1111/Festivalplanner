@@ -45,21 +45,13 @@ public class Simulator {
 
 	}
 
-	public void setVisitorTarget(Visitor v, Target t) {
-		Point2D newDest = getNextWayPoint(v.getPosition(), t);
-		if (newDest != null) {
-			v.setTarget(t);
-			//v.setDestination(newDest);
-		}
-	}
-
 	private boolean canSpawn(Visitor visitor) {
 		visitor.update();
 		return !visitor.checkcollision(visitors);
 	}
 
 	public void runSimulation() {
-		if (visitors.size() <= maxVisitors) {
+		if (visitors.size() < maxVisitors) {
 			Point2D.Double position = new  Point2D.Double(1710, 750);
 			Visitor visitor = new Visitor(3, position, images.get((int) (Math.random() * 8)));
 			if(canSpawn(visitor)) {
@@ -80,8 +72,10 @@ public class Simulator {
 			boolean collided = v.checkcollision(visitors);
 			if (collided) {
 				Point2D newDest = getNextWayPoint(v.getPosition(), v.getTarget());
-				if (newDest != null && canSpawn(v)) {
+				if (newDest != null) {
 					v.setDestination(newDest);
+				} else {
+					v.setTarget(null);
 				}
 			}
 			if (v.isTargetSet()) {
@@ -94,6 +88,8 @@ public class Simulator {
 						Point2D newDest = getNextWayPoint(destiny, v.getTarget());
 						if (newDest != null) {
 							v.setDestination(newDest);
+						} else {
+							v.setTarget(null);
 						}
 					}
 				}

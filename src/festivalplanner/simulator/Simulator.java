@@ -2,14 +2,12 @@ package festivalplanner.simulator;
 
 import festivalplanner.gui.simulator.Visitor;
 import festivalplanner.simulator.map.TileMap;
-import festivalplanner.simulator.target.ToiletTarget;
 import festivalplanner.simulator.target.Target;
 
 import javax.imageio.ImageIO;
 import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 

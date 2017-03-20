@@ -69,7 +69,7 @@ public class Visitor {
 		blather = (int) Math.random() * 500;
 		hasToPee = false;
 
-		blather = maxBlather;
+		//blather = maxBlather;
 
 
 
@@ -151,7 +151,7 @@ public class Visitor {
 			if(currentAction == CurrentAction.PEEING) {
 				if(target !=  null && target instanceof ToiletTarget) {
 					if(!((ToiletTarget) target).isFull() && !peeing) {
-						((ToiletTarget) target).use();
+						((ToiletTarget) target).changeAttendency(+1);
 						peeing = true;
 					}
 					newPosition = position;
@@ -250,7 +250,7 @@ public class Visitor {
         currentAction = CurrentAction.IDLE;
         blather = 0;
         ToiletTarget currentToilet = (ToiletTarget) getTarget();
-        currentToilet.done();
+        currentToilet.changeAttendency(-1);
         fullToilets = new ArrayList<>();
 		peeing = false;
         //destination = new Point2D.Double(200,900);

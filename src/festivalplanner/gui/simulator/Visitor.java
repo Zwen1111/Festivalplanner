@@ -3,6 +3,7 @@ package festivalplanner.gui.simulator;
 import festivalplanner.data.Artist;
 import festivalplanner.data.Database;
 import festivalplanner.simulator.Navigator;
+import festivalplanner.simulator.target.PerformanceTarget;
 import festivalplanner.simulator.target.StageTarget;
 import festivalplanner.simulator.target.Target;
 import festivalplanner.simulator.target.ToiletTarget;

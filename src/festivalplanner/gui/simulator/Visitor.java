@@ -1,6 +1,7 @@
 package festivalplanner.gui.simulator;
 
 import festivalplanner.simulator.Navigator;
+import festivalplanner.simulator.target.StageTarget;
 import festivalplanner.simulator.target.Target;
 import festivalplanner.simulator.target.ToiletTarget;
 
@@ -66,7 +67,7 @@ public class Visitor {
 
 
 		maxBlather = 1000;
-		blather = (int) Math.random() * 500;
+		blather = (int) Math.random() * 1000;
 		hasToPee = false;
 
 		//blather = maxBlather;
@@ -162,35 +163,30 @@ public class Visitor {
 				pee();
 			} else if (currentAction == CurrentAction.BUYINGDRINKS && timeAtTarget >= 12) {
 				drink();
-			} else if (currentAction == CurrentAction.WATCHING && timeAtTarget >= 30) {
+			} else if (currentAction == CurrentAction.WATCHING && timeAtTarget >= 600) {
 				currentAction = CurrentAction.IDLE;
 			}
 		}
 
 
 		//checks if the currentaction  = idle. if currentAction = idle then it wil select a random action
-		if (currentAction == CurrentAction.IDLE) {
-			timeAtTarget = 0;
-			int action = (int) (Math.random() * 2);
-			switch (action) {
-				case 0:
-					isThirsty = true;
-					break;
-				case 1:
-					currentAction = CurrentAction.WATCHING;
-			}
-		}
-
-		if (currentAction != CurrentAction.PEEING && hasToPee) {
+		if (currentAction == CurrentAction.IDLE && hasToPee) {
 			currentAction = CurrentAction.PEEING;
 			setTarget(Navigator.getNearestToilet(position));
-		} else if (currentAction != CurrentAction.BUYINGDRINKS && isThirsty) {
+		} else if (currentAction == CurrentAction.IDLE && isThirsty) {
 			currentAction = CurrentAction.BUYINGDRINKS;
-			setTarget(Navigator.getDummyStage());
+			target = Navigator.getNearestStand(position);
+		}else if (currentAction == CurrentAction.IDLE) {
+				timeAtTarget = 0;
+				int action = (int) (Math.random() * 2);
+				if(action < 0.1) {
+					isThirsty = true;
+				}else {
+					currentAction = CurrentAction.WATCHING;
+					target = Navigator.getDummyStage();
+				}
+
 		}
-
-
-
 
 	}
 
@@ -257,6 +253,11 @@ public class Visitor {
     }
 
     public boolean isAtTarget(){
+    	if(target instanceof StageTarget){
+    		if(target.getDistance(position) == 0){
+    			return true;
+			}else return false;
+		}
         return position.distance(target.getPosition()) < 20;
     }
 

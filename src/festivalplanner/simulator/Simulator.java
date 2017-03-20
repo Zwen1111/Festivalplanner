@@ -72,8 +72,6 @@ public class Simulator {
 				Point2D newDest = getNextWayPoint(v.getPosition(), v.getTarget());
 				if (newDest != null) {
 					v.setDestination(newDest);
-				} else {
-					v.setTarget(null);
 				}
 			}
 			if (v.isTargetSet()) {
@@ -86,8 +84,6 @@ public class Simulator {
 						Point2D newDest = getNextWayPoint(destiny, v.getTarget());
 						if (newDest != null) {
 							v.setDestination(newDest);
-						} else {
-							v.setTarget(null);
 						}
 					}
 				}

@@ -2,6 +2,7 @@ package festivalplanner.simulator.data;
 
 import festivalplanner.data.Stage;
 import festivalplanner.simulator.target.StageTarget;
+import festivalplanner.simulator.target.StandTarget;
 import festivalplanner.simulator.target.Target;
 import festivalplanner.simulator.map.TileMap;
 import festivalplanner.simulator.target.ToiletTarget;
@@ -21,6 +22,7 @@ public class ObjectLayer extends Layer {
 
 	public static final String TYPE_STAGE = "stage";
 	public static final String TYPE_TOILET = "toilet";
+	public static final String TYPE_STAND = "stand";
 
 	private JsonArray objectArray;
 
@@ -83,6 +85,10 @@ public class ObjectLayer extends Layer {
 					break;
 				case TYPE_TOILET:
 					parsedTargets.add(new ToiletTarget(new Point2D.Double(targetX + targetWidth / 2,
+							targetY + targetHeigth / 2), targetCapacity));
+					break;
+				case TYPE_STAND:
+					parsedTargets.add(new StandTarget(new Point2D.Double(targetX + targetWidth / 2,
 							targetY + targetHeigth / 2), targetCapacity));
 					break;
 			}

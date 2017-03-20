@@ -4,6 +4,7 @@ import festivalplanner.data.Artist;
 import festivalplanner.data.Database;
 import festivalplanner.data.Performance;
 import festivalplanner.simulator.target.StageTarget;
+import festivalplanner.simulator.target.StandTarget;
 import festivalplanner.simulator.target.Target;
 import festivalplanner.simulator.target.ToiletTarget;
 
@@ -29,10 +30,19 @@ public class Navigator {
 	}
 
 	public static ToiletTarget getNearestToilet(Point2D position) {
-		return (ToiletTarget) TARGETS.stream()
+		List<Target> toilets = TARGETS.stream()
 				.filter(target -> target instanceof ToiletTarget)
 				.sorted(Comparator.comparing(target -> target.getDistance(position)))
-				.findFirst().orElse(null);
+				.collect(Collectors.toList());
+		return (ToiletTarget) toilets.get(toilets.size() - 1);
+	}
+
+	public static StandTarget getNearestStand(Point2D position) {
+		List<Target> stands = TARGETS.stream()
+				.filter(target -> target instanceof StandTarget)
+				.sorted(Comparator.comparing(target -> target.getDistance(position)))
+				.collect(Collectors.toList());
+		return (StandTarget) stands.get(stands.size() - 1);
 	}
 
 	public static List<Target> getTargets() {

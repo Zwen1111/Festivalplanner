@@ -78,12 +78,6 @@ public class SimulatorPanel extends JPanel implements MouseMotionListener, Mouse
 		}
 		for (Visitor v : simulator.getVisitors()) {
 			v.draw(g2d);
-			if (target != null && !v.isTargetSet()) {
-				//v.setPosition(new Point2D.Double(Math.random() * map.getMapWidth(),
-				//		Math.random() * map.getMapHeight()));
-				//simulator.setVisitorTarget(v, target);
-				v.setTarget(target);
-			}
 		}
 	}
 

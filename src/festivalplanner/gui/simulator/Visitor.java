@@ -55,7 +55,7 @@ public class Visitor {
 
 
 	public enum CurrentAction {
-		IDLE, PEEING, WATCHING, BUYINGDRINKS,
+		IDLE, PEEING, WATCHING, BUYINGDRINKS,GOINGHOME
 	}
 
 
@@ -188,6 +188,8 @@ public class Visitor {
 					newPosition = position;
 				}
 				pee();
+			}else if(currentAction == CurrentAction.GOINGHOME && !hasToPee && !isThirsty){
+				remove = true;
 			}
 
 
@@ -207,25 +209,29 @@ public class Visitor {
 			currentAction = CurrentAction.BUYINGDRINKS;
 			target = Navigator.getNearestStand(position);
 		}else if (currentAction == CurrentAction.IDLE) {
-
-				timeAtTarget = 0;
-				int action = (int) (Math.random() * 2);
-				if(action < 0.1) {
-					isThirsty = true;
-				}else {
-					currentAction = CurrentAction.WATCHING;
-					List<StageTarget> stageTargets = Navigator.getArtistPerformances(artists,time);
-					if(stageTargets.size() > 0) {
-						target =  stageTargets.get((int) (Math.random() * stageTargets.size()));
-						isDummy = false;
-					}else {
-						target = Navigator.getDummyStage();
-						isDummy = true;
+					timeAtTarget = 0;
+					int action = (int) (Math.random() * 2);
+					if (action < 0.1) {
+						isThirsty = true;
+					} else {
+						currentAction = CurrentAction.WATCHING;
+						List<StageTarget> stageTargets = Navigator.getArtistPerformances(artists, time);
+						if (stageTargets.size() > 0) {
+							target = stageTargets.get((int) (Math.random() * stageTargets.size()));
+							isDummy = false;
+						} else {
+							target = Navigator.getDummyStage();
+							isDummy = true;
+						}
 					}
 				}
-
+		if(time.getHour() < 6) {
+			target = Navigator.getTargets().get(Navigator.getTargets().size() - 1);
+			currentAction = CurrentAction.GOINGHOME;
+			isThirsty = false;
+			hasToPee =false;
+			peeing = false;
 		}
-
 	}
 
 	public boolean checkcollision(List<Visitor> visitors) {

@@ -2,6 +2,7 @@ package festivalplanner.simulator;
 
 import festivalplanner.gui.simulator.Visitor;
 import festivalplanner.simulator.map.TileMap;
+import festivalplanner.simulator.target.SimpleTarget;
 import festivalplanner.simulator.target.Target;
 
 import javax.imageio.ImageIO;
@@ -25,8 +26,11 @@ public class Simulator {
 	public Simulator(TileMap map) {
 		Navigator.clearTargets();
 		Navigator.addTargets(map.getTargets());
+		SimpleTarget target = new SimpleTarget(new Point2D.Double(1710,750));
+		target.setupDistances(map);
+		Navigator.addTarget(target);
 		visitors = new ArrayList<>();
-		maxVisitors = 5;//200;
+		maxVisitors = 10;//200;
 		getImages();
 	}
 

@@ -105,7 +105,7 @@ public class SimulatorTabGUI extends JPanel implements ActionListener {
 	public void actionPerformed(ActionEvent e) {
         frame++;
         if(buttonArrayList.get(0).getName().equals("Play")) {
-            if(frame >= 7) {
+            if(frame >= 3) {
                 timeLabel.setText(time.toString());
                 time = time.plusMinutes(1);
                 frame = 0;

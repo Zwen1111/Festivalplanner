@@ -3,10 +3,7 @@ package festivalplanner.simulator;
 import festivalplanner.data.Artist;
 import festivalplanner.data.Database;
 import festivalplanner.data.Performance;
-import festivalplanner.simulator.target.StageTarget;
-import festivalplanner.simulator.target.StandTarget;
-import festivalplanner.simulator.target.Target;
-import festivalplanner.simulator.target.ToiletTarget;
+import festivalplanner.simulator.target.*;
 
 import java.awt.geom.Point2D;
 import java.time.LocalTime;
@@ -62,7 +59,7 @@ public class Navigator {
 	 * after the specified time. Returns a list of Stage-targets that represent the
 	 * location of that stage, as well as contains the tile-distance to it.
 	 *
-	 * @param artist the preferred Artist.
+	 * @param artists the preferred Artist.
 	 * @param afterTime the time after which it should start.
 	 * @return a list of Targets matching preferences. Empty if no matches.
 	 */
@@ -79,5 +76,9 @@ public class Navigator {
 						.findFirst()
 						.ifPresent(target -> targets.add((StageTarget) target)));
 		return targets;
+	}
+
+	public static void addTarget(SimpleTarget target) {
+		TARGETS.add(target);
 	}
 }

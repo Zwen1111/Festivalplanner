@@ -47,6 +47,15 @@ public class Navigator {
 		return (StageTarget) stages.get((int) (Math.random() * stages.size()));
 	}
 
+	/**
+	 * Searches the Database for performances which host a specific Artist and start
+	 * after the specified time. Returns a list of Stage-targets that represent the
+	 * location of that stage, as well as contains the tile-distance to it.
+	 *
+	 * @param artist the preferred Artist.
+	 * @param afterTime the time after which it should start.
+	 * @return a list of Targets matching preferences. Empty if no matches.
+	 */
 	public static List<StageTarget> getArtistPerformances(Artist artist, LocalTime afterTime) {
 		List<StageTarget> targets = new ArrayList<>();
 		Database.getPerformacesOfArtist(artist).stream()

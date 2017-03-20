@@ -84,7 +84,7 @@
                      "capacity":"int"
                     },
                  "rotation":0,
-                 "type":"",
+                 "type":"stage",
                  "visible":true,
                  "width":252,
                  "x":643.333,
@@ -103,7 +103,7 @@
                      "capacity":"int"
                     },
                  "rotation":0,
-                 "type":"",
+                 "type":"stage",
                  "visible":true,
                  "width":74.6667,
                  "x":287.667,
@@ -114,7 +114,7 @@
                  "id":3,
                  "name":"MainStage",
                  "rotation":0,
-                 "type":"",
+                 "type":"stage",
                  "visible":true,
                  "width":285.333,
                  "x":1282.33,
@@ -133,7 +133,7 @@
                      "capacity":"int"
                     },
                  "rotation":0,
-                 "type":"",
+                 "type":"toilet",
                  "visible":true,
                  "width":31,
                  "x":288,
@@ -152,7 +152,7 @@
                      "capacity":"int"
                     },
                  "rotation":0,
-                 "type":"",
+                 "type":"toilet",
                  "visible":true,
                  "width":31,
                  "x":320.5,
@@ -171,7 +171,7 @@
                      "capacity":"int"
                     },
                  "rotation":0,
-                 "type":"",
+                 "type":"toilet",
                  "visible":true,
                  "width":31,
                  "x":352.5,
@@ -190,7 +190,7 @@
                      "capacity":"int"
                     },
                  "rotation":0,
-                 "type":"",
+                 "type":"toilet",
                  "visible":true,
                  "width":31,
                  "x":384.5,
@@ -285,7 +285,7 @@
                      "capacity":"int"
                     },
                  "rotation":0,
-                 "type":"",
+                 "type":"stand",
                  "visible":true,
                  "width":31,
                  "x":609,
@@ -304,7 +304,7 @@
                      "capacity":"int"
                     },
                  "rotation":0,
-                 "type":"",
+                 "type":"stand",
                  "visible":true,
                  "width":93,
                  "x":703,
@@ -323,7 +323,7 @@
                      "capacity":"int"
                     },
                  "rotation":0,
-                 "type":"",
+                 "type":"stand",
                  "visible":true,
                  "width":33,
                  "x":862,

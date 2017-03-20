@@ -1,19 +1,13 @@
 package festivalplanner.gui.simulator;
 
-import festivalplanner.data.Artist;
-import festivalplanner.data.Database;
 import festivalplanner.simulator.Navigator;
-import festivalplanner.simulator.target.PerformanceTarget;
-import festivalplanner.simulator.target.StageTarget;
-import festivalplanner.simulator.target.Target;
-import festivalplanner.simulator.target.ToiletTarget;
+import festivalplanner.simulator.target.*;
 
 import java.awt.*;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
 import java.time.LocalTime;
-import java.util.ArrayList;
 import java.util.List;
 
 
@@ -30,6 +24,7 @@ public class Visitor {
 	private Point2D destination;
 	private Point2D newPosition;
 	private Target target;
+	private ToiletBlockTarget currentToiletBlock;
 
 	private BufferedImage image;
 	private int radius;
@@ -37,14 +32,10 @@ public class Visitor {
 
 	private int timeAtTarget;
 
-	private boolean hasToPee;
-	private int peeSpeed;
-	private boolean peeing;
-	private int blather;
-	private int maxBlather;
+	private double peeSpeed;
+	private double blather;
 
-
-	private boolean isThirsty;
+	private double hydration;
 
 	private boolean remove;
 
@@ -53,16 +44,6 @@ public class Visitor {
 	public boolean getRemove() {
 		return remove;
 	}
-
-
-	public enum CurrentAction {
-		IDLE, PEEING, WATCHING, BUYINGDRINKS,GOINGHOME
-	}
-
-
-	private List<Artist> artists;
-	private String wantedGenre;
-	private boolean isDummy;
 
 	public Visitor(double speed, Point2D position, BufferedImage image) {
 		this.speed = speed;
@@ -76,25 +57,10 @@ public class Visitor {
 
 		currentAction = CurrentAction.IDLE;
 
-
-		maxBlather = 1000;
-		blather = (int) (Math.random() * 1000);
-		hasToPee = false;
-		peeSpeed = (int) (Math.random() * 5 + 5);
+		blather = Math.random();
+		peeSpeed = (Math.random() * 5 + 5) / 1000;
+		hydration = 1.0;
 		//blather = maxBlather;
-
-		artists = new ArrayList<>();
-
-		wantedGenre = Database.getArtists().size() > 0 ?
-				Database.getArtists().get((int) (Math.random() * Database.getArtists().size())).getGenre() : "";
-		for (Artist artist : Database.getArtists()) {
-			if(artist.getGenre().equals(wantedGenre))
-				artists.add(artist);
-		}
-
-		/*for (int i = 0; i < Math.random() * Database.getArtists().size(); i++) {
-			artists.add(Database.getArtists().get( (int) (Math.random() * Database.getArtists().size())));
-		}*/
 
 	}
 
@@ -111,11 +77,12 @@ public class Visitor {
 			int w = (int) g.getFontMetrics().getStringBounds(targetString, g).getWidth();
 			g.setColor(Color.WHITE);
 			g.fillRect((int) position.getX() - 5, (int) position.getY() - 10, w + 10, 60);
-			g.setColor(isDummy ? Color.RED : Color.black);
+			g.setColor(Color.BLACK);//isDummy ? Color.RED : Color.black);
 			g.drawString(targetString, (float) position.getX(), (float) position.getY());
 			g.setColor(Color.black);
 			g.drawString("Action: " + currentAction, (float) position.getX(), (float) position.getY() + 20);
-			g.drawString("Blather: " + blather + "/" + maxBlather, (float) position.getX(), (float) position.getY() + 40);
+			g.drawString(String.format("Blather: %.0f%%, Hydra: %.0f%%", blather * 100, hydration * 100),
+					(float) position.getX(), (float) position.getY() + 40);
 		}
 		g.drawImage(image, af, null);
 	}
@@ -172,15 +139,70 @@ public class Visitor {
 	}
 
 	private void preferences(LocalTime time) {
-		//if blather is full the visitor has to pee
+		if (isAtTarget()) timeAtTarget++;
+		hydration -= 0.001;
 
+		switch (currentAction) {
+			case IDLE:
+				timeAtTarget = 0;
+				//Decide next action, in order of priority:
+				if (time.getHour() < 6) {
+					target = Navigator.getTargets().get(Navigator.getTargets().size() - 1);
+					currentAction = CurrentAction.GOING_HOME;
+					blather = 0;
+					hydration = 1.0;
+				} else if (blather >= 0.8) {
+					currentAction = CurrentAction.GOING_TO_TOILET;
+					setTarget(Navigator.getNearestToilet(position));
+				} else if (hydration <= 0.2) {
+					currentAction = CurrentAction.GOING_TO_STAND;
+					setTarget(Navigator.getNearestStand(position));
+				} else {
+					double coin = Math.random();
+					currentAction = CurrentAction.GOING_TO_GRASS;
+					setTarget(Navigator.getDummyStage());
+				}
+				break;
+			case PEEING:
+				if (position.distance(target.getPosition()) < 10) pee();
+				break;
+			case RESTING:
+				if (timeAtTarget >= 600) currentAction = CurrentAction.IDLE;
+				break;
+			case ATTENDING_PERFORMANCE:
+				if (timeAtTarget >= 600) currentAction = CurrentAction.IDLE;
+				break;
+			case GOING_TO_GRASS:
+				if (timeAtTarget >= 1) {
+					currentAction = CurrentAction.RESTING;
+				}
+				break;
+			case GOING_TO_PERMORMANCE:
+				if (timeAtTarget >= 1) {
+					currentAction = CurrentAction.ATTENDING_PERFORMANCE;
+				}
+				break;
+			case GOING_TO_STAND:
+				if (timeAtTarget >= 1) {
+					currentAction = CurrentAction.BUYING_DRINKS;
+				}
+				break;
+			case GOING_TO_TOILET:
+				if (timeAtTarget >= 1 && !target.isFull()) {
+					currentToiletBlock = (ToiletBlockTarget) target;
+					setTarget(((ToiletBlockTarget) target).useToilet());
+					currentAction = CurrentAction.PEEING;
+				}
+				break;
+			case BUYING_DRINKS:
+				if (timeAtTarget >= 12) drink();
+				break;
+			case GOING_HOME:
+				if (timeAtTarget >= 1) remove = true;
+				break;
+		}
 
-
-		// checks howLong a visitor
-		if (isAtTarget()) {
-			timeAtTarget++;
-
-			//peeing
+			/*//peeing
 			if(currentAction == CurrentAction.PEEING) {
 				if(target !=  null && target instanceof ToiletTarget) {
 					if(!((ToiletTarget) target).isFull() && !peeing) {
@@ -190,14 +212,14 @@ public class Visitor {
 					newPosition = position;
 				}
 				pee();
-			}else if(currentAction == CurrentAction.GOINGHOME && !hasToPee && !isThirsty){
+			}else if(currentAction == CurrentAction.GOING_HOME && !hasToPee && !isThirsty){
 				remove = true;
 			}
 
 
-			if (currentAction == CurrentAction.BUYINGDRINKS && timeAtTarget >= 12) {
+			if (currentAction == CurrentAction.BUYING_DRINKS && timeAtTarget >= 12) {
 				drink();
-			} else if (currentAction == CurrentAction.WATCHING && timeAtTarget >= 600) {
+			} else if (currentAction == CurrentAction.ATTENDING_PERFORMANCE && timeAtTarget >= 600) {
 				currentAction = CurrentAction.IDLE;
 			}
 		}
@@ -208,7 +230,7 @@ public class Visitor {
 			currentAction = CurrentAction.PEEING;
 			setTarget(Navigator.getNearestToilet(position));
 		} else if (currentAction == CurrentAction.IDLE && isThirsty) {
-			currentAction = CurrentAction.BUYINGDRINKS;
+			currentAction = CurrentAction.BUYING_DRINKS;
 			target = Navigator.getNearestStand(position);
 		}else if (currentAction == CurrentAction.IDLE) {
 					timeAtTarget = 0;
@@ -216,7 +238,7 @@ public class Visitor {
 					if (action < 0.1) {
 						isThirsty = true;
 					} else {
-						currentAction = CurrentAction.WATCHING;
+						currentAction = CurrentAction.ATTENDING_PERFORMANCE;
 						List<PerformanceTarget> stageTargets = Navigator.getArtistPerformances(artists, time);
 						if (stageTargets.size() > 0) {
 							target = stageTargets.get((int) (Math.random() * stageTargets.size()));
@@ -229,11 +251,11 @@ public class Visitor {
 				}
 		if(time.getHour() < 6) {
 			target = Navigator.getTargets().get(Navigator.getTargets().size() - 1);
-			currentAction = CurrentAction.GOINGHOME;
+			currentAction = CurrentAction.GOING_HOME;
 			isThirsty = false;
 			hasToPee =false;
 			peeing = false;
-		}
+		}*/
 	}
 
 	public boolean checkcollision(List<Visitor> visitors) {
@@ -282,27 +304,26 @@ public class Visitor {
     }
 
     public void drink(){
-        isThirsty = false;
-        blather += 200;
+        //isThirsty = false;
+        //blather += 200;
+		blather += 0.2;
+		hydration += 1.0;
         currentAction = CurrentAction.IDLE;
-		if (blather >= maxBlather) {
-			hasToPee = true;
-		}
+		//if (blather >= maxBlather) {
+		//	hasToPee = true;
+		//}
     }
 
-    public void pee(){
-    	if(blather <= 0) {
-			hasToPee = false;
+    public void pee() {
+		blather -= peeSpeed;
+		newPosition = position;
+    	if (blather <= 0) {
 			currentAction = CurrentAction.IDLE;
 			blather = 0;
-			ToiletTarget currentToilet = (ToiletTarget) getTarget();
-			currentToilet.changeAttendency(-1);
-			peeing = false;
-			//destination = new Point2D.Double(200,900);
-		}else {
-    		blather-= peeSpeed;
+			currentToiletBlock.freeToilet((ToiletTarget) getTarget());
+			//ToiletTarget currentToilet = (ToiletTarget) getTarget();
+			//currentToilet.changeAttendency(-1);
 		}
-
     }
 
     public boolean isAtTarget(){
@@ -314,4 +335,16 @@ public class Visitor {
         return position.distance(target.getPosition()) < 20;
     }
 
+	public enum CurrentAction {
+		IDLE,
+		GOING_TO_PERMORMANCE,
+		GOING_TO_GRASS,
+		GOING_TO_TOILET,
+		GOING_TO_STAND,
+		GOING_HOME,
+		ATTENDING_PERFORMANCE,
+		RESTING,
+		PEEING,
+		BUYING_DRINKS
+	}
 }

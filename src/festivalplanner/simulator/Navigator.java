@@ -26,12 +26,12 @@ public class Navigator {
 		TARGETS.clear();
 	}
 
-	public static ToiletTarget getNearestToilet(Point2D position) {
+	public static ToiletBlockTarget getNearestToilet(Point2D position) {
 		List<Target> toilets = TARGETS.stream()
-				.filter(target -> target instanceof ToiletTarget)
+				.filter(target -> target instanceof ToiletBlockTarget)
 				.sorted(Comparator.comparing(target -> target.getDistance(position)))
 				.collect(Collectors.toList());
-		return (ToiletTarget) toilets.get(0);
+		return (ToiletBlockTarget) toilets.get(0);
 	}
 
 	public static StandTarget getNearestStand(Point2D position) {

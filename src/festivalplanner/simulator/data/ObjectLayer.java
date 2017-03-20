@@ -1,11 +1,8 @@
 package festivalplanner.simulator.data;
 
 import festivalplanner.data.Stage;
-import festivalplanner.simulator.target.StageTarget;
-import festivalplanner.simulator.target.StandTarget;
-import festivalplanner.simulator.target.Target;
+import festivalplanner.simulator.target.*;
 import festivalplanner.simulator.map.TileMap;
-import festivalplanner.simulator.target.ToiletTarget;
 
 import javax.json.JsonArray;
 import javax.json.JsonObject;
@@ -60,6 +57,8 @@ public class ObjectLayer extends Layer {
 	 */
 	public List<Target> parseAsTargetLayer(TileMap map) {
 		List<Target> parsedTargets = new ArrayList<>();
+		List<ToiletBlockTarget> parsedToiletBlocks = new ArrayList<>();
+
 		for (int i = 0; i < objectArray.size(); i++) {
 			JsonObject object = objectArray.getJsonObject(i);
 
@@ -78,18 +77,39 @@ public class ObjectLayer extends Layer {
 				targetCapacity = properties.getInt("capacity");
 			}
 
+			Point2D targetPoint = new Point2D.Double(targetX + targetWidth / 2,
+					targetY + targetHeigth / 2);
+
 			switch (targetType) {
 				case TYPE_STAGE:
-					parsedTargets.add(new StageTarget(new Point2D.Double(targetX + targetWidth / 2,
-							targetY + targetHeigth / 2), new Stage(targetName, targetCapacity)));
+					parsedTargets.add(new StageTarget(targetPoint, new Stage(targetName, targetCapacity)));
 					break;
 				case TYPE_TOILET:
-					parsedTargets.add(new ToiletTarget(new Point2D.Double(targetX + targetWidth / 2,
-							targetY + targetHeigth / 2), targetCapacity));
+					//Try matching toilets into blocks of toilets.
+					String[] split = targetName.split("\\.");
+					if (split.length == 2) {
+						String toiletBlockName = split[0];
+						ToiletTarget newToilet = new ToiletTarget(targetPoint, targetCapacity);
+						ToiletBlockTarget tbt = parsedToiletBlocks.stream()
+								.filter(tb -> tb.getName().equals(toiletBlockName))
+								.findFirst().orElse(null);
+						if (tbt != null) {
+							System.out.println("Matched " + targetName + " with " + tbt.getName());
+						} else {
+							//For the position of the toilet block, we currently assume it is one tile south.
+							tbt = new ToiletBlockTarget(toiletBlockName, new Point2D.Double(targetPoint.getX(),
+									targetPoint.getY() + map.getTileHeight()));
+							parsedTargets.add(tbt);
+							parsedToiletBlocks.add(tbt);
+							System.out.println("New ToiletBlock named " + tbt.getName());
+						}
+						tbt.addToilet(newToilet);
+					}
+					//parsedTargets.add(new ToiletTarget(new Point2D.Double(targetX + targetWidth / 2,
+					//		targetY + targetHeigth / 2), targetCapacity));
 					break;
 				case TYPE_STAND:
-					parsedTargets.add(new StandTarget(new Point2D.Double(targetX + targetWidth / 2,
-							targetY + targetHeigth / 2), targetCapacity));
+					parsedTargets.add(new StandTarget(targetPoint, targetCapacity));
 					break;
 			}
 		}

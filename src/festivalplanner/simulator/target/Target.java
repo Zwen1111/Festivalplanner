@@ -11,6 +11,7 @@ import java.util.*;
  */
 public abstract class Target {
 
+	private String name;
 	private int capacity;
 	private int attendants;
 	private Point2D position;
@@ -33,6 +34,14 @@ public abstract class Target {
 		startIndex = data.getIndex((int) Math.floor(position.getX() / map.getTileWidth()),
 				(int) Math.floor(position.getY() / map.getTileHeight()));
 		bfs();
+	}
+
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String value) {
+		name = value;
 	}
 
 	private void setCell(int index, int value) {

@@ -26,7 +26,7 @@ public class Simulator {
 		Navigator.clearTargets();
 		Navigator.addTargets(map.getTargets());
 		visitors = new ArrayList<>();
-		maxVisitors = 5;//200;
+		maxVisitors = 200;
 		getImages();
 	}
 

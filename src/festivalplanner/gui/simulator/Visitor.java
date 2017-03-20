@@ -85,7 +85,8 @@ public class Visitor {
 
 		artists = new ArrayList<>();
 
-		wantedGenre = Database.getArtists().get((int) Math.random() * Database.getArtists().size()).getGenre();
+		wantedGenre = Database.getArtists().size() > 0 ?
+				Database.getArtists().get((int) (Math.random() * Database.getArtists().size())).getGenre() : "";
 		for (Artist artist : Database.getArtists()) {
 			if(artist.getGenre().equals(wantedGenre))
 				artists.add(artist);

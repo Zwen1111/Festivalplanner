@@ -1,5 +1,7 @@
 package festivalplanner.gui.simulator;
 
+import festivalplanner.data.Artist;
+import festivalplanner.data.Database;
 import festivalplanner.simulator.Navigator;
 import festivalplanner.simulator.target.StageTarget;
 import festivalplanner.simulator.target.Target;
@@ -9,6 +11,7 @@ import java.awt.*;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -19,6 +22,7 @@ import java.util.List;
 public class Visitor {
 
 	private static boolean debug = true;
+
 	private double speed;
 	private double angle;
 	private Point2D position;
@@ -33,10 +37,11 @@ public class Visitor {
 	private int timeAtTarget;
 
 	private boolean hasToPee;
+	private int peeSpeed;
 	private boolean peeing;
 	private int blather;
 	private int maxBlather;
-	private List<ToiletTarget> fullToilets;
+
 
 	private boolean isThirsty;
 
@@ -54,11 +59,15 @@ public class Visitor {
 	}
 
 
+	private List<Artist> artists;
+	private String wantedGenre;
+	private boolean isDummy;
+
 	public Visitor(double speed, Point2D position, BufferedImage image) {
-		fullToilets = new ArrayList<>();
 		this.speed = speed;
 		angle = 0.0;
 		this.position = position;
+		newPosition = position;
 		//destination = new Point2D.Double(500, 500);
 		//setTarget(Navigator.getDummyStage());
 		radius = 10;
@@ -68,12 +77,22 @@ public class Visitor {
 
 
 		maxBlather = 1000;
-		blather = (int) Math.random() * 1000;
+		blather = (int) (Math.random() * 1000);
 		hasToPee = false;
-
+		peeSpeed = (int) (Math.random() * 5 + 5);
 		//blather = maxBlather;
 
+		artists = new ArrayList<>();
 
+		wantedGenre = Database.getArtists().get((int) Math.random() * Database.getArtists().size()).getGenre();
+		for (Artist artist : Database.getArtists()) {
+			if(artist.getGenre().equals(wantedGenre))
+				artists.add(artist);
+		}
+
+		/*for (int i = 0; i < Math.random() * Database.getArtists().size(); i++) {
+			artists.add(Database.getArtists().get( (int) (Math.random() * Database.getArtists().size())));
+		}*/
 
 	}
 
@@ -84,16 +103,19 @@ public class Visitor {
 		af.translate(image.getWidth() / 2,image.getHeight() / 2);
 		af.rotate(angle);
 		af.translate(- image.getWidth() / 2, - image.getHeight() / 2);
-		g.drawImage(image, af, null);
+
 		if (debug) {
 			String targetString = "Target: " + target.getClass().getSimpleName() + ": " + target.getPosition();
 			int w = (int) g.getFontMetrics().getStringBounds(targetString, g).getWidth();
 			g.setColor(Color.WHITE);
-			g.fillRect((int) position.getX() - 5, (int) position.getY() - 10, w + 10, 40);
-			g.setColor(Color.black);
+			g.fillRect((int) position.getX() - 5, (int) position.getY() - 10, w + 10, 60);
+			g.setColor(isDummy ? Color.RED : Color.black);
 			g.drawString(targetString, (float) position.getX(), (float) position.getY());
+			g.setColor(Color.black);
 			g.drawString("Action: " + currentAction, (float) position.getX(), (float) position.getY() + 20);
+			g.drawString("Blather: " + blather + "/" + maxBlather, (float) position.getX(), (float) position.getY() + 40);
 		}
+		g.drawImage(image, af, null);
 	}
 
 	public void setTarget(Target newTarget) {
@@ -116,7 +138,7 @@ public class Visitor {
 		this.position = position;
 	}
 
-	public void update() {
+	public void update(LocalTime time) {
 		if (destination == null) {
 			target = Navigator.getDummyStage();
 			newPosition = position;
@@ -144,14 +166,12 @@ public class Visitor {
 		newPosition = new Point2D.Double(
 				position.getX() + speed * Math.cos(angle),
 				position.getY() + speed * Math.sin(angle));
-		preferences();
+		preferences(time);
 	}
 
-	private void preferences() {
+	private void preferences(LocalTime time) {
 		//if blather is full the visitor has to pee
-		if (blather >= maxBlather) {
-			hasToPee = true;
-		}
+
 
 
 		// checks howLong a visitor
@@ -167,11 +187,11 @@ public class Visitor {
 					}
 					newPosition = position;
 				}
+				pee();
 			}
 
-			if (currentAction == CurrentAction.PEEING && timeAtTarget >= 100 ) {
-				pee();
-			} else if (currentAction == CurrentAction.BUYINGDRINKS && timeAtTarget >= 12) {
+
+			if (currentAction == CurrentAction.BUYINGDRINKS && timeAtTarget >= 12) {
 				drink();
 			} else if (currentAction == CurrentAction.WATCHING && timeAtTarget >= 600) {
 				currentAction = CurrentAction.IDLE;
@@ -187,13 +207,21 @@ public class Visitor {
 			currentAction = CurrentAction.BUYINGDRINKS;
 			target = Navigator.getNearestStand(position);
 		}else if (currentAction == CurrentAction.IDLE) {
+
 				timeAtTarget = 0;
 				int action = (int) (Math.random() * 2);
 				if(action < 0.1) {
 					isThirsty = true;
 				}else {
 					currentAction = CurrentAction.WATCHING;
-					target = Navigator.getDummyStage();
+					List<StageTarget> stageTargets = Navigator.getArtistPerformances(artists,time);
+					if(stageTargets.size() > 0) {
+						target =  stageTargets.get((int) (Math.random() * stageTargets.size()));
+						isDummy = false;
+					}else {
+						target = Navigator.getDummyStage();
+						isDummy = true;
+					}
 				}
 
 		}
@@ -249,17 +277,24 @@ public class Visitor {
         isThirsty = false;
         blather += 200;
         currentAction = CurrentAction.IDLE;
+		if (blather >= maxBlather) {
+			hasToPee = true;
+		}
     }
 
     public void pee(){
-        hasToPee = false;
-        currentAction = CurrentAction.IDLE;
-        blather = 0;
-        ToiletTarget currentToilet = (ToiletTarget) getTarget();
-        currentToilet.changeAttendency(-1);
-        fullToilets = new ArrayList<>();
-		peeing = false;
-        //destination = new Point2D.Double(200,900);
+    	if(blather <= 0) {
+			hasToPee = false;
+			currentAction = CurrentAction.IDLE;
+			blather = 0;
+			ToiletTarget currentToilet = (ToiletTarget) getTarget();
+			currentToilet.changeAttendency(-1);
+			peeing = false;
+			//destination = new Point2D.Double(200,900);
+		}else {
+    		blather-= peeSpeed;
+		}
+
     }
 
     public boolean isAtTarget(){

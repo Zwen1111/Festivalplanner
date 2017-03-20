@@ -9,6 +9,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.awt.geom.Point2D;
+import java.time.LocalTime;
 
 /**
  * The SimulatorPanel displays a TileMap. The map can be dragged and zoomed using mouse
@@ -81,8 +82,8 @@ public class SimulatorPanel extends JPanel implements MouseMotionListener, Mouse
 		}
 	}
 
-	public void update() {
-		simulator.runSimulation();
+	public void update(LocalTime time) {
+		simulator.runSimulation(time);
 	}
 
 	private void smartScale() {

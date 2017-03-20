@@ -179,6 +179,7 @@ public abstract class Target {
 		this.position = position;
 	}
 
+
 	public class Distance {
 		private int x;
 		private int y;

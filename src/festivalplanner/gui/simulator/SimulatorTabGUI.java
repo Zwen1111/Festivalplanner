@@ -17,7 +17,7 @@ public class SimulatorTabGUI extends JPanel implements ActionListener {
 
     private LocalTime time;
     private JLabel timeLabel;
-    private Long startTime;
+    private int frame;
 
     public SimulatorTabGUI() {
     	setName("SimulatorPanel");
@@ -86,7 +86,7 @@ public class SimulatorTabGUI extends JPanel implements ActionListener {
         add(timeLabel);
         add(simulatorPanel);
 
-		startTime = System.currentTimeMillis();
+		frame = 0;
         int fps = 60;
         new Timer(1000/fps,this).start();
     }
@@ -103,14 +103,14 @@ public class SimulatorTabGUI extends JPanel implements ActionListener {
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
-        long elapsed = System.currentTimeMillis() - startTime;
+        frame++;
         if(buttonArrayList.get(0).getName().equals("Play")) {
-            if(elapsed >= 200) {
+            if(frame >= 7) {
                 timeLabel.setText(time.toString());
                 time = time.plusMinutes(1);
-                startTime = System.currentTimeMillis();
+                frame = 0;
             }
-            simulatorPanel.update();
+            simulatorPanel.update(time);
         }
 
 		repaint();

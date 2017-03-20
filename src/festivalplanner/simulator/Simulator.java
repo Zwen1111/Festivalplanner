@@ -7,6 +7,7 @@ import festivalplanner.simulator.target.Target;
 import javax.imageio.ImageIO;
 import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -44,11 +45,10 @@ public class Simulator {
 	}
 
 	private boolean canSpawn(Visitor visitor) {
-		visitor.update();
 		return !visitor.checkcollision(visitors);
 	}
 
-	public void runSimulation() {
+	public void runSimulation(LocalTime time) {
 		if (visitors.size() < maxVisitors) {
 			Point2D.Double position = new  Point2D.Double(1710, 750);
 			Visitor visitor = new Visitor(3, position, images.get((int) (Math.random() * 8)));
@@ -61,7 +61,7 @@ public class Simulator {
 		while (visitorIterator.hasNext())
 		{
 			Visitor v = visitorIterator.next();
-			v.update();
+			v.update(time);
 			if(v.getRemove()){
 				visitorIterator.remove();
 				maxVisitors--;

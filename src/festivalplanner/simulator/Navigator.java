@@ -34,7 +34,7 @@ public class Navigator {
 				.filter(target -> target instanceof ToiletTarget)
 				.sorted(Comparator.comparing(target -> target.getDistance(position)))
 				.collect(Collectors.toList());
-		return (ToiletTarget) toilets.get(toilets.size() - 1);
+		return (ToiletTarget) toilets.get(0);
 	}
 
 	public static StandTarget getNearestStand(Point2D position) {
@@ -42,7 +42,7 @@ public class Navigator {
 				.filter(target -> target instanceof StandTarget)
 				.sorted(Comparator.comparing(target -> target.getDistance(position)))
 				.collect(Collectors.toList());
-		return (StandTarget) stands.get(stands.size() - 1);
+		return (StandTarget) stands.get(0);
 	}
 
 	public static List<Target> getTargets() {
@@ -66,9 +66,12 @@ public class Navigator {
 	 * @param afterTime the time after which it should start.
 	 * @return a list of Targets matching preferences. Empty if no matches.
 	 */
-	public static List<StageTarget> getArtistPerformances(Artist artist, LocalTime afterTime) {
+	public static List<StageTarget> getArtistPerformances(Collection<Artist> artists, LocalTime afterTime) {
+		if (artists == null) return new ArrayList<>();
 		List<StageTarget> targets = new ArrayList<>();
-		Database.getPerformacesOfArtist(artist).stream()
+		List<Performance> performances = new ArrayList<>();
+		artists.forEach(e-> performances.addAll(Database.getPerformacesOfArtist(e)));
+		performances.stream()
 				.filter(performance -> performance.getStartTime().isAfter(afterTime))
 				.forEach(performance -> TARGETS.stream()
 						.filter(target -> target instanceof StageTarget

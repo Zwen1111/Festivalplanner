@@ -1,7 +1,6 @@
 package festivalplanner.simulator.target;
 
 import festivalplanner.data.Stage;
-import festivalplanner.simulator.map.TileMap;
 
 import java.awt.geom.Point2D;
 
@@ -20,5 +19,12 @@ public class StageTarget extends Target {
 
 	public Stage getStage() {
 		return stage;
+	}
+
+	@Override
+	public String toString() {
+		return "StageTarget{" +
+				"stage=" + stage +
+				'}';
 	}
 }

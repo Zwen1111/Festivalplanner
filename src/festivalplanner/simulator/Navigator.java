@@ -74,7 +74,11 @@ public class Navigator {
 						.filter(target -> target instanceof StageTarget
 								&& ((StageTarget) target).getStage().equals(performance.getStage()))
 						.findFirst()
-						.ifPresent(target -> targets.add(new PerformanceTarget((StageTarget) target, performance))));
+						.ifPresent(target -> targets.add((PerformanceTarget) target)));
 		return targets;
+	}
+
+	public static void addTarget(SimpleTarget target) {
+		TARGETS.add(target);
 	}
 }

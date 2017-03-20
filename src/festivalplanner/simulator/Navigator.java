@@ -74,7 +74,7 @@ public class Navigator {
 						.filter(target -> target instanceof StageTarget
 								&& ((StageTarget) target).getStage().equals(performance.getStage()))
 						.findFirst()
-						.ifPresent(target -> targets.add((StageTarget) target)));
+						.ifPresent(target -> targets.add((PerformanceTarget) target)));
 		return targets;
 	}
 

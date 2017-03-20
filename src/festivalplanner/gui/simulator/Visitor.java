@@ -216,7 +216,7 @@ public class Visitor {
 						isThirsty = true;
 					} else {
 						currentAction = CurrentAction.WATCHING;
-						List<StageTarget> stageTargets = Navigator.getArtistPerformances(artists, time);
+						List<PerformanceTarget> stageTargets = Navigator.getArtistPerformances(artists, time);
 						if (stageTargets.size() > 0) {
 							target = stageTargets.get((int) (Math.random() * stageTargets.size()));
 							isDummy = false;

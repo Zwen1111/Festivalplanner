@@ -1,10 +1,14 @@
 package festivalplanner.simulator;
 
+import festivalplanner.data.Artist;
+import festivalplanner.data.Database;
+import festivalplanner.data.Performance;
 import festivalplanner.simulator.target.StageTarget;
 import festivalplanner.simulator.target.Target;
 import festivalplanner.simulator.target.ToiletTarget;
 
 import java.awt.geom.Point2D;
+import java.time.LocalTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -35,10 +39,23 @@ public class Navigator {
 		return Collections.unmodifiableList(TARGETS);
 	}
 
+	@Deprecated
 	public static StageTarget getDummyStage() {
 		List<Target> stages =  TARGETS.stream()
 				.filter(target -> target instanceof StageTarget)
 				.collect(Collectors.toList());
 		return (StageTarget) stages.get((int) (Math.random() * stages.size()));
+	}
+
+	public static List<StageTarget> getArtistPerformances(Artist artist, LocalTime afterTime) {
+		List<StageTarget> targets = new ArrayList<>();
+		Database.getPerformacesOfArtist(artist).stream()
+				.filter(performance -> performance.getStartTime().isAfter(afterTime))
+				.forEach(performance -> TARGETS.stream()
+						.filter(target -> target instanceof StageTarget
+								&& ((StageTarget) target).getStage().equals(performance.getStage()))
+						.findFirst()
+						.ifPresent(target -> targets.add((StageTarget) target)));
+		return targets;
 	}
 }

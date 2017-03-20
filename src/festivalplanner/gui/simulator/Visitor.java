@@ -1,7 +1,6 @@
 package festivalplanner.gui.simulator;
 
 import festivalplanner.simulator.Navigator;
-import festivalplanner.simulator.Simulator;
 import festivalplanner.simulator.target.Target;
 import festivalplanner.simulator.target.ToiletTarget;
 
@@ -32,6 +31,7 @@ public class Visitor {
 	private int timeAtTarget;
 
 	private boolean hasToPee;
+	private boolean peeing;
 	private int blather;
 	private int maxBlather;
 	private List<ToiletTarget> fullToilets;
@@ -69,7 +69,7 @@ public class Visitor {
 		blather = (int) Math.random() * 500;
 		hasToPee = false;
 
-		//blather = maxBlather;
+		blather = maxBlather;
 
 
 
@@ -107,6 +107,7 @@ public class Visitor {
 
 	public void update() {
 		if (destination == null) {
+			target = Navigator.getDummyStage();
 			newPosition = position;
 			return;
 		}
@@ -141,51 +142,32 @@ public class Visitor {
 			hasToPee = true;
 		}
 
-		if (currentAction != CurrentAction.PEEING && hasToPee) {
-			currentAction = CurrentAction.PEEING;
-			//setTarget(Navigator.getNearestToilet(position));
-			//destination = currentTarget.getPosition();
-		} else if (currentAction != CurrentAction.BUYINGDRINKS && isThirsty) {
-			currentAction = CurrentAction.BUYINGDRINKS;
-			//setTarget(Navigator.getDummyStage());
-			//destination = new Point2D.Double(1200, 900);
-			//currentTarget = getNearestStand;
-		}
 
 		// checks howLong a visitor
 		if (isAtTarget()) {
 			timeAtTarget++;
-			//if (destination.equals(new Point2D.Double(200, 900)))
-			//	remove = true;
-			//peeing
-			//ToiletTarget currentToilet = Navigator.getNearestToilet(position);
-			if(currentAction == CurrentAction.PEEING) {
-				/*while (currentToilet != null && currentToilet.isFull() ) {
-					if(currentToilet.isFull()) {
-						fullToilets.add(currentToilet);
-					}
-					currentToilet = simulator.getNearestToiletExcept(position, fullToilets);
-				}*/
 
-				Target currentToilet = getTarget();
-				if(currentToilet !=  null && currentToilet instanceof ToiletTarget) {
-					((ToiletTarget) currentToilet).use();
-					//currentTarget = currentToilet;
-					//destination = currentTarget.getPosition();
-				}else {
-					currentAction = CurrentAction.IDLE;
+			//peeing
+			if(currentAction == CurrentAction.PEEING) {
+				if(target !=  null && target instanceof ToiletTarget) {
+					if(!((ToiletTarget) target).isFull() && !peeing) {
+						((ToiletTarget) target).use();
+						peeing = true;
+					}
+					newPosition = position;
 				}
 			}
 
-			if (currentAction == CurrentAction.PEEING && timeAtTarget >= 30 ) {
+			if (currentAction == CurrentAction.PEEING && timeAtTarget >= 100 ) {
 				pee();
 			} else if (currentAction == CurrentAction.BUYINGDRINKS && timeAtTarget >= 12) {
 				drink();
 			} else if (currentAction == CurrentAction.WATCHING && timeAtTarget >= 30) {
 				currentAction = CurrentAction.IDLE;
-			}// else if (currentAction != CurrentAction.IDLE)
-			//	newPosition = position;
+			}
 		}
+
+
 		//checks if the currentaction  = idle. if currentAction = idle then it wil select a random action
 		if (currentAction == CurrentAction.IDLE) {
 			timeAtTarget = 0;
@@ -196,17 +178,18 @@ public class Visitor {
 					break;
 				case 1:
 					currentAction = CurrentAction.WATCHING;
-					//setTarget(Navigator.getDummyStage());
-					//destination = new Point2D.Double(1000, 100);
-                    /*currentTarget = random stage check if an performance is on the change
-
-                    if so currentTarget is that stage
-                    if not check rest of the changes else do nothing
-
-                    //currentTarget = targets.get(Math.random * target.size - 1);
-                    */
 			}
 		}
+
+		if (currentAction != CurrentAction.PEEING && hasToPee) {
+			currentAction = CurrentAction.PEEING;
+			setTarget(Navigator.getNearestToilet(position));
+		} else if (currentAction != CurrentAction.BUYINGDRINKS && isThirsty) {
+			currentAction = CurrentAction.BUYINGDRINKS;
+			setTarget(Navigator.getDummyStage());
+		}
+
+
 
 
 	}
@@ -269,12 +252,12 @@ public class Visitor {
         ToiletTarget currentToilet = (ToiletTarget) getTarget();
         currentToilet.done();
         fullToilets = new ArrayList<>();
-        setTarget(null);
+		peeing = false;
         //destination = new Point2D.Double(200,900);
     }
 
     public boolean isAtTarget(){
-        return position.distance(destination) < 50;
+        return position.distance(target.getPosition()) < 20;
     }
 
 }

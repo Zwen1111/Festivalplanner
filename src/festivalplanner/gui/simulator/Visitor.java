@@ -18,6 +18,7 @@ import java.util.List;
  */
 public class Visitor {
 
+	private static boolean debug = true;
 	private double speed;
 	private double angle;
 	private Point2D position;
@@ -84,6 +85,15 @@ public class Visitor {
 		af.rotate(angle);
 		af.translate(- image.getWidth() / 2, - image.getHeight() / 2);
 		g.drawImage(image, af, null);
+		if (debug) {
+			String targetString = "Target: " + target.getClass().getSimpleName() + ": " + target.getPosition();
+			int w = (int) g.getFontMetrics().getStringBounds(targetString, g).getWidth();
+			g.setColor(Color.WHITE);
+			g.fillRect((int) position.getX() - 5, (int) position.getY() - 10, w + 10, 40);
+			g.setColor(Color.black);
+			g.drawString(targetString, (float) position.getX(), (float) position.getY());
+			g.drawString("Action: " + currentAction, (float) position.getX(), (float) position.getY() + 20);
+		}
 	}
 
 	public void setTarget(Target newTarget) {

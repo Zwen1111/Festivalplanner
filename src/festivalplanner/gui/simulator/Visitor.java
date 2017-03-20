@@ -3,6 +3,7 @@ package festivalplanner.gui.simulator;
 import festivalplanner.data.Artist;
 import festivalplanner.data.Database;
 import festivalplanner.simulator.Navigator;
+import festivalplanner.simulator.target.PerformanceTarget;
 import festivalplanner.simulator.target.StageTarget;
 import festivalplanner.simulator.target.Target;
 import festivalplanner.simulator.target.ToiletTarget;
@@ -214,7 +215,7 @@ public class Visitor {
 					isThirsty = true;
 				}else {
 					currentAction = CurrentAction.WATCHING;
-					List<StageTarget> stageTargets = Navigator.getArtistPerformances(artists,time);
+					List<PerformanceTarget> stageTargets = Navigator.getArtistPerformances(artists,time);
 					if(stageTargets.size() > 0) {
 						target =  stageTargets.get((int) (Math.random() * stageTargets.size()));
 						isDummy = false;

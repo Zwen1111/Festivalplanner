@@ -3,10 +3,7 @@ package festivalplanner.simulator;
 import festivalplanner.data.Artist;
 import festivalplanner.data.Database;
 import festivalplanner.data.Performance;
-import festivalplanner.simulator.target.StageTarget;
-import festivalplanner.simulator.target.StandTarget;
-import festivalplanner.simulator.target.Target;
-import festivalplanner.simulator.target.ToiletTarget;
+import festivalplanner.simulator.target.*;
 
 import java.awt.geom.Point2D;
 import java.time.LocalTime;
@@ -62,13 +59,13 @@ public class Navigator {
 	 * after the specified time. Returns a list of Stage-targets that represent the
 	 * location of that stage, as well as contains the tile-distance to it.
 	 *
-	 * @param artist the preferred Artist.
+	 * @param artists the preferred Artists.
 	 * @param afterTime the time after which it should start.
 	 * @return a list of Targets matching preferences. Empty if no matches.
 	 */
-	public static List<StageTarget> getArtistPerformances(Collection<Artist> artists, LocalTime afterTime) {
+	public static List<PerformanceTarget> getArtistPerformances(Collection<Artist> artists, LocalTime afterTime) {
 		if (artists == null) return new ArrayList<>();
-		List<StageTarget> targets = new ArrayList<>();
+		List<PerformanceTarget> targets = new ArrayList<>();
 		List<Performance> performances = new ArrayList<>();
 		artists.forEach(e-> performances.addAll(Database.getPerformacesOfArtist(e)));
 		performances.stream()
@@ -77,7 +74,7 @@ public class Navigator {
 						.filter(target -> target instanceof StageTarget
 								&& ((StageTarget) target).getStage().equals(performance.getStage()))
 						.findFirst()
-						.ifPresent(target -> targets.add((StageTarget) target)));
+						.ifPresent(target -> targets.add(new PerformanceTarget((StageTarget) target, performance))));
 		return targets;
 	}
 }

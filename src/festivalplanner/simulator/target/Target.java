@@ -12,6 +12,7 @@ import java.util.*;
 public abstract class Target {
 
 	private int capacity;
+	private int attendants;
 	private Point2D position;
 	private int[][] destinations;
 	private TileMap map;
@@ -74,6 +75,24 @@ public abstract class Target {
 	public int getDistance(int x, int y) {
 		return x >= 0 && x < data.getWidth() && y >= 0 && y < data.getHeight() ?
 				destinations[x][y] : -1;
+	}
+
+	/**
+	 * Changes the amount of current visitors by the specified amount.
+	 * @param amount change value. Negative amount allowed (frees up space).
+	 */
+	public void changeAttendency(int amount) {
+		attendants += amount;
+		if (attendants < 0) attendants = 0;
+		if (attendants > capacity) attendants = capacity;
+	}
+
+	public boolean hasRoom() {
+		return attendants < capacity;
+	}
+
+	public boolean isFull() {
+		return attendants >= capacity;
 	}
 
 	public CollisionLayer getLayer() {

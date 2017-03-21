@@ -61,6 +61,11 @@ public abstract class Target {
 				(otherX == baseX - 1 && otherY == baseY);*/
 	}
 
+	public int getData(Point2D position) {
+		return data.getData((int) Math.floor(position.getX() / map.getTileWidth()),
+				(int) Math.floor(position.getY() / map.getTileHeight()));
+	}
+
 	public Distance getDistances(Point2D position) {
 		return getDistances((int) Math.floor(position.getX() / map.getTileWidth()),
 				(int) Math.floor(position.getY() / map.getTileHeight()));
@@ -114,7 +119,6 @@ public abstract class Target {
 
 		logic(queue, checked, 0, startIndex, data.getData(startIndex));
 		bfs(queue, checked, startIndex);
-		System.out.println("Starting index's value: " + data.getData(startIndex));
 
 		while (queue.size() > 0) {
 			bfs(queue, checked, queue.poll());
@@ -152,6 +156,7 @@ public abstract class Target {
 		//System.out.print("Check " + cellIndex + ": ");
 		checked.add(cellIndex);
 		switch (cellData) {
+			case CollisionLayer.TOILET_TILE:
 			case CollisionLayer.PATH_TILE:
 				setCell(cellIndex, fromDistance + 1);
 				q.offer(cellIndex);

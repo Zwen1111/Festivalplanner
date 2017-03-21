@@ -98,7 +98,7 @@ public class ObjectLayer extends Layer {
 						} else {
 							//For the position of the toilet block, we currently assume it is one tile south.
 							tbt = new ToiletBlockTarget(toiletBlockName, new Point2D.Double(targetPoint.getX(),
-									targetPoint.getY() + map.getTileHeight()));
+									targetPoint.getY() +  3 * map.getTileHeight()));
 							parsedTargets.add(tbt);
 							parsedToiletBlocks.add(tbt);
 							System.out.println("New ToiletBlock named " + tbt.getName());

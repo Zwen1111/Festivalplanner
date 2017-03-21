@@ -1,6 +1,7 @@
 package festivalplanner.gui.simulator;
 
 import festivalplanner.simulator.Navigator;
+import festivalplanner.simulator.data.CollisionLayer;
 import festivalplanner.simulator.target.*;
 
 import java.awt.*;
@@ -16,7 +17,7 @@ import java.util.List;
  */
 public class Visitor {
 
-	private static boolean debug = true;
+	private static boolean debug = false;
 
 	private double speed;
 	private double angle;
@@ -57,7 +58,7 @@ public class Visitor {
 
 		currentAction = CurrentAction.IDLE;
 
-		blather = Math.random();
+		blather = 1.0;//Math.random();
 		peeSpeed = (Math.random() * 5 + 5) / 1000;
 		hydration = 1.0;
 		//blather = maxBlather;
@@ -73,7 +74,8 @@ public class Visitor {
 		af.translate(- image.getWidth() / 2, - image.getHeight() / 2);
 
 		if (debug) {
-			String targetString = "Target: " + target.getClass().getSimpleName() + ": " + target.getPosition();
+			String targetString = "Target: " + (target == null ? null :
+					target.getClass().getSimpleName() + ": " + target.getPosition());
 			int w = (int) g.getFontMetrics().getStringBounds(targetString, g).getWidth();
 			g.setColor(Color.WHITE);
 			g.fillRect((int) position.getX() - 5, (int) position.getY() - 10, w + 10, 60);
@@ -83,6 +85,15 @@ public class Visitor {
 			g.drawString("Action: " + currentAction, (float) position.getX(), (float) position.getY() + 20);
 			g.drawString(String.format("Blather: %.0f%%, Hydra: %.0f%%", blather * 100, hydration * 100),
 					(float) position.getX(), (float) position.getY() + 40);
+			g.setColor(Color.MAGENTA);
+			if (target != null) {
+				g.fillOval((int) target.getPosition().getX() - 5, (int) target.getPosition().getY() - 5,
+						10, 10);
+			}
+		}
+		if (target != null && target instanceof ToiletTarget) {
+			g.setColor(Color.YELLOW);
+			g.fillOval((int) position.getX() - 10, (int) position.getY() - 10, 20, 20);
 		}
 		g.drawImage(image, af, null);
 	}
@@ -109,45 +120,45 @@ public class Visitor {
 
 	public void update(LocalTime time) {
 		if (destination == null) {
-			target = Navigator.getDummyStage();
+			//target = Navigator.getDummyStage();
 			newPosition = position;
-			return;
+		} else {
+
+			double dx = destination.getX() - position.getX();
+			double dy = destination.getY() - position.getY();
+
+			double newAngle = Math.atan2(dy, dx);
+
+			double difference = newAngle - angle;
+			while (difference < -Math.PI)
+				difference += 2 * Math.PI;
+			while (difference > Math.PI)
+				difference -= 2 * Math.PI;
+
+			if (difference > 0.1)
+				angle += 0.1;
+			else if (difference < -0.1)
+				angle -= 0.1;
+			else
+				angle = newAngle;
+
+			newPosition = new Point2D.Double(
+					position.getX() + speed * Math.cos(angle),
+					position.getY() + speed * Math.sin(angle));
 		}
-
-		double dx = destination.getX() - position.getX();
-		double dy = destination.getY() - position.getY();
-
-		double newAngle = Math.atan2(dy, dx);
-
-		double difference = newAngle - angle;
-		while (difference < -Math.PI)
-			difference += 2 * Math.PI;
-		while (difference > Math.PI)
-			difference -= 2 * Math.PI;
-
-		if (difference > 0.1)
-			angle += 0.1;
-		else if (difference < -0.1)
-			angle -= 0.1;
-		else
-			angle = newAngle;
-
-		newPosition = new Point2D.Double(
-				position.getX() + speed * Math.cos(angle),
-				position.getY() + speed * Math.sin(angle));
 		preferences(time);
 	}
 
 	private void preferences(LocalTime time) {
 		if (isAtTarget()) timeAtTarget++;
-		hydration -= 0.001;
+		hydration -= 0.00025;
 
 		switch (currentAction) {
 			case IDLE:
 				timeAtTarget = 0;
 				//Decide next action, in order of priority:
 				if (time.getHour() < 6) {
-					target = Navigator.getTargets().get(Navigator.getTargets().size() - 1);
+					setTarget(Navigator.getTargets().get(Navigator.getTargets().size() - 1));
 					currentAction = CurrentAction.GOING_HOME;
 					blather = 0;
 					hydration = 1.0;
@@ -164,7 +175,7 @@ public class Visitor {
 				}
 				break;
 			case PEEING:
-				if (position.distance(target.getPosition()) < 10) pee();
+				if (position.distance(target.getPosition()) < 5) pee();
 				break;
 			case RESTING:
 				if (timeAtTarget >= 600) currentAction = CurrentAction.IDLE;
@@ -260,10 +271,21 @@ public class Visitor {
 
 	public boolean checkcollision(List<Visitor> visitors) {
 		boolean collision = false;
-
+		
 		if (target != null) {
-			if (target.getDistance(newPosition) < 0 || !target.isAdjacent(position, newPosition)) {
+			int currentField = target.getData(position);
+			int newField = target.getData(newPosition);
+			if (newField == CollisionLayer.WALL_TILE || !target.isAdjacent(position, newPosition)) {
 				collision = true;
+			}
+			if (!collision) {
+				if (currentAction == CurrentAction.PEEING) {
+					//if (newField == CollisionLayer.TOILET_TILE && target.getDistance(newPosition) > 1)
+					//	collision = true;
+				} else {
+					if (newField == CollisionLayer.TOILET_TILE && currentField != CollisionLayer.TOILET_TILE)
+						collision = true;
+				}
 			}
 		}
 		if (!collision) {
@@ -306,7 +328,7 @@ public class Visitor {
     public void drink(){
         //isThirsty = false;
         //blather += 200;
-		blather += 0.2;
+		blather += 0.8;
 		hydration += 1.0;
         currentAction = CurrentAction.IDLE;
 		//if (blather >= maxBlather) {
@@ -326,7 +348,8 @@ public class Visitor {
 		}
     }
 
-    public boolean isAtTarget(){
+    public boolean isAtTarget() {
+    	if (target == null) return false;
     	if(target instanceof StageTarget){
     		if(target.getDistance(position) == 0){
     			return true;

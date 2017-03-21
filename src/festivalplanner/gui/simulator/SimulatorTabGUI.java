@@ -5,6 +5,7 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.time.LocalTime;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 
 /**
@@ -106,8 +107,8 @@ public class SimulatorTabGUI extends JPanel implements ActionListener {
         frame++;
         if(buttonArrayList.get(0).getName().equals("Play")) {
             if(frame >= 3) {
-                timeLabel.setText(time.toString());
-                time = time.plusMinutes(1);
+                timeLabel.setText(time.truncatedTo(ChronoUnit.MINUTES).toString());
+                time = time.plusSeconds(15);
                 frame = 0;
             }
             simulatorPanel.update(time);

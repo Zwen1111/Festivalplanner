@@ -30,7 +30,7 @@ public class Simulator {
 		target.setupDistances(map);
 		Navigator.addTarget(target);
 		visitors = new ArrayList<>();
-		maxVisitors = 10;//200;
+		maxVisitors = 30;//200;
 		getImages();
 	}
 

@@ -38,7 +38,7 @@ public class SimulatorPanel extends JPanel implements MouseMotionListener, Mouse
 		super(null);
 		init = false;
 
-		map = new TileMap("/maps/Map+Colliosion.json");
+		map = new TileMap("/Map+Colliosion.json");
 		map.buildMap();
 		simulator = new Simulator(map);
 		scale = 0.65;

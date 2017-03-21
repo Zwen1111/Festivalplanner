@@ -116,6 +116,13 @@ public class Database implements Serializable {
 		return nextTime;
 	}
 
+	public static List<Performance> getNowPerforming(LocalTime time) {
+		return performances.stream()
+				.filter(performance -> time.isAfter(performance.getStartTime()) &&
+						time.isBefore(performance.getEndTime()))
+				.collect(Collectors.toList());
+	}
+
 	public static List<Performance> getPerformacesOfArtist(Artist artist) {
 		return performances.stream()
 				.filter(performance -> performance.getArtists().contains(artist))

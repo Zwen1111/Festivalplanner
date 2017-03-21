@@ -14,6 +14,7 @@ public class PerformanceTarget extends StageTarget {
 
 	public PerformanceTarget(StageTarget target, Performance performance){
 		super(target.getPosition(), target.getStage());
+		shareDistances(target);
 		this.performance = performance;
 	}
 

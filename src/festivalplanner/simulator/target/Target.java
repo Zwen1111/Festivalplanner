@@ -36,6 +36,12 @@ public abstract class Target {
 		bfs();
 	}
 
+	protected void shareDistances(Target other) {
+		this.map = other.map;
+		this.data = other.data;
+		this.destinations = other.destinations;
+	}
+
 	public String getName() {
 		return name;
 	}

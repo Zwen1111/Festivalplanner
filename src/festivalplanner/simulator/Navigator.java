@@ -3,6 +3,7 @@ package festivalplanner.simulator;
 import festivalplanner.data.Artist;
 import festivalplanner.data.Database;
 import festivalplanner.data.Performance;
+import festivalplanner.data.Stage;
 import festivalplanner.simulator.target.*;
 
 import java.awt.geom.Point2D;
@@ -46,12 +47,52 @@ public class Navigator {
 		return Collections.unmodifiableList(TARGETS);
 	}
 
+	/**
+	 * @deprecated use {@link #getPopularityBasedRandomStage(double, LocalTime)} or
+	 * {@link #getRandomEmptyStage(LocalTime)} instead.
+	 * @return
+	 */
 	@Deprecated
 	public static StageTarget getDummyStage() {
 		List<Target> stages =  TARGETS.stream()
 				.filter(target -> target instanceof StageTarget)
 				.collect(Collectors.toList());
 		return (StageTarget) stages.get((int) (Math.random() * stages.size()));
+	}
+
+	public static StageTarget getRandomEmptyStage(LocalTime time) {
+		List<Performance> ps = Database.getNowPerforming(time);
+		List<Stage> usedStages = new ArrayList<>();
+		ps.forEach(p -> usedStages.add(p.getStage()));
+		List<Target> stages =  TARGETS.stream()
+				.filter(target -> target instanceof StageTarget &&
+						!usedStages.contains(((StageTarget) target).getStage()))
+				.collect(Collectors.toList());
+		return (StageTarget) stages.get((int) (Math.random() * stages.size()));
+	}
+
+	public static PerformanceTarget getPopularityBasedRandomStage(double visitorsRandom, LocalTime time) {
+		List<Performance> ps = Database.getNowPerforming(time);
+		Performance chosen = null;
+		for (int i = 0;i < ps.size(); i++) {
+			double popularity = ps.get(i).generatePopularity();
+			if (visitorsRandom <= popularity) {
+				chosen = ps.get(i);
+				break;
+			}
+			visitorsRandom -= popularity;
+		}
+		if (chosen == null) return null;
+		final Performance finalChosen = chosen;
+		StageTarget st = (StageTarget) TARGETS.stream()
+				.filter(target -> target instanceof StageTarget &&
+						((StageTarget) target).getStage().equals(finalChosen.getStage()))
+				.findFirst().orElse(null);
+		if (st != null) return new PerformanceTarget(st, finalChosen);
+		else {
+			System.out.println("Unexpected: No target found for Stage!");
+			return null;
+		}
 	}
 
 	/**

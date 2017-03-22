@@ -117,6 +117,8 @@ public class SimulatorPanel extends JPanel implements MouseMotionListener, Mouse
 					darkIndex = 0;
 				}
 
+				g2d.setColor(Color.BLACK);
+
 				float alpha = darkIndex * 0.0001f;
 				AlphaComposite alcom = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, alpha);
 				g2d.setComposite(alcom);

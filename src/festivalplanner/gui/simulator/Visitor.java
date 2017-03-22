@@ -44,10 +44,6 @@ public class Visitor {
 
 	private CurrentAction currentAction;
 
-	public boolean getRemove() {
-		return remove;
-	}
-
 	public Visitor(double speed, Point2D position, BufferedImage image) {
 		this.speed = speed;
 		angle = 0.0;
@@ -93,24 +89,63 @@ public class Visitor {
 		g.drawImage(image, af, null);
 	}
 
-	public void setTarget(Target newTarget) {
-		target = newTarget;
+	private void drink() {
+		blather += 0.2;
+		hydration += 1.0;
+		currentAction = CurrentAction.IDLE;
 	}
 
-	public boolean isTargetSet() {
-		return target != null;
-	}
-
-	public Target getTarget() {
-		return target;
+	public Point2D getDestination() {
+		return destination;
 	}
 
 	public Point2D getPosition() {
 		return position;
 	}
 
+	public boolean getRemove() {
+		return remove;
+	}
+
+	public Target getTarget() {
+		return target;
+	}
+
+	private boolean isAtTarget(){
+		if (target instanceof StageTarget){
+			return target.getDistance(position) == 0;
+		}
+		return position.distance(target.getPosition()) < 20;
+	}
+
+	public boolean isDestinationSet() {
+		return destination != null;
+	}
+
+	public boolean isTargetSet() {
+		return target != null;
+	}
+
+	private void pee() {
+		blather -= peeSpeed;
+		newPosition = position;
+		if (blather <= 0) {
+			currentAction = CurrentAction.IDLE;
+			blather = 0;
+			currentToiletBlock.freeToilet((ToiletTarget) getTarget());
+		}
+	}
+
+	public void setDestination(Point2D destination) {
+		this.destination = destination;
+	}
+
 	public void setPosition(Point2D position) {
 		this.position = position;
+	}
+
+	public void setTarget(Target newTarget) {
+		target = newTarget;
 	}
 
 	public void update(LocalTime time) {
@@ -141,10 +176,10 @@ public class Visitor {
 		newPosition = new Point2D.Double(
 				position.getX() + speed * Math.cos(angle),
 				position.getY() + speed * Math.sin(angle));
-		preferences(time);
+		updatePreferences(time);
 	}
 
-	private void preferences(LocalTime time) {
+	private void updatePreferences(LocalTime time) {
 		if (isAtTarget()) timeAtTarget++;
 		hydration -= 0.00025;
 
@@ -214,63 +249,9 @@ public class Visitor {
 				if (timeAtTarget >= 1) remove = true;
 				break;
 		}
-
-			/*//peeing
-			if(currentAction == CurrentAction.PEEING) {
-				if(target !=  null && target instanceof ToiletTarget) {
-					if(!((ToiletTarget) target).isFull() && !peeing) {
-						((ToiletTarget) target).changeAttendency(+1);
-						peeing = true;
-					}
-					newPosition = position;
-				}
-				pee();
-			}else if(currentAction == CurrentAction.GOING_HOME && !hasToPee && !isThirsty){
-				remove = true;
-			}
-
-
-			if (currentAction == CurrentAction.BUYING_DRINKS && timeAtTarget >= 12) {
-				drink();
-			} else if (currentAction == CurrentAction.ATTENDING_PERFORMANCE && timeAtTarget >= 600) {
-				currentAction = CurrentAction.IDLE;
-			}
-		}
-
-
-		//checks if the currentaction  = idle. if currentAction = idle then it wil select a random action
-		if (currentAction == CurrentAction.IDLE && hasToPee) {
-			currentAction = CurrentAction.PEEING;
-			setTarget(Navigator.getNearestToilet(position));
-		} else if (currentAction == CurrentAction.IDLE && isThirsty) {
-			currentAction = CurrentAction.BUYING_DRINKS;
-			target = Navigator.getNearestStand(position);
-		}else if (currentAction == CurrentAction.IDLE) {
-					timeAtTarget = 0;
-					int action = (int) (Math.random() * 2);
-					if (action < 0.1) {
-						isThirsty = true;
-					} else {
-						currentAction = CurrentAction.ATTENDING_PERFORMANCE;
-						List<PerformanceTarget> stageTargets = Navigator.getArtistPerformances(artists, time);
-						if (stageTargets.size() > 0) {
-							target = stageTargets.get((int) (Math.random() * stageTargets.size()));
-							isDummy = false;
-						} else {
-							target = Navigator.getDummyStage();
-							isDummy = true;
-						}
-					}
-				}
-		if(time.getHour() < 6) {
-			target = Navigator.getTargets().get(Navigator.getTargets().size() - 1);
-			currentAction = CurrentAction.GOING_HOME;
-			isThirsty = false;
-			hasToPee =false;
-			peeing = false;
-		}*/
 	}
 
+	//TODO: Move up to Simulator for optimizations?
 	public boolean checkcollision(List<Visitor> visitors) {
 		boolean collision = false;
 
@@ -294,59 +275,11 @@ public class Visitor {
 
 		if (!collision) {
 			position = newPosition;
-//			} else if (target.getDistances(position).getCenter() < 0) {
-			//Respawn!
-//				remove = true;
 		} else {
 			angle += 0.2;
 		}
-		//}
 		return collision;
 	}
-
-	public Point2D getDestination() {
-		return destination;
-	}
-
-	public boolean isDestinationSet() {
-		return destination != null;
-	}
-
-    public void setDestination(Point2D destination) {
-        this.destination = destination;
-    }
-
-    public void drink(){
-        //isThirsty = false;
-        //blather += 200;
-		blather += 0.2;
-		hydration += 1.0;
-        currentAction = CurrentAction.IDLE;
-		//if (blather >= maxBlather) {
-		//	hasToPee = true;
-		//}
-    }
-
-    public void pee() {
-		blather -= peeSpeed;
-		newPosition = position;
-    	if (blather <= 0) {
-			currentAction = CurrentAction.IDLE;
-			blather = 0;
-			currentToiletBlock.freeToilet((ToiletTarget) getTarget());
-			//ToiletTarget currentToilet = (ToiletTarget) getTarget();
-			//currentToilet.changeAttendency(-1);
-		}
-    }
-
-    public boolean isAtTarget(){
-    	if(target instanceof StageTarget){
-    		if(target.getDistance(position) == 0){
-    			return true;
-			}else return false;
-		}
-        return position.distance(target.getPosition()) < 20;
-    }
 
 	public enum CurrentAction {
 		IDLE,

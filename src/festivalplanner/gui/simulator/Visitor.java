@@ -199,12 +199,13 @@ public class Visitor {
 					currentAction = CurrentAction.GOING_TO_STAND;
 					setTarget(Navigator.getNearestStand(position));
 				} else {
-					PerformanceTarget stageToGo = Navigator.getPopularityBasedRandomStage(performanceRandom, time);
-					if (stageToGo == null) {
+					PerformanceWrapper wrapper = Navigator.getPopularityBasedRandomStage(performanceRandom, time);
+					if (wrapper == null) {
 						currentAction = CurrentAction.GOING_TO_GRASS;
 						setTarget(Navigator.getRandomEmptyStage(time));
 					} else {
-						currentPerformance = stageToGo.getPerformance();
+						StageTarget stageToGo = wrapper.getTarget();
+						currentPerformance = wrapper.getPerformance();
 						currentAction = CurrentAction.GOING_TO_PERMORMANCE;
 						setTarget(stageToGo);
 					}
@@ -214,20 +215,27 @@ public class Visitor {
 				if (position.distance(target.getPosition()) < 10) pee();
 				break;
 			case RESTING:
-				if (timeAtTarget >= 300) currentAction = CurrentAction.IDLE;
+				if (timeAtTarget >= 300) {
+					currentAction = CurrentAction.IDLE;
+					target.changeAttendency(-1);
+				}
 				break;
 			case ATTENDING_PERFORMANCE:
-				if (time.isAfter(currentPerformance.getEndTime()))
+				if (time.isAfter(currentPerformance.getEndTime()) || timeAtTarget >= 50) {
 					currentAction = CurrentAction.IDLE;
+					target.changeAttendency(-1);
+				}
 				break;
 			case GOING_TO_GRASS:
 				if (timeAtTarget >= 1) {
 					currentAction = CurrentAction.RESTING;
+					target.changeAttendency(+1);
 				}
 				break;
 			case GOING_TO_PERMORMANCE:
 				if (timeAtTarget >= 1) {
 					currentAction = CurrentAction.ATTENDING_PERFORMANCE;
+					target.changeAttendency(+1);
 				}
 				break;
 			case GOING_TO_STAND:

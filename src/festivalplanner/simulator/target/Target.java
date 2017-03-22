@@ -107,6 +107,10 @@ public abstract class Target {
 		if (attendants > capacity) attendants = capacity;
 	}
 
+	public int getAttendants() {
+		return attendants;
+	}
+
 	public boolean hasRoom() {
 		return attendants < capacity;
 	}

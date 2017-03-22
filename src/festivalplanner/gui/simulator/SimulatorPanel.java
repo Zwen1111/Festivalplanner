@@ -1,5 +1,7 @@
 package festivalplanner.gui.simulator;
 
+import festivalplanner.simulator.Navigator;
+import festivalplanner.simulator.target.StageTarget;
 import festivalplanner.simulator.target.Target;
 import festivalplanner.simulator.target.SimpleTarget;
 import festivalplanner.simulator.map.TileMap;
@@ -80,6 +82,15 @@ public class SimulatorPanel extends JPanel implements MouseMotionListener, Mouse
 		for (Visitor v : simulator.getVisitors()) {
 			v.draw(g2d);
 		}
+		Navigator.getTargets().stream()
+				.filter(target1 -> target1 instanceof StageTarget)
+				.forEach(t -> {
+					g2d.setColor(Color.BLACK);
+					g2d.fillRect((int) t.getPosition().getX(), (int) t.getPosition().getY(), 80, 30);
+					g2d.setColor(Color.WHITE);
+					g2d.drawString(t.getAttendants() + "/" + t.getCapacity(),
+							(int) t.getPosition().getX() + 5, (int) t.getPosition().getY() + 20);
+				});
 	}
 
 	public void update(LocalTime time) {

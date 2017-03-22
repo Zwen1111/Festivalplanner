@@ -32,4 +32,12 @@ public class TileLayer extends Layer {
 	public int getData(int index) {
 		return data.get(index);
 	}
+
+	public int getData(int x, int y) {
+		return getData(y * getWidth() + x);
+	}
+
+	public int getIndex(int x, int y) {
+		return y * getWidth() + x;
+	}
 }

@@ -1,10 +1,7 @@
 package festivalplanner.simulator.data;
 
-import javax.json.JsonArray;
 import javax.json.JsonObject;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Dataholder for layers of the map.
@@ -12,6 +9,10 @@ import java.util.List;
  * @author Coen Boelhouwers, Zwen van Erkelens
  */
 public abstract class Layer {
+
+	public static final String TILE_LAYER_TYPE = "tilelayer";
+	public static final String OBJECT_LAYER_TYPE = "objectgroup";
+	public static final String COLLISION_LAYER_NAME = "ColisonPersonPlaceMent";
 
 	private int x;
 	private int y;
@@ -32,9 +33,15 @@ public abstract class Layer {
 	public static Layer parseJson(JsonObject layerJson) throws UnsupportedLayerTypeException {
 		String type = layerJson.getString("type");
 		switch (type) {
-			case "tilelayer":
-				return new TileLayer(layerJson);
-			case "objectgroup":
+			case TILE_LAYER_TYPE:
+				String name = layerJson.getString("name");
+				switch (name) {
+					case COLLISION_LAYER_NAME:
+						return new CollisionLayer(layerJson);
+					default:
+						return new TileLayer(layerJson);
+				}
+			case OBJECT_LAYER_TYPE:
 				return new ObjectLayer(layerJson);
 			default:
 				throw new UnsupportedLayerTypeException("Unsupported layer type: " + type);

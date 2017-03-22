@@ -1,4 +1,4 @@
-package festivalplanner.simulator;
+package festivalplanner.simulator.map;
 
 import festivalplanner.simulator.data.Tileset;
 

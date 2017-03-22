@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * The Database manages all Performances and offers utility methods
@@ -113,6 +114,19 @@ public class Database implements Serializable {
 			}
 		}
 		return nextTime;
+	}
+
+	public static List<Performance> getNowPerforming(LocalTime time) {
+		return performances.stream()
+				.filter(performance -> time.isAfter(performance.getStartTime()) &&
+						time.isBefore(performance.getEndTime()))
+				.collect(Collectors.toList());
+	}
+
+	public static List<Performance> getPerformacesOfArtist(Artist artist) {
+		return performances.stream()
+				.filter(performance -> performance.getArtists().contains(artist))
+				.collect(Collectors.toList());
 	}
 
 	public static boolean isStageInUse(Stage stage, LocalTime start, LocalTime end, Performance ignore) {

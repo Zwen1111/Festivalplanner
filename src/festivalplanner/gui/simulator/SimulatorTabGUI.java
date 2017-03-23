@@ -14,7 +14,7 @@ import java.util.ArrayList;
  */
 public class SimulatorTabGUI extends JPanel implements ActionListener {
 
-    private static final LocalTime START_TIME = LocalTime.of(5, 0);
+    public static final LocalTime START_TIME = LocalTime.of(5, 0);
 
     private ArrayList<JButton> buttonArrayList;
     private SimulatorPanel simulatorPanel;
@@ -89,7 +89,7 @@ public class SimulatorTabGUI extends JPanel implements ActionListener {
         zoomOutButton.addActionListener(e -> simulatorPanel.setScale(simulatorPanel.getScale() - 0.25));
 
         loadButtons();
-
+        timeLabel = new JLabel(START_TIME.toString());
         timeLabel.setPreferredSize(new Dimension(60, 30));
         timeLabel.setFont(new Font(timeLabel.getFont().getName(), timeLabel.getFont().getStyle(), 20));
         timeLabel.setForeground(Color.WHITE);

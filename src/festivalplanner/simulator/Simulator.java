@@ -1,5 +1,6 @@
 package festivalplanner.simulator;
 
+import festivalplanner.gui.simulator.SimulatorTabGUI;
 import festivalplanner.gui.simulator.Visitor;
 import festivalplanner.simulator.map.TileMap;
 import festivalplanner.simulator.target.SimpleTarget;
@@ -39,6 +40,7 @@ public class Simulator {
 		Navigator.addTarget(target);
 		state = new SimulatorState();
 		state.visitors = new ArrayList<>();
+		state.currentTime = SimulatorTabGUI.START_TIME;
 		maxVisitors = 30;//200;
 		stateCounter = 0;
 		currentStateIndex = 0;

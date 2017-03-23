@@ -46,6 +46,17 @@ public class Simulator {
 		saveLocations = new ArrayList<>();
 		currentStateIndex = 0;
 		getImages();
+		for (int i = 0; i < MAX_SNAPSHOTS; i++) {
+			File location = null;
+			try {
+				location = File.createTempFile("simulator_state_", null);
+				location.deleteOnExit();
+				saveLocations.add(location);
+				System.out.println("New snapshot file: " + location);
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
 	}
 
 	public static void getImages() {
@@ -68,6 +79,7 @@ public class Simulator {
 
 	public void runSimulation(LocalTime time) {
 		state.currentTime = time;
+		stateCounter = currentStateIndex;
 		if (saveInterval != null && time.isAfter(lastSave.plus(saveInterval))) {
 			saveState();
 			lastSave = time;
@@ -120,6 +132,9 @@ public class Simulator {
 
 	/**
 	 * Tries to restore a previous state of the simulator.
+	 * The future is unpredictable. Once the simulation is run from a point in the
+	 * past, you can't go back to the future. However, if the simulation stays halted while
+	 * you're in the past, this method does allow you to go back.
 	 *
 	 * @param amount the amount of snapshots the simulator should look back in the past.
 	 *               A negative number for past states, positive for future.
@@ -142,6 +157,8 @@ public class Simulator {
 			state = (SimulatorState) ois.readObject();
 			for (Visitor v : state.visitors) v.setImage(images.get(v.getImageId()));
 			currentStateIndex = newIndex;
+			lastSave = state.currentTime;
+			System.out.println("Back to " + lastSave + "(index: " + currentStateIndex + "/" + stateCounter + ")");
 			return true;
 		} catch (IOException | ClassNotFoundException e) {
 			e.printStackTrace();
@@ -150,25 +167,13 @@ public class Simulator {
 	}
 
 	public void saveState() {
-		try {
-			File location;
-			if (stateCounter < MAX_SNAPSHOTS) {
-				location = File.createTempFile("simulator_state_", null);
-				location.deleteOnExit();
-				saveLocations.add(location);
-				System.out.println("New snapshot file: " + location);
-			} else {
-				location = saveLocations.get(stateCounter % MAX_SNAPSHOTS);
-				System.out.println("Reused snapshot file: " + location);
-			}
-			try (FileOutputStream fos = new FileOutputStream(location);
-				 ObjectOutputStream oos = new ObjectOutputStream(fos)) {
-				oos.writeObject(this.state);
-				stateCounter++;
-				currentStateIndex++;
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
+		File location = saveLocations.get(stateCounter % MAX_SNAPSHOTS);
+		System.out.println("Reused snapshot file: " + location);
+		try (FileOutputStream fos = new FileOutputStream(location);
+			 ObjectOutputStream oos = new ObjectOutputStream(fos)) {
+			oos.writeObject(this.state);
+			stateCounter++;
+			currentStateIndex = stateCounter;
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

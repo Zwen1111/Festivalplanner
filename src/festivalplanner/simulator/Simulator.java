@@ -20,8 +20,8 @@ import java.util.List;
  */
 public class Simulator {
 
-	public static final LocalTime START_TIME = LocalTime.of(5, 0);
-	public static final int MAX_SNAPSHOTS = 10;
+	public static final LocalTime START_TIME = LocalTime.of(5, 45);
+	public static final int MAX_SNAPSHOTS = 40;
 
 	private SimulatorState state;
 	private static int maxVisitors;

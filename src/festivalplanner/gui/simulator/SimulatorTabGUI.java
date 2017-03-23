@@ -137,7 +137,7 @@ public class SimulatorTabGUI extends JPanel implements ActionListener {
 	@Override
 	public void actionPerformed(ActionEvent e) {
         if (play) {
-			simulatorPanel.getSimulator().runSimulation(Duration.ofSeconds(15));
+			simulatorPanel.getSimulator().runSimulation(Duration.ofSeconds(2));
 		}
         timeLabel.setText(simulatorPanel.getSimulator().getSimulatedTime()
                 .truncatedTo(ChronoUnit.MINUTES).toString());

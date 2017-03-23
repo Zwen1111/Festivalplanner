@@ -46,7 +46,7 @@ public class SimulatorPanel extends JPanel implements MouseMotionListener, Mouse
 		map = new TileMap("/Map+Colliosion.json");
 		map.buildMap();
 		simulator = new Simulator(map);
-		simulator.setSaveInterval(Duration.ofMinutes(45));
+		simulator.setSaveInterval(Duration.ofMinutes(15));
 		scale = 0.65;
 		mousePosition = new Point2D.Double(0, 0);
 		darkIndex = -1;

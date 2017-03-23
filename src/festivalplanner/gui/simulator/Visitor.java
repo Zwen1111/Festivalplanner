@@ -2,6 +2,7 @@ package festivalplanner.gui.simulator;
 
 import festivalplanner.data.Performance;
 import festivalplanner.simulator.Navigator;
+import festivalplanner.simulator.Simulator;
 import festivalplanner.simulator.target.*;
 
 import java.awt.*;
@@ -16,8 +17,6 @@ import java.util.List;
  * Created by Gebruiker on 6-3-2017.
  */
 public class Visitor {
-
-	private static boolean debug = true;
 
 	private double speed;
 	private double angle;
@@ -72,7 +71,7 @@ public class Visitor {
 		af.rotate(angle);
 		af.translate(- image.getWidth() / 2, - image.getHeight() / 2);
 
-		if (debug) {
+		if (Simulator.debug) {
 			String targetString = "Target: " + target.getClass().getSimpleName() + ": " + target.getPosition();
 			int w = (int) g.getFontMetrics().getStringBounds(targetString, g).getWidth();
 			g.setColor(currentAction == CurrentAction.ATTENDING_PERFORMANCE ? Color.MAGENTA : Color.WHITE);

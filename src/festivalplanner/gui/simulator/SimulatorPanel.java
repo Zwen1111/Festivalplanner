@@ -1,9 +1,9 @@
 package festivalplanner.gui.simulator;
 
-import festivalplanner.simulator.target.Target;
-import festivalplanner.simulator.target.SimpleTarget;
-import festivalplanner.simulator.map.TileMap;
 import festivalplanner.simulator.Simulator;
+import festivalplanner.simulator.map.TileMap;
+import festivalplanner.simulator.target.SimpleTarget;
+import festivalplanner.simulator.target.Target;
 
 import javax.swing.*;
 import java.awt.*;
@@ -245,5 +245,25 @@ public class SimulatorPanel extends JPanel implements MouseMotionListener, Mouse
 			scaleBy(value);
 			//repaint();
 		}
+	}
+
+	public void loadPrev() {
+		int hour = time.getHour() - 1;
+		if(hour < 0)
+			hour = 23;
+		if(true /*Vorige uur beston nog niet*/){
+			JOptionPane.showMessageDialog(this,"Previous time hasn't been loaded","Could not Load",JOptionPane.WARNING_MESSAGE);
+		}else{}
+		//simulator = getPrevSimulator;
+	}
+
+	public void loadNext() {
+		int hour = time.getHour() + 1;
+		if(hour <= 24)
+			hour = 0;
+		if(true /*next hour doesn't exist */) {
+			JOptionPane.showMessageDialog(this,"next hour hasn't been loaded","Could not Load",JOptionPane.WARNING_MESSAGE);
+		}else {}
+		//simulator  =  getSimultor(hour);
 	}
 }

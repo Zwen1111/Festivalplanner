@@ -1,5 +1,6 @@
 package festivalplanner.simulator;
 
+import festivalplanner.gui.GUIFrame;
 import festivalplanner.gui.simulator.Visitor;
 import festivalplanner.simulator.map.TileMap;
 import festivalplanner.simulator.target.SimpleTarget;
@@ -22,6 +23,7 @@ public class Simulator {
 	private int maxVisitors;
 
 	public static java.util.List<BufferedImage> images;
+    public static boolean debug;
 
 	public Simulator(TileMap map) {
 		Navigator.clearTargets();
@@ -53,6 +55,7 @@ public class Simulator {
 	}
 
 	public void runSimulation(LocalTime time) {
+	    debug = GUIFrame.debug.isSelected();
 		if (visitors.size() < maxVisitors) {
 			Point2D.Double position = new  Point2D.Double(1710, 750);
 			Visitor visitor = new Visitor(3, position, images.get((int) (Math.random() * 8)));

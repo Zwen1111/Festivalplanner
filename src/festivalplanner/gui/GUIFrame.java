@@ -1,8 +1,6 @@
 package festivalplanner.gui;
 
 import festivalplanner.data.Database;
-import festivalplanner.gui.dialog.AddArtistDialog;
-import festivalplanner.gui.dialog.AddStageDialog;
 import festivalplanner.gui.simulator.SimulatorTabGUI;
 import festivalplanner.gui.table.CalendarTable;
 import festivalplanner.gui.table2d.CalendarTable2D;
@@ -20,6 +18,8 @@ public class GUIFrame extends JFrame implements Database.OnDataChangedListener{
 
 	public static final String APP_NAME = "Festivalplanner";
 	public static final String APP_VERSION = "0.1";
+
+	public static JCheckBoxMenuItem debug;
 
 	private FileSystem fileSystem;
 
@@ -70,6 +70,13 @@ public class GUIFrame extends JFrame implements Database.OnDataChangedListener{
 		JMenuItem saveas = new JMenuItem("Save as");
 		saveas.addActionListener(e ->  fileSystem.saveAs());
 		fileMenu.add(saveas);
+
+		JMenu options = new JMenu("Options");
+		menuBar.add(options);
+
+		debug = new JCheckBoxMenuItem("Debug");
+		options.add(debug);
+
 
 		mainPanel.add(menuBar,BorderLayout.NORTH);
 

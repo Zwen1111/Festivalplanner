@@ -11,6 +11,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.awt.geom.Point2D;
+import java.awt.geom.Rectangle2D;
 import java.time.LocalTime;
 
 /**
@@ -35,6 +36,10 @@ public class SimulatorPanel extends JPanel implements MouseMotionListener, Mouse
 	private double translateY;
 	private boolean init;
 	private Target target;
+	private Rectangle2D nightOverlay;
+	private LocalTime time;
+	private int darkIndex;
+	private boolean active = false;
 
 	public SimulatorPanel() {
 		super(null);
@@ -45,6 +50,10 @@ public class SimulatorPanel extends JPanel implements MouseMotionListener, Mouse
 		simulator = new Simulator(map);
 		scale = 0.65;
 		mousePosition = new Point2D.Double(0, 0);
+		time = LocalTime.now();
+		darkIndex = -1;
+
+		nightOverlay = new Rectangle2D.Double(0,0,map.getMapWidth(),map.getMapHeight());
 
 		addMouseMotionListener(this);
 		addMouseListener(this);
@@ -82,9 +91,47 @@ public class SimulatorPanel extends JPanel implements MouseMotionListener, Mouse
 		for (Visitor v : simulator.getVisitors()) {
 			v.draw(g2d);
 		}
+
+		if (active) {
+			if (darkIndex == -1) {
+				if (time.getHour() >= 18 && time.getHour() < 21){
+					int seconds = (time.getHour() * 60 * 60 + time.getMinute() * 60 + time.getSecond()) - 64800;
+					darkIndex = (int) (seconds * 0.200278164116828);
+				}else if (time.getHour() >= 21 && time.getHour() < 24){
+					int seconds = (time.getHour() * 60 * 60 + time.getMinute() * 60 + time.getSecond()) - 79200;
+					darkIndex = (int) (seconds * 0.600835073068893) + 2881;
+				}else if (time.getHour() >= 0 && time.getHour() < 2){
+					int seconds = (time.getHour() * 60 * 60 + time.getMinute() * 60 + time.getSecond());
+					darkIndex = (int) (seconds * 0.200278164116828) + 7200;
+				}else if (time.getHour() >= 2) {
+					int seconds = (time.getHour() * 60 * 60 + time.getMinute() * 60 + time.getSecond()) - 7200;
+					darkIndex = (int) (seconds * -0.40032407407407) + 8646;
+				}
+			}else {
+				if (time.getHour() >= 18 || time.getHour() < 2) {
+					darkIndex++;
+					if (time.getHour() > 21) {
+						darkIndex += 2;
+					}
+				}else if (time.getHour() >= 2 && darkIndex >= 2) {
+					darkIndex -= 2;
+				}else {
+					darkIndex = 0;
+				}
+
+				g2d.setColor(Color.BLACK);
+
+				float alpha = darkIndex * 0.0001f;
+				AlphaComposite alcom = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, alpha);
+				g2d.setComposite(alcom);
+				g2d.fill(nightOverlay);
+			}
+		}
 	}
 
 	public void update(LocalTime time) {
+		this.time = time;
+		active = true;
 		simulator.runSimulation(time);
 	}
 

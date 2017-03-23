@@ -1,7 +1,5 @@
 package festivalplanner.simulator;
 
-import festivalplanner.gui.simulator.SimulatorPanel;
-import festivalplanner.gui.simulator.SimulatorTabGUI;
 import festivalplanner.gui.simulator.Visitor;
 import festivalplanner.simulator.map.TileMap;
 import festivalplanner.simulator.target.SimpleTarget;

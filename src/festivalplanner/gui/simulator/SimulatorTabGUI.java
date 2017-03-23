@@ -14,8 +14,6 @@ import java.util.ArrayList;
  */
 public class SimulatorTabGUI extends JPanel implements ActionListener {
 
-    public static final LocalTime START_TIME = LocalTime.of(5, 0);
-
     private ArrayList<JButton> buttonArrayList;
     private SimulatorPanel simulatorPanel;
     private JLabel timeLabel;
@@ -35,7 +33,7 @@ public class SimulatorTabGUI extends JPanel implements ActionListener {
         JButton zoomInButton = new JButton(new ImageIcon(getClass().getResource("/icon's/zoomInIcon.png")));
         JButton zoomOutButton = new JButton(new ImageIcon(getClass().getResource("/icon's/zoomOutIcon.png")));
         JButton prevButton = new JButton(new ImageIcon(getClass().getResource("/icon's/prevIcon.png")));
-        JButton nextButton = new JButton("next");//new ImageIcon(getClass().getResource("/icon's/nextIcon.png")));
+        JButton nextButton = new JButton(new ImageIcon(getClass().getResource("/icon's/nextIcon.png")));
         JButton resetButton = new JButton(new ImageIcon(getClass().getResource("/icon's/resetIcon.png")));
 		JButton debugButton = new JButton(new ImageIcon(getClass().getResource("/icon's/debugIcon.png")));
 
@@ -81,7 +79,7 @@ public class SimulatorTabGUI extends JPanel implements ActionListener {
         zoomOutButton.addActionListener(e -> simulatorPanel.setScale(simulatorPanel.getScale() - 0.25));
 
         loadButtons();
-        timeLabel = new JLabel(START_TIME.toString());
+
         timeLabel.setPreferredSize(new Dimension(60, 30));
         timeLabel.setFont(new Font(timeLabel.getFont().getName(), timeLabel.getFont().getStyle(), 20));
         timeLabel.setForeground(Color.WHITE);

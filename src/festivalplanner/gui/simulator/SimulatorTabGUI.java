@@ -4,6 +4,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.time.Duration;
 import java.time.LocalTime;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
@@ -13,13 +14,11 @@ import java.util.ArrayList;
  */
 public class SimulatorTabGUI extends JPanel implements ActionListener {
 
+    private static final LocalTime START_TIME = LocalTime.of(5, 0);
+
     private ArrayList<JButton> buttonArrayList;
     private SimulatorPanel simulatorPanel;
-
-    private LocalTime time;
-    private LocalTime startTime;
     private JLabel timeLabel;
-    private int frame;
 
     public SimulatorTabGUI() {
     	setName("SimulatorPanel");
@@ -37,18 +36,16 @@ public class SimulatorTabGUI extends JPanel implements ActionListener {
         JButton prevButton = new JButton(new ImageIcon(getClass().getResource("/icon's/prevIcon.png")));
         JButton nextButton = new JButton(new ImageIcon(getClass().getResource("/icon's/nextIcon.png")));
         JButton resetButton = new JButton(new ImageIcon(getClass().getResource("/icon's/resetIcon.png")));
-		startTime = LocalTime.of(5,0);
-		time = startTime;
-		if (time.getHour() < 10)
-		    if (time.getMinute() < 10)
-		        timeLabel = new JLabel("0" + time.getHour() + ":0" + time.getMinute());
-		    else
-                timeLabel = new JLabel("0" + time.getHour() + ":" + time.getMinute());
-        else
-            if (time.getMinute() < 10)
-                timeLabel = new JLabel(time.getHour() + ":0" + time.getMinute());
-            else
-                timeLabel = new JLabel(time.getHour() + ":" + time.getMinute());
+//		if (time.getHour() < 10)
+//		    if (time.getMinute() < 10)
+//		        timeLabel = new JLabel("0" + time.getHour() + ":0" + time.getMinute());
+//		    else
+//                timeLabel = new JLabel("0" + time.getHour() + ":" + time.getMinute());
+//        else
+//            if (time.getMinute() < 10)
+//                timeLabel = new JLabel(time.getHour() + ":0" + time.getMinute());
+//            else
+//                timeLabel = new JLabel(time.getHour() + ":" + time.getMinute());
 
 
         buttonArrayList.add(playButton);
@@ -72,18 +69,19 @@ public class SimulatorTabGUI extends JPanel implements ActionListener {
         });
 
         prevButton.addActionListener(e -> {
-            simulatorPanel.loadPrev();
-            time = time.minusHours(1);
+            if (!simulatorPanel.getSimulator().restoreState(-1))
+				JOptionPane.showMessageDialog(this,"Previous time hasn't been loaded",
+						"Could not Load",JOptionPane.WARNING_MESSAGE);
         });
 
         nextButton.addActionListener(e -> {
-            simulatorPanel.loadNext();
-            time = time.plusHours(1);
+            if (!simulatorPanel.getSimulator().restoreState(+1))
+				JOptionPane.showMessageDialog(this,"next hour hasn't been loaded",
+						"Could not Load",JOptionPane.WARNING_MESSAGE);
         });
 
         resetButton.addActionListener(e -> {
-            time = startTime;
-            simulatorPanel.reset();
+            simulatorPanel.resetSimulator();
         });
 
         zoomInButton.addActionListener(e -> simulatorPanel.setScale(simulatorPanel.getScale() + 0.25));
@@ -131,8 +129,6 @@ public class SimulatorTabGUI extends JPanel implements ActionListener {
         add(timeLabel);
         add(simulatorPanel);
 
-
-		frame = 0;
         int fps = 60;
         new Timer(1000/fps,this).start();
     }
@@ -149,18 +145,11 @@ public class SimulatorTabGUI extends JPanel implements ActionListener {
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
-        frame++;
-        if(buttonArrayList.get(0).getName().equals("Play")) {
-            simulatorPanel.update(time);
-            if(frame >= 3) {
-                timeLabel.setText(time.truncatedTo(ChronoUnit.MINUTES).toString());
-                time = time.plusSeconds(15);
-                frame = 0;
-                if(time.getSecond() == 0 && time.getMinute() == 0){
-                    //save
-                }
-            }
-        }
+        if (buttonArrayList.get(0).getName().equals("Play")) {
+			simulatorPanel.getSimulator().runSimulation(Duration.ofSeconds(15));
+			timeLabel.setText(simulatorPanel.getSimulator().getSimulatedTime()
+					.truncatedTo(ChronoUnit.MINUTES).toString());
+		}
 		repaint();
 	}
 }

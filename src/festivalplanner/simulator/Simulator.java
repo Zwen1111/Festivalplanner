@@ -8,6 +8,8 @@ import festivalplanner.simulator.target.Target;
 import javax.imageio.ImageIO;
 import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
+import java.io.*;
+import java.time.Duration;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -21,7 +23,7 @@ public class Simulator {
 	public static final int MAX_SNAPSHOTS = 10;
 
 	private SimulatorState state;
-	private int maxVisitors;
+	private static int maxVisitors;
 	private String baseLocation;
 	private int stateCounter;
 	private int currentStateIndex;
@@ -35,6 +37,7 @@ public class Simulator {
 		SimpleTarget target = new SimpleTarget(new Point2D.Double(1710,750));
 		target.setupDistances(map);
 		Navigator.addTarget(target);
+		state = new SimulatorState();
 		state.visitors = new ArrayList<>();
 		maxVisitors = 30;//200;
 		stateCounter = 0;
@@ -105,6 +108,10 @@ public class Simulator {
 		}
 	}
 
+	public void runSimulation(Duration duration) {
+		runSimulation(state.currentTime.plus(duration));
+	}
+
 	/**
 	 * Tries to restore a previous state of the simulator.
 	 *
@@ -171,6 +178,10 @@ public class Simulator {
 			possibleDirections.add(distance.getWestPoint());
 		if (possibleDirections.isEmpty()) return null;
 		else return possibleDirections.get((int) Math.floor(Math.random() * possibleDirections.size()));
+	}
+
+	public LocalTime getSimulatedTime() {
+		return state.currentTime;
 	}
 
 	public List<Visitor> getVisitors() {

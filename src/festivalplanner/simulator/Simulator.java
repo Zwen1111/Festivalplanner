@@ -21,6 +21,8 @@ public class Simulator {
 
 	private List<Visitor> visitors;
 	private static int maxVisitors;
+	private LocalTime time;
+
 
 	public static java.util.List<BufferedImage> images;
     public static boolean debug;
@@ -51,10 +53,14 @@ public class Simulator {
 	}
 
 	private boolean canSpawn(Visitor visitor) {
+	    if(time.getHour() < 6){
+	        return false;
+        }else
 		return !visitor.checkcollision(visitors);
 	}
 
 	public void runSimulation(LocalTime time) {
+	    this.time = time;
 	    debug = GUIFrame.debug.isSelected();
 		if (visitors.size() < maxVisitors) {
 			Point2D.Double position = new  Point2D.Double(1710, 750);

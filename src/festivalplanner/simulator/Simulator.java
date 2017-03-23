@@ -20,7 +20,7 @@ import java.util.List;
 public class Simulator {
 
 	private List<Visitor> visitors;
-	private int maxVisitors;
+	private static int maxVisitors;
 
 	public static java.util.List<BufferedImage> images;
     public static boolean debug;
@@ -124,6 +124,10 @@ public class Simulator {
 	public List<Visitor> getVisitors() {
 		return visitors;
 	}
+
+	public static void setVisitorsAmount(int visitorsAmount) {
+	   maxVisitors = visitorsAmount;
+    }
 
 
 //	public ToiletTarget getNearestToilet(Point2D position) {

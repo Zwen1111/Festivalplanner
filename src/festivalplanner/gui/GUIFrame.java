@@ -4,6 +4,7 @@ import festivalplanner.data.Database;
 import festivalplanner.gui.simulator.SimulatorTabGUI;
 import festivalplanner.gui.table.CalendarTable;
 import festivalplanner.gui.table2d.CalendarTable2D;
+import festivalplanner.simulator.Simulator;
 import festivalplanner.util.FileSystem;
 
 import javax.swing.*;
@@ -20,6 +21,7 @@ public class GUIFrame extends JFrame implements Database.OnDataChangedListener{
 	public static final String APP_VERSION = "0.1";
 
 	public static JCheckBoxMenuItem debug;
+	public static JMenuItem visitorsAmount;
 
 	private FileSystem fileSystem;
 
@@ -76,6 +78,19 @@ public class GUIFrame extends JFrame implements Database.OnDataChangedListener{
 
 		debug = new JCheckBoxMenuItem("Debug");
 		options.add(debug);
+
+		JMenuItem visitorsAmount = new JMenuItem("Visitors amount");
+		visitorsAmount.addActionListener(e ->{
+			try {
+				Simulator.setVisitorsAmount(Integer.parseInt(JOptionPane.showInputDialog(null, "Amount of visitors")));
+			}catch (NumberFormatException ex){
+					JOptionPane.showMessageDialog(null,"Please Insert a number","Warning",JOptionPane.WARNING_MESSAGE);
+			}catch (Exception e1){
+				e1.printStackTrace();
+			}
+		});
+		options.add(visitorsAmount);
+
 
 
 		mainPanel.add(menuBar,BorderLayout.NORTH);

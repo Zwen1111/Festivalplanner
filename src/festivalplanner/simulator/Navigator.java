@@ -7,6 +7,7 @@ import festivalplanner.data.Stage;
 import festivalplanner.simulator.target.*;
 
 import java.awt.geom.Point2D;
+import java.time.Duration;
 import java.time.LocalTime;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -48,8 +49,8 @@ public class Navigator {
 	}
 
 	/**
-	 * @deprecated use {@link #getPopularityBasedRandomStage(double, LocalTime)} or
-	 * {@link #getRandomEmptyStage(LocalTime)} instead.
+	 * @deprecated use {@link #getPopularityBasedRandomStage(double, LocalTime, Duration)} or
+	 * {@link #getRandomEmptyStage(LocalTime, Duration)} instead.
 	 * @return
 	 */
 	@Deprecated
@@ -60,8 +61,8 @@ public class Navigator {
 		return (StageTarget) stages.get((int) (Math.random() * stages.size()));
 	}
 
-	public static StageTarget getRandomEmptyStage(LocalTime time) {
-		List<Performance> ps = Database.getNowPerforming(time);
+	public static StageTarget getRandomEmptyStage(LocalTime time, Duration preLook) {
+		List<Performance> ps = Database.getNowPerforming(time, preLook);
 		List<Stage> usedStages = new ArrayList<>();
 		ps.forEach(p -> usedStages.add(p.getStage()));
 		List<Target> stages =  TARGETS.stream()
@@ -71,8 +72,9 @@ public class Navigator {
 		return (StageTarget) stages.get((int) (Math.random() * stages.size()));
 	}
 
-	public static PerformanceWrapper getPopularityBasedRandomStage(double visitorsRandom, LocalTime time) {
-		List<Performance> ps = Database.getNowPerforming(time);
+	public static PerformanceWrapper getPopularityBasedRandomStage(double visitorsRandom, LocalTime time,
+																   Duration preLook) {
+		List<Performance> ps = Database.getNowPerforming(time, preLook);
 		Performance chosen = null;
 		for (Performance p : ps) {
 			double popularity = p.generatePopularity();

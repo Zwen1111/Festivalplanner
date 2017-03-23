@@ -116,9 +116,9 @@ public class Database implements Serializable {
 		return nextTime;
 	}
 
-	public static List<Performance> getNowPerforming(LocalTime time) {
+	public static List<Performance> getNowPerforming(LocalTime time, Duration preLook) {
 		return performances.stream()
-				.filter(performance -> time.isAfter(performance.getStartTime()) &&
+				.filter(performance -> time.plus(preLook).isAfter(performance.getStartTime()) &&
 						time.isBefore(performance.getEndTime()))
 				.collect(Collectors.toList());
 	}

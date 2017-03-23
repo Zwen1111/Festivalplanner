@@ -9,6 +9,7 @@ import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
 import java.io.Serializable;
+import java.time.Duration;
 import java.time.LocalTime;
 import java.util.List;
 
@@ -27,6 +28,8 @@ public class Visitor implements Serializable {
 	private ToiletBlockTarget currentToiletBlock;
 	private Performance currentPerformance;
 	private double performanceRandom;
+	/**A random, visitor-specific time that the visitor will head towards a performance before it starts.*/
+	private Duration preLookTime;
 
 	private int imageId;
 	private transient BufferedImage image;
@@ -49,8 +52,7 @@ public class Visitor implements Serializable {
 		angle = 0.0;
 		this.position = position;
 		newPosition = position;
-		//destination = new Point2D.Double(500, 500);
-		//setTarget(Navigator.getDummyStage());
+		preLookTime = Duration.ofMinutes((long) (Math.random() * 40 + 20));
 		radius = 10;
 		imageId = id;
 
@@ -59,7 +61,7 @@ public class Visitor implements Serializable {
 		performanceRandom = Math.random() * 10;
 		blather = Math.random();
 		peeSpeed = (Math.random() * 5 + 5) / 1000;
-		hydration = 1.0;
+		hydration = Math.random();
 	}
 
 	public void draw(Graphics2D g) {
@@ -73,14 +75,20 @@ public class Visitor implements Serializable {
 	}
 
 	public void drawDebugInfo(Graphics2D g) {
+		boolean attending = currentAction == CurrentAction.ATTENDING_PERFORMANCE;
 		String targetString = "Target: " + target.getClass().getSimpleName() + ": " + target.getPosition();
 		int w = (int) g.getFontMetrics().getStringBounds(targetString, g).getWidth();
-		g.setColor(currentAction == CurrentAction.ATTENDING_PERFORMANCE ? Color.MAGENTA : Color.WHITE);
+		g.setColor(attending ? (currentPerformance != null ? Color.MAGENTA : Color.WHITE) : Color.WHITE);
 		g.fillRect((int) position.getX() - 5, (int) position.getY() - 10, w + 10, 80);
-		g.setColor(currentAction == CurrentAction.ATTENDING_PERFORMANCE ? Color.WHITE : Color.BLACK);
+		if (currentAction == CurrentAction.GOING_TO_PERMORMANCE || attending) {
+			g.setColor(Color.MAGENTA);
+			g.setStroke(new BasicStroke(4));
+			g.drawRect((int) position.getX() - 5, (int) position.getY() - 10, w + 10, 80);
+		}
+		g.setColor(attending ? (currentPerformance != null ? Color.WHITE : Color.BLACK) : Color.BLACK);
 		g.drawString(targetString, (float) position.getX(), (float) position.getY());
 		g.drawString("Action: " + currentAction, (float) position.getX(), (float) position.getY() + 20);
-		if (currentAction == CurrentAction.ATTENDING_PERFORMANCE)
+		if (currentAction == CurrentAction.ATTENDING_PERFORMANCE && currentPerformance != null)
 			g.drawString("On stage: " + currentPerformance.getArtists(),
 					(float) position.getX(), (float) position.getY() + 40);
 		g.drawString(String.format("Blather: %.0f%%, Hydra: %.0f%%", blather * 100, hydration * 100),
@@ -187,7 +195,8 @@ public class Visitor implements Serializable {
 
 	private void updatePreferences(LocalTime time) {
 		if (isAtTarget()) timeAtTarget++;
-		hydration -= 0.00025;
+		hydration -= 0.00005;
+		blather += 0.00005;
 
 		switch (currentAction) {
 			case IDLE:
@@ -205,13 +214,15 @@ public class Visitor implements Serializable {
 					currentAction = CurrentAction.GOING_TO_STAND;
 					setTarget(Navigator.getNearestStand(position));
 				} else {
-					PerformanceWrapper wrapper = Navigator.getPopularityBasedRandomStage(performanceRandom, time);
+					PerformanceWrapper wrapper = Navigator.getPopularityBasedRandomStage(
+							performanceRandom, time, preLookTime);
 					if (wrapper == null) {
 						currentAction = CurrentAction.GOING_TO_GRASS;
-						setTarget(Navigator.getRandomEmptyStage(time));
+						setTarget(Navigator.getRandomEmptyStage(time, preLookTime));
 					} else {
 						StageTarget stageToGo = wrapper.getTarget();
-						currentPerformance = wrapper.getPerformance();
+						if (time.isAfter(wrapper.getPerformance().getStartTime()))
+							currentPerformance = wrapper.getPerformance();
 						currentAction = CurrentAction.GOING_TO_PERMORMANCE;
 						setTarget(stageToGo);
 					}
@@ -227,8 +238,10 @@ public class Visitor implements Serializable {
 				}
 				break;
 			case ATTENDING_PERFORMANCE:
-				if (time.isAfter(currentPerformance.getEndTime()) || timeAtTarget >= 50) {
+				if ((currentPerformance != null &&  time.isAfter(currentPerformance.getEndTime())) ||
+						timeAtTarget >= 50) {
 					currentAction = CurrentAction.IDLE;
+					currentPerformance = null;
 					target.changeAttendency(-1);
 				}
 				break;

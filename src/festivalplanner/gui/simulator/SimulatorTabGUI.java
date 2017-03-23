@@ -17,6 +17,7 @@ public class SimulatorTabGUI extends JPanel implements ActionListener {
     private ArrayList<JButton> buttonArrayList;
     private SimulatorPanel simulatorPanel;
     private JLabel timeLabel;
+    private boolean play;
 
     public SimulatorTabGUI() {
     	setName("SimulatorPanel");
@@ -45,17 +46,13 @@ public class SimulatorTabGUI extends JPanel implements ActionListener {
         buttonArrayList.add(resetButton);
         buttonArrayList.add(debugButton);
 
-        playButton.setName("Pause");
-
         playButton.addActionListener(e -> {
-
-            if (playButton.getName().equals("Pause")) {
-                playButton.setIcon(new ImageIcon(getClass().getResource("/icon's/pauseIcon.png")));
-                playButton.setName("Play");
-            } else if (playButton.getName().equals("Play")) {
-                playButton.setIcon(new ImageIcon(getClass().getResource("/icon's/playIcon.png")));
-                playButton.setName("Pause");
-            }
+			play = !play;
+			if (play) {
+				playButton.setIcon(new ImageIcon(getClass().getResource("/icon's/pauseIcon.png")));
+			} else {
+				playButton.setIcon(new ImageIcon(getClass().getResource("/icon's/playIcon.png")));
+			}
         });
 
         prevButton.addActionListener(e -> {
@@ -139,11 +136,11 @@ public class SimulatorTabGUI extends JPanel implements ActionListener {
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
-        if (buttonArrayList.get(0).getName().equals("Play")) {
+        if (play) {
 			simulatorPanel.getSimulator().runSimulation(Duration.ofSeconds(15));
-			timeLabel.setText(simulatorPanel.getSimulator().getSimulatedTime()
-					.truncatedTo(ChronoUnit.MINUTES).toString());
 		}
+        timeLabel.setText(simulatorPanel.getSimulator().getSimulatedTime()
+                .truncatedTo(ChronoUnit.MINUTES).toString());
 		repaint();
 	}
 }

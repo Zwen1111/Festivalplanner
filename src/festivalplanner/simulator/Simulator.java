@@ -25,11 +25,10 @@ public class Simulator {
 
 	private SimulatorState state;
 	private static int maxVisitors;
-	private String baseLocation;
 	private int stateCounter;
 	private int currentStateIndex;
-	private long lastSave;
-	private long saveInterval;
+	private LocalTime lastSave;
+	private Duration saveInterval;
 	private List<File> saveLocations;
 
 	public static java.util.List<BufferedImage> images;
@@ -41,6 +40,7 @@ public class Simulator {
 		target.setupDistances(map);
 		Navigator.addTarget(target);
 		state = new SimulatorState(START_TIME);
+		lastSave = START_TIME;
 		maxVisitors = 30;//200;
 		stateCounter = 0;
 		saveLocations = new ArrayList<>();
@@ -63,15 +63,14 @@ public class Simulator {
 	}
 
 	private boolean canSpawn(Visitor visitor) {
-	    if(state.currentTime.getHour() < 6) return false;
-		return !visitor.checkcollision(state.visitors);
+		return state.currentTime.getHour() >= 6 && !visitor.checkcollision(state.visitors);
 	}
 
 	public void runSimulation(LocalTime time) {
 		state.currentTime = time;
-		if (saveInterval > 0 && lastSave + saveInterval < System.currentTimeMillis()) {
+		if (saveInterval != null && time.isAfter(lastSave.plus(saveInterval))) {
 			saveState();
-			lastSave = System.currentTimeMillis();
+			lastSave = time;
 		}
 		if (state.visitors.size() < maxVisitors) {
 			Point2D.Double position = new  Point2D.Double(1710, 750);
@@ -89,7 +88,6 @@ public class Simulator {
 			v.update(time);
 			if(v.getRemove()){
 				visitorIterator.remove();
-				maxVisitors--;
 				continue;
 			}
 			boolean collided = v.checkcollision(state.visitors);
@@ -163,7 +161,6 @@ public class Simulator {
 				location = saveLocations.get(stateCounter % MAX_SNAPSHOTS);
 				System.out.println("Reused snapshot file: " + location);
 			}
-			baseLocation = location.getParent();
 			try (FileOutputStream fos = new FileOutputStream(location);
 				 ObjectOutputStream oos = new ObjectOutputStream(fos)) {
 				oos.writeObject(this.state);
@@ -177,8 +174,8 @@ public class Simulator {
 		}
 	}
 
-	public void setSaveInterval(long millis) {
-		saveInterval = millis;
+	public void setSaveInterval(Duration duration) {
+		saveInterval = duration;
 	}
 
 	public Point2D getNextWayPoint(Point2D currentPosition, Target target) {

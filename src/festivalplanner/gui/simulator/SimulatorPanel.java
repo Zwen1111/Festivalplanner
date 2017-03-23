@@ -246,4 +246,8 @@ public class SimulatorPanel extends JPanel implements MouseMotionListener, Mouse
 		}else {}
 		//simulator  =  getSimultor(hour);
 	}
+
+    public void reset() {
+	    simulator = new Simulator(map);
+    }
 }

@@ -17,6 +17,7 @@ public class SimulatorTabGUI extends JPanel implements ActionListener {
     private SimulatorPanel simulatorPanel;
 
     private LocalTime time;
+    private LocalTime startTime;
     private JLabel timeLabel;
     private int frame;
 
@@ -35,7 +36,9 @@ public class SimulatorTabGUI extends JPanel implements ActionListener {
         JButton zoomOutButton = new JButton(new ImageIcon(getClass().getResource("/icon's/zoomOutIcon.png")));
         JButton prevButton = new JButton(new ImageIcon(getClass().getResource("/icon's/prevIcon.png")));
         JButton nextButton = new JButton(new ImageIcon(getClass().getResource("/icon's/nextIcon.png")));
-		time = LocalTime.of(8,0);
+        JButton resetButton = new JButton(new ImageIcon(getClass().getResource("/icon's/resetIcon.png")));
+		startTime = LocalTime.of(5,0);
+		time = startTime;
 		if (time.getHour() < 10)
 		    if (time.getMinute() < 10)
 		        timeLabel = new JLabel("0" + time.getHour() + ":0" + time.getMinute());
@@ -53,6 +56,7 @@ public class SimulatorTabGUI extends JPanel implements ActionListener {
         buttonArrayList.add(zoomOutButton);
         buttonArrayList.add(prevButton);
         buttonArrayList.add(nextButton);
+        buttonArrayList.add(resetButton);
 
         playButton.setName("Pause");
 
@@ -75,6 +79,11 @@ public class SimulatorTabGUI extends JPanel implements ActionListener {
         nextButton.addActionListener(e -> {
             simulatorPanel.loadNext();
             time = time.plusHours(1);
+        });
+
+        resetButton.addActionListener(e -> {
+            time = startTime;
+            simulatorPanel.reset();
         });
 
         zoomInButton.addActionListener(e -> simulatorPanel.setScale(simulatorPanel.getScale() + 0.25));
@@ -110,13 +119,18 @@ public class SimulatorTabGUI extends JPanel implements ActionListener {
         springLayout.putConstraint(SpringLayout.NORTH, nextButton, 10, SpringLayout.SOUTH, timeLabel);
         springLayout.putConstraint(SpringLayout.WEST, nextButton, 5, SpringLayout.EAST, playButton);
 
+        springLayout.putConstraint(SpringLayout.NORTH, resetButton, 0, SpringLayout.NORTH, this);
+        springLayout.putConstraint(SpringLayout.EAST, resetButton, 0, SpringLayout.EAST, this);
+
         add(playButton);
         add(zoomInButton);
         add(zoomOutButton);
         add(prevButton);
         add(nextButton);
+        add(resetButton);
         add(timeLabel);
         add(simulatorPanel);
+
 
 		frame = 0;
         int fps = 60;

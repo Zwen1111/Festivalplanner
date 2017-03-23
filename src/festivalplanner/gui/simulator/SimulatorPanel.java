@@ -1,7 +1,5 @@
 package festivalplanner.gui.simulator;
 
-import festivalplanner.simulator.Navigator;
-import festivalplanner.simulator.target.StageTarget;
 import festivalplanner.simulator.target.Target;
 import festivalplanner.simulator.target.SimpleTarget;
 import festivalplanner.simulator.map.TileMap;
@@ -35,7 +33,6 @@ public class SimulatorPanel extends JPanel implements MouseMotionListener, Mouse
 	private double translateX;
 	private double translateY;
 	private boolean init;
-	private Target target;
 	private Rectangle2D nightOverlay;
 	private LocalTime time;
 	private int darkIndex;
@@ -78,16 +75,6 @@ public class SimulatorPanel extends JPanel implements MouseMotionListener, Mouse
 		g2d.scale(scale, scale);
 
 		g2d.drawImage(map.getMapImage(), null, null);
-		if (target != null) {
-			for (int x = 0; x < target.getLayer().getWidth(); x++) {
-				for (int y = 0; y < target.getLayer().getHeight(); y++) {
-					int dist = target.getDistance(x, y);
-					g2d.drawString(String.valueOf(dist),
-							x * map.getTileWidth(),
-							y * map.getTileHeight() + 10);
-				}
-			}
-		}
 		for (Visitor v : simulator.getVisitors()) {
 			v.draw(g2d);
 		}
@@ -204,14 +191,7 @@ public class SimulatorPanel extends JPanel implements MouseMotionListener, Mouse
 
 	@Override
 	public void mouseClicked(MouseEvent e) {
-		long mil = System.currentTimeMillis();
-		target = new SimpleTarget(new Point2D.Double(e.getX() / scale - translateX / scale,
-				e.getY() / scale - translateY / scale));
-		target.setupDistances(map);
-		System.out.println("took " + (System.currentTimeMillis() - mil) + " ms");
-		for (Visitor v : simulator.getVisitors()) {
-			v.setTarget(target);
-		}
+
 	}
 
 	@Override
@@ -248,4 +228,28 @@ public class SimulatorPanel extends JPanel implements MouseMotionListener, Mouse
 			//repaint();
 		}
 	}
+
+	public void loadPrev() {
+		int hour = time.getHour() - 1;
+		if(hour < 0)
+			hour = 23;
+		if(true /*Vorige uur beston nog niet*/){
+			JOptionPane.showMessageDialog(this,"Previous time hasn't been loaded","Could not Load",JOptionPane.WARNING_MESSAGE);
+		}else{}
+		//simulator = getPrevSimulator;
+	}
+
+	public void loadNext() {
+		int hour = time.getHour() + 1;
+		if(hour <= 24)
+			hour = 0;
+		if(true /*next hour doesn't exist */) {
+			JOptionPane.showMessageDialog(this,"next hour hasn't been loaded","Could not Load",JOptionPane.WARNING_MESSAGE);
+		}else {}
+		//simulator  =  getSimultor(hour);
+	}
+
+    public void reset() {
+	    simulator = new Simulator(map);
+    }
 }

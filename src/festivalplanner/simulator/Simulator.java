@@ -8,7 +8,6 @@ import festivalplanner.simulator.target.Target;
 import javax.imageio.ImageIO;
 import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
-import java.io.*;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -28,6 +27,7 @@ public class Simulator {
 	private int currentStateIndex;
 
 	public static java.util.List<BufferedImage> images;
+    public static boolean debug;
 
 	public Simulator(TileMap map) {
 		Navigator.clearTargets();
@@ -57,6 +57,7 @@ public class Simulator {
 	}
 
 	private boolean canSpawn(Visitor visitor) {
+	    if(state.currentTime.getHour() < 6) return false;
 		return !visitor.checkcollision(state.visitors);
 	}
 
@@ -175,6 +176,10 @@ public class Simulator {
 	public List<Visitor> getVisitors() {
 		return state.visitors;
 	}
+
+	public static void setVisitorsAmount(int visitorsAmount) {
+	   maxVisitors = visitorsAmount;
+    }
 
 	private static class SimulatorState {
 		private List<Visitor> visitors;

@@ -121,42 +121,4 @@ public class Simulator {
 	public List<Visitor> getVisitors() {
 		return visitors;
 	}
-
-
-//	public ToiletTarget getNearestToilet(Point2D position) {
-//		return (ToiletTarget) targets.stream()
-//				.filter(target -> target instanceof ToiletTarget)
-//				.sorted(Comparator.comparing(target -> target.getDistance(position)))
-//				.findFirst().orElse(null);
-//		ToiletTarget nearestTarget = null;
-//		for (ToiletTarget toiletTarget : toiletTargets) {
-//			int distance = (int) toiletTarget.getPosition().distance(position);
-//			if (nearestTarget == null || (nearestTarget.getPosition().distance(position) > distance)) {
-//				nearestTarget = toiletTarget;
-//			}
-//		}
-//		return nearestTarget;
-//	}
-//
-//	public ToiletTarget getNearestToiletExcept(Point2D position, List<ToiletTarget> fullToilets){
-//		ToiletTarget nearestTarget = null;
-//
-//		for (ToiletTarget fullToilet : fullToilets) {
-//			for (ToiletTarget toiletTarget : toiletTargets) {
-//				if(!fullToilet.equals(toiletTarget)) {
-//					int distance = toiletTarget.getDistances((int) position.getX(), (int) position.getY()).getCenter();
-//					if (nearestTarget == null || (nearestTarget.getDistances((int) position.getX(), (int) position.getY()).getCenter() < distance)) {
-//						nearestTarget = toiletTarget;
-//					}
-//				}
-//			}
-//		}
-//
-//		return nearestTarget;
-//	}
-
-//	public int getToiletsSize() {
-//		return toiletTargets.size();
-//	}
-
 }

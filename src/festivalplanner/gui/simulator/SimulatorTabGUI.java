@@ -33,7 +33,7 @@ public class SimulatorTabGUI extends JPanel implements ActionListener {
         JButton playButton = new JButton(new ImageIcon(getClass().getResource("/icon's/playIcon.png")));
         JButton zoomInButton = new JButton(new ImageIcon(getClass().getResource("/icon's/zoomInIcon.png")));
         JButton zoomOutButton = new JButton(new ImageIcon(getClass().getResource("/icon's/zoomOutIcon.png")));
-		time = LocalTime.of(0,0);
+		time = LocalTime.of(8,0);
 		if (time.getHour() < 10)
 		    if (time.getMinute() < 10)
 		        timeLabel = new JLabel("0" + time.getHour() + ":0" + time.getMinute());
@@ -54,12 +54,12 @@ public class SimulatorTabGUI extends JPanel implements ActionListener {
 
         playButton.addActionListener(e -> {
 
-            if (playButton.getName().equals("Play")) {
+            if (playButton.getName().equals("Pause")) {
                 playButton.setIcon(new ImageIcon(getClass().getResource("/icon's/pauseIcon.png")));
-                playButton.setName("Pause");
-            } else if (playButton.getName().equals("Pause")) {
-                playButton.setIcon(new ImageIcon(getClass().getResource("/icon's/playIcon.png")));
                 playButton.setName("Play");
+            } else if (playButton.getName().equals("Play")) {
+                playButton.setIcon(new ImageIcon(getClass().getResource("/icon's/playIcon.png")));
+                playButton.setName("Pause");
             }
         });
 

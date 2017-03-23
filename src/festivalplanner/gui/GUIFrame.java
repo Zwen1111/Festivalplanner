@@ -20,9 +20,6 @@ public class GUIFrame extends JFrame implements Database.OnDataChangedListener{
 	public static final String APP_NAME = "Festivalplanner";
 	public static final String APP_VERSION = "0.1";
 
-	public static JCheckBoxMenuItem debug;
-	public static JMenuItem visitorsAmount;
-
 	private FileSystem fileSystem;
 
 	public GUIFrame() {
@@ -75,9 +72,6 @@ public class GUIFrame extends JFrame implements Database.OnDataChangedListener{
 
 		JMenu options = new JMenu("Options");
 		menuBar.add(options);
-
-		debug = new JCheckBoxMenuItem("Debug");
-		options.add(debug);
 
 		JMenuItem visitorsAmount = new JMenuItem("Visitors amount");
 		visitorsAmount.addActionListener(e ->{

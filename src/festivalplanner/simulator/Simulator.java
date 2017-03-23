@@ -1,5 +1,7 @@
 package festivalplanner.simulator;
 
+import festivalplanner.gui.simulator.SimulatorPanel;
+import festivalplanner.gui.simulator.SimulatorTabGUI;
 import festivalplanner.gui.simulator.Visitor;
 import festivalplanner.simulator.map.TileMap;
 import festivalplanner.simulator.target.SimpleTarget;
@@ -20,6 +22,7 @@ import java.util.List;
  */
 public class Simulator {
 
+	public static final LocalTime START_TIME = LocalTime.of(5, 0);
 	public static final int MAX_SNAPSHOTS = 10;
 
 	private SimulatorState state;
@@ -29,7 +32,6 @@ public class Simulator {
 	private int currentStateIndex;
 
 	public static java.util.List<BufferedImage> images;
-    public static boolean debug;
 
 	public Simulator(TileMap map) {
 		Navigator.clearTargets();
@@ -37,8 +39,7 @@ public class Simulator {
 		SimpleTarget target = new SimpleTarget(new Point2D.Double(1710,750));
 		target.setupDistances(map);
 		Navigator.addTarget(target);
-		state = new SimulatorState();
-		state.visitors = new ArrayList<>();
+		state = new SimulatorState(START_TIME);
 		maxVisitors = 30;//200;
 		stateCounter = 0;
 		currentStateIndex = 0;
@@ -195,5 +196,10 @@ public class Simulator {
 	private static class SimulatorState {
 		private List<Visitor> visitors;
 		private LocalTime currentTime;
+
+		SimulatorState(LocalTime startTime) {
+			visitors = new ArrayList<>();
+			currentTime = startTime;
+		}
 	}
 }

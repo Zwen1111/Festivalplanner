@@ -1,9 +1,9 @@
 package festivalplanner.gui.simulator;
 
-import festivalplanner.simulator.target.Target;
-import festivalplanner.simulator.target.SimpleTarget;
-import festivalplanner.simulator.map.TileMap;
+import festivalplanner.simulator.Navigator;
 import festivalplanner.simulator.Simulator;
+import festivalplanner.simulator.map.TileMap;
+import festivalplanner.simulator.target.StageTarget;
 
 import javax.swing.*;
 import java.awt.*;
@@ -35,6 +35,8 @@ public class SimulatorPanel extends JPanel implements MouseMotionListener, Mouse
 	private boolean init;
 	private Rectangle2D nightOverlay;
 	private int darkIndex;
+	private final Font debugFont = new Font("Monospaced", Font.PLAIN, 14);
+	private boolean debug;
 
 	public SimulatorPanel() {
 		super(null);
@@ -58,6 +60,10 @@ public class SimulatorPanel extends JPanel implements MouseMotionListener, Mouse
 		return simulator;
 	}
 
+	public boolean isDebugShowing() {
+		return debug;
+	}
+
 	public void paintComponent(Graphics g) {
 		super.paintComponent(g);
 		Graphics2D g2d = (Graphics2D) g;
@@ -74,9 +80,24 @@ public class SimulatorPanel extends JPanel implements MouseMotionListener, Mouse
 		g2d.translate(translateX, translateY);
 		g2d.scale(scale, scale);
 
+		g2d.setFont(debugFont);
 		g2d.drawImage(map.getMapImage(), null, null);
 		for (Visitor v : simulator.getVisitors()) {
+			if (debug) v.drawDebugInfo(g2d);
 			v.draw(g2d);
+		}
+
+		if (debug) {
+			Navigator.getTargets().stream()
+					.filter(target1 -> target1 instanceof StageTarget)
+					.forEach(t -> {
+						g2d.setColor(Color.BLACK);
+						g2d.fillRect((int) t.getPosition().getX(), (int) t.getPosition().getY(), 70, 22);
+						g2d.setColor(Color.WHITE);
+						g2d.drawRect((int) t.getPosition().getX(), (int) t.getPosition().getY(), 70, 22);
+						g2d.drawString(String.format("%3d/%3d", t.getAttendants(), t.getCapacity()),
+								(int) t.getPosition().getX() + 5, (int) t.getPosition().getY() + 15);
+					});
 		}
 
 		LocalTime time = simulator.getSimulatedTime();
@@ -113,6 +134,10 @@ public class SimulatorPanel extends JPanel implements MouseMotionListener, Mouse
 			g2d.setComposite(alcom);
 			g2d.fill(nightOverlay);
 		}
+	}
+
+	public void showDebug(boolean value) {
+		debug = value;
 	}
 
 	private void smartScale() {

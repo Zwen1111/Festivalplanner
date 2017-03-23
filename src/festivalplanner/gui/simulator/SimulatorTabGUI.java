@@ -26,6 +26,7 @@ public class SimulatorTabGUI extends JPanel implements ActionListener {
         simulatorPanel = new SimulatorPanel();
         simulatorPanel.setBackground(Color.black);
 
+		timeLabel = new JLabel("--:--");
 
         SpringLayout springLayout = new SpringLayout();
         this.setLayout(springLayout);
@@ -34,19 +35,9 @@ public class SimulatorTabGUI extends JPanel implements ActionListener {
         JButton zoomInButton = new JButton(new ImageIcon(getClass().getResource("/icon's/zoomInIcon.png")));
         JButton zoomOutButton = new JButton(new ImageIcon(getClass().getResource("/icon's/zoomOutIcon.png")));
         JButton prevButton = new JButton(new ImageIcon(getClass().getResource("/icon's/prevIcon.png")));
-        JButton nextButton = new JButton(new ImageIcon(getClass().getResource("/icon's/nextIcon.png")));
+        JButton nextButton = new JButton("next");//new ImageIcon(getClass().getResource("/icon's/nextIcon.png")));
         JButton resetButton = new JButton(new ImageIcon(getClass().getResource("/icon's/resetIcon.png")));
-//		if (time.getHour() < 10)
-//		    if (time.getMinute() < 10)
-//		        timeLabel = new JLabel("0" + time.getHour() + ":0" + time.getMinute());
-//		    else
-//                timeLabel = new JLabel("0" + time.getHour() + ":" + time.getMinute());
-//        else
-//            if (time.getMinute() < 10)
-//                timeLabel = new JLabel(time.getHour() + ":0" + time.getMinute());
-//            else
-//                timeLabel = new JLabel(time.getHour() + ":" + time.getMinute());
-
+		JButton debugButton = new JButton(new ImageIcon(getClass().getResource("/icon's/debugIcon.png")));
 
         buttonArrayList.add(playButton);
         buttonArrayList.add(zoomInButton);
@@ -54,6 +45,7 @@ public class SimulatorTabGUI extends JPanel implements ActionListener {
         buttonArrayList.add(prevButton);
         buttonArrayList.add(nextButton);
         buttonArrayList.add(resetButton);
+        buttonArrayList.add(debugButton);
 
         playButton.setName("Pause");
 
@@ -80,9 +72,9 @@ public class SimulatorTabGUI extends JPanel implements ActionListener {
 						"Could not Load",JOptionPane.WARNING_MESSAGE);
         });
 
-        resetButton.addActionListener(e -> {
-            simulatorPanel.resetSimulator();
-        });
+        resetButton.addActionListener(e -> simulatorPanel.resetSimulator());
+
+        debugButton.addActionListener(e -> simulatorPanel.showDebug(!simulatorPanel.isDebugShowing()));
 
         zoomInButton.addActionListener(e -> simulatorPanel.setScale(simulatorPanel.getScale() + 0.25));
 
@@ -120,12 +112,16 @@ public class SimulatorTabGUI extends JPanel implements ActionListener {
         springLayout.putConstraint(SpringLayout.NORTH, resetButton, 0, SpringLayout.NORTH, this);
         springLayout.putConstraint(SpringLayout.EAST, resetButton, 0, SpringLayout.EAST, this);
 
+		springLayout.putConstraint(SpringLayout.NORTH, debugButton, 0, SpringLayout.SOUTH, resetButton);
+		springLayout.putConstraint(SpringLayout.EAST, debugButton, 0, SpringLayout.EAST, this);
+
         add(playButton);
         add(zoomInButton);
         add(zoomOutButton);
         add(prevButton);
         add(nextButton);
         add(resetButton);
+        add(debugButton);
         add(timeLabel);
         add(simulatorPanel);
 

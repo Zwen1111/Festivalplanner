@@ -67,25 +67,25 @@ public class Visitor {
 		g.setColor(Color.RED);
 		AffineTransform af = new AffineTransform();
 		af.translate(position.getX(), position.getY());
-		af.translate(image.getWidth() / 2,image.getHeight() / 2);
+		af.translate(image.getWidth() / 2, image.getHeight() / 2);
 		af.rotate(angle);
-		af.translate(- image.getWidth() / 2, - image.getHeight() / 2);
-
-		if (Simulator.debug) {
-			String targetString = "Target: " + target.getClass().getSimpleName() + ": " + target.getPosition();
-			int w = (int) g.getFontMetrics().getStringBounds(targetString, g).getWidth();
-			g.setColor(currentAction == CurrentAction.ATTENDING_PERFORMANCE ? Color.MAGENTA : Color.WHITE);
-			g.fillRect((int) position.getX() - 5, (int) position.getY() - 10, w + 10, 80);
-			g.setColor(currentAction == CurrentAction.ATTENDING_PERFORMANCE ? Color.WHITE : Color.BLACK);
-			g.drawString(targetString, (float) position.getX(), (float) position.getY());
-			g.drawString("Action: " + currentAction, (float) position.getX(), (float) position.getY() + 20);
-			if (currentAction == CurrentAction.ATTENDING_PERFORMANCE)
-				g.drawString("On stage: " + currentPerformance.getArtists(),
-						(float) position.getX(), (float) position.getY() + 40);
-			g.drawString(String.format("Blather: %.0f%%, Hydra: %.0f%%", blather * 100, hydration * 100),
-					(float) position.getX(), (float) position.getY() + 60);
-		}
+		af.translate(-image.getWidth() / 2, -image.getHeight() / 2);
 		g.drawImage(image, af, null);
+	}
+
+	public void drawDebugInfo(Graphics2D g) {
+		String targetString = "Target: " + target.getClass().getSimpleName() + ": " + target.getPosition();
+		int w = (int) g.getFontMetrics().getStringBounds(targetString, g).getWidth();
+		g.setColor(currentAction == CurrentAction.ATTENDING_PERFORMANCE ? Color.MAGENTA : Color.WHITE);
+		g.fillRect((int) position.getX() - 5, (int) position.getY() - 10, w + 10, 80);
+		g.setColor(currentAction == CurrentAction.ATTENDING_PERFORMANCE ? Color.WHITE : Color.BLACK);
+		g.drawString(targetString, (float) position.getX(), (float) position.getY());
+		g.drawString("Action: " + currentAction, (float) position.getX(), (float) position.getY() + 20);
+		if (currentAction == CurrentAction.ATTENDING_PERFORMANCE)
+			g.drawString("On stage: " + currentPerformance.getArtists(),
+					(float) position.getX(), (float) position.getY() + 40);
+		g.drawString(String.format("Blather: %.0f%%, Hydra: %.0f%%", blather * 100, hydration * 100),
+				(float) position.getX(), (float) position.getY() + 60);
 	}
 
 	private void drink() {

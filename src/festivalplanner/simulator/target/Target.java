@@ -4,19 +4,21 @@ import festivalplanner.simulator.data.CollisionLayer;
 import festivalplanner.simulator.map.TileMap;
 
 import java.awt.geom.Point2D;
+import java.io.Serializable;
 import java.util.*;
 
 /**
  * @author Coen Boelhouwers
  */
-public abstract class Target {
+public abstract class Target implements Serializable {
 
 	private String name;
 	private int capacity;
 	private int attendants;
 	private Point2D position;
 	private int[][] destinations;
-	private TileMap map;
+	private int tileHeight;
+	private int tileWidth;
 	private CollisionLayer data;
 	private int startIndex;
 
@@ -25,21 +27,16 @@ public abstract class Target {
 	}
 
 	public void setupDistances(TileMap map) {
-		this.map = map;
+		tileHeight = map.getTileHeight();
+		tileWidth = map.getTileWidth();
 		this.data = map.getCollisionLayer();
 		destinations = new int[data.getWidth()][data.getHeight()];
 		for (int i = 0; i < destinations.length; i++) {
 			Arrays.fill(destinations[i], -5);
 		}
-		startIndex = data.getIndex((int) Math.floor(position.getX() / map.getTileWidth()),
-				(int) Math.floor(position.getY() / map.getTileHeight()));
+		startIndex = data.getIndex((int) Math.floor(position.getX() / tileWidth),
+				(int) Math.floor(position.getY() / tileHeight));
 		bfs();
-	}
-
-	protected void shareDistances(Target other) {
-		this.map = other.map;
-		this.data = other.data;
-		this.destinations = other.destinations;
 	}
 
 	public String getName() {
@@ -55,10 +52,10 @@ public abstract class Target {
 	}
 
 	public boolean isAdjacent(Point2D base, Point2D other) {
-		int baseX = (int) Math.floor(base.getX() / map.getTileWidth());
-		int baseY = (int) Math.floor(base.getY() / map.getTileHeight());
-		int otherX = (int) Math.floor(other.getX() / map.getTileWidth());
-		int otherY = (int) Math.floor(other.getY() / map.getTileHeight());
+		int baseX = (int) Math.floor(base.getX() / tileWidth);
+		int baseY = (int) Math.floor(base.getY() / tileHeight);
+		int otherX = (int) Math.floor(other.getX() / tileWidth);
+		int otherY = (int) Math.floor(other.getY() / tileHeight);
 		return Math.abs(baseX - otherX) + Math.abs(baseY - otherY) <= 1;
 		/*return (otherX == baseX && otherY == baseY) ||
 				(otherX == baseX && otherY == baseY - 1) ||
@@ -68,13 +65,13 @@ public abstract class Target {
 	}
 
 	public int getData(Point2D position) {
-		return data.getData((int) Math.floor(position.getX() / map.getTileWidth()),
-				(int) Math.floor(position.getY() / map.getTileHeight()));
+		return data.getData((int) Math.floor(position.getX() / tileWidth),
+				(int) Math.floor(position.getY() / tileHeight));
 	}
 
 	public Distance getDistances(Point2D position) {
-		return getDistances((int) Math.floor(position.getX() / map.getTileWidth()),
-				(int) Math.floor(position.getY() / map.getTileHeight()));
+		return getDistances((int) Math.floor(position.getX() / tileWidth),
+				(int) Math.floor(position.getY() / tileHeight));
 	}
 
 	public Distance getDistances(int x, int y) {
@@ -88,8 +85,8 @@ public abstract class Target {
 	}
 
 	public int getDistance(Point2D position) {
-		return getDistance((int) Math.floor(position.getX() / map.getTileWidth()),
-				(int) Math.floor(position.getY() / map.getTileHeight()));
+		return getDistance((int) Math.floor(position.getX() / tileWidth),
+				(int) Math.floor(position.getY() / tileHeight));
 	}
 
 	public int getDistance(int x, int y) {
@@ -232,8 +229,8 @@ public abstract class Target {
 		}
 
 		private Point2D getPoint(int x, int y) {
-			int tw = map.getTileWidth();
-			int th = map.getTileHeight();
+			int tw = tileWidth;
+			int th = tileHeight;
 			return new Point2D.Double((x * tw) + (tw / 2), (y * th) + (th / 2));
 		}
 

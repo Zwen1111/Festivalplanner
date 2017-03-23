@@ -28,6 +28,9 @@ public class Simulator {
 	private String baseLocation;
 	private int stateCounter;
 	private int currentStateIndex;
+	private long lastSave;
+	private long saveInterval;
+	private List<File> saveLocations;
 
 	public static java.util.List<BufferedImage> images;
 
@@ -40,6 +43,7 @@ public class Simulator {
 		state = new SimulatorState(START_TIME);
 		maxVisitors = 30;//200;
 		stateCounter = 0;
+		saveLocations = new ArrayList<>();
 		currentStateIndex = 0;
 		getImages();
 	}
@@ -65,9 +69,14 @@ public class Simulator {
 
 	public void runSimulation(LocalTime time) {
 		state.currentTime = time;
+		if (saveInterval > 0 && lastSave + saveInterval < System.currentTimeMillis()) {
+			saveState();
+			lastSave = System.currentTimeMillis();
+		}
 		if (state.visitors.size() < maxVisitors) {
 			Point2D.Double position = new  Point2D.Double(1710, 750);
-			Visitor visitor = new Visitor(3, position, images.get((int) (Math.random() * 8)));
+			Visitor visitor = new Visitor(3, position, (int) (Math.random() * 8));
+			visitor.setImage(images.get(visitor.getImageId()));
 			if(canSpawn(visitor)) {
 				state.visitors.add(visitor);
 			}
@@ -131,8 +140,10 @@ public class Simulator {
 			return false;
 		}
 		try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(
-				new File(baseLocation, "simulator_state_" + newIndex % MAX_SNAPSHOTS)))) {
+				saveLocations.get(newIndex % MAX_SNAPSHOTS)))) {
 			state = (SimulatorState) ois.readObject();
+			for (Visitor v : state.visitors) v.setImage(images.get(v.getImageId()));
+			currentStateIndex = newIndex;
 			return true;
 		} catch (IOException | ClassNotFoundException e) {
 			e.printStackTrace();
@@ -142,18 +153,32 @@ public class Simulator {
 
 	public void saveState() {
 		try {
-			File location = File.createTempFile("simulator_state_" + stateCounter % MAX_SNAPSHOTS, null);
-			baseLocation = location.getAbsolutePath();
+			File location;
+			if (stateCounter < MAX_SNAPSHOTS) {
+				location = File.createTempFile("simulator_state_", null);
+				location.deleteOnExit();
+				saveLocations.add(location);
+				System.out.println("New snapshot file: " + location);
+			} else {
+				location = saveLocations.get(stateCounter % MAX_SNAPSHOTS);
+				System.out.println("Reused snapshot file: " + location);
+			}
+			baseLocation = location.getParent();
 			try (FileOutputStream fos = new FileOutputStream(location);
 				 ObjectOutputStream oos = new ObjectOutputStream(fos)) {
 				oos.writeObject(this.state);
 				stateCounter++;
+				currentStateIndex++;
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+	}
+
+	public void setSaveInterval(long millis) {
+		saveInterval = millis;
 	}
 
 	public Point2D getNextWayPoint(Point2D currentPosition, Target target) {
@@ -191,7 +216,7 @@ public class Simulator {
 	   maxVisitors = visitorsAmount;
     }
 
-	private static class SimulatorState {
+	private static class SimulatorState implements Serializable {
 		private List<Visitor> visitors;
 		private LocalTime currentTime;
 

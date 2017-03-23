@@ -2,13 +2,13 @@ package festivalplanner.gui.simulator;
 
 import festivalplanner.data.Performance;
 import festivalplanner.simulator.Navigator;
-import festivalplanner.simulator.Simulator;
 import festivalplanner.simulator.target.*;
 
 import java.awt.*;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
+import java.io.Serializable;
 import java.time.LocalTime;
 import java.util.List;
 
@@ -16,7 +16,7 @@ import java.util.List;
 /**
  * Created by Gebruiker on 6-3-2017.
  */
-public class Visitor {
+public class Visitor implements Serializable {
 
 	private double speed;
 	private double angle;
@@ -28,7 +28,8 @@ public class Visitor {
 	private Performance currentPerformance;
 	private double performanceRandom;
 
-	private BufferedImage image;
+	private int imageId;
+	private transient BufferedImage image;
 	private int radius;
 
 
@@ -43,7 +44,7 @@ public class Visitor {
 
 	private CurrentAction currentAction;
 
-	public Visitor(double speed, Point2D position, BufferedImage image) {
+	public Visitor(double speed, Point2D position, int id) {
 		this.speed = speed;
 		angle = 0.0;
 		this.position = position;
@@ -51,7 +52,7 @@ public class Visitor {
 		//destination = new Point2D.Double(500, 500);
 		//setTarget(Navigator.getDummyStage());
 		radius = 10;
-		this.image = image;
+		imageId = id;
 
 		currentAction = CurrentAction.IDLE;
 
@@ -59,8 +60,6 @@ public class Visitor {
 		blather = Math.random();
 		peeSpeed = (Math.random() * 5 + 5) / 1000;
 		hydration = 1.0;
-		//blather = maxBlather;
-
 	}
 
 	public void draw(Graphics2D g) {
@@ -96,6 +95,10 @@ public class Visitor {
 
 	public Point2D getDestination() {
 		return destination;
+	}
+
+	public int getImageId() {
+		return imageId;
 	}
 
 	public Point2D getPosition() {
@@ -137,6 +140,10 @@ public class Visitor {
 
 	public void setDestination(Point2D destination) {
 		this.destination = destination;
+	}
+
+	public void setImage(BufferedImage image) {
+		this.image = image;
 	}
 
 	public void setPosition(Point2D position) {

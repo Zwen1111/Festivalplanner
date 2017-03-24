@@ -61,9 +61,9 @@ public class Visitor implements Serializable {
 		currentAction = CurrentAction.IDLE;
 
 		performanceRandom = Math.random() * 10;
-		blather = 0;//Math.random();
+		blather = Math.random();
 		peeSpeed = (Math.random() * 5 + 5) / 1000;
-		hydration = 0;//Math.random();
+		hydration = Math.random();
 	}
 
 	/**

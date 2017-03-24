@@ -1,16 +1,17 @@
 package festivalplanner.gui.simulator;
 
 import festivalplanner.simulator.Navigator;
-import festivalplanner.simulator.Simulator;
-import festivalplanner.simulator.map.TileMap;
 import festivalplanner.simulator.target.StageTarget;
+import festivalplanner.simulator.target.Target;
+import festivalplanner.simulator.target.SimpleTarget;
+import festivalplanner.simulator.map.TileMap;
+import festivalplanner.simulator.Simulator;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
-import java.time.Duration;
 import java.time.LocalTime;
 
 /**
@@ -103,35 +104,19 @@ public class SimulatorPanel extends JPanel implements MouseMotionListener, Mouse
 		}
 
 		LocalTime time = simulator.getSimulatedTime();
-		if (darkIndex == -1) {
-			if (time.getHour() >= 18 && time.getHour() < 21) {
-				int seconds = (time.getHour() * 60 * 60 + time.getMinute() * 60 + time.getSecond()) - 64800;
-				darkIndex = (int) (seconds * 0.200278164116828);
-			} else if (time.getHour() >= 21 && time.getHour() < 24) {
-				int seconds = (time.getHour() * 60 * 60 + time.getMinute() * 60 + time.getSecond()) - 79200;
-				darkIndex = (int) (seconds * 0.600835073068893) + 2881;
-			} else if (time.getHour() >= 0 && time.getHour() < 2) {
-				int seconds = (time.getHour() * 60 * 60 + time.getMinute() * 60 + time.getSecond());
-				darkIndex = (int) (seconds * 0.200278164116828) + 7200;
-			} else if (time.getHour() >= 2) {
-				int seconds = (time.getHour() * 60 * 60 + time.getMinute() * 60 + time.getSecond()) - 7200;
-				darkIndex = (int) (seconds * -0.40032407407407) + 8646;
-			}
-		} else {
-			if (time.getHour() >= 18 || time.getHour() < 2) {
-				darkIndex++;
-				if (time.getHour() > 21) {
-					darkIndex += 2;
-				}
-			} else if (time.getHour() >= 2 && darkIndex >= 2) {
-				darkIndex -= 2;
-			} else {
-				darkIndex = 0;
-			}
+		if (time.getHour() >= 18 && time.getHour() < 23){
+			int seconds = (time.getHour() * 60 * 60 + time.getMinute() * 60 + time.getSecond()) - 64800;
+			darkIndex = (int) (seconds / 2.2);
+		}else if (time.getHour() >= 23 || time.getHour() < 3){
+			darkIndex = 8182;
+		}else if (time.getHour() >= 3 && darkIndex != 0 && time.getHour() <= 10) {
+			int seconds = (time.getHour() * 60 * 60 + time.getMinute() * 60 + time.getSecond()) - 10800;
+			darkIndex = (int) (8182 - seconds * 0.4);
+		}
 
+		float alpha = darkIndex * 0.0001f;
+		if (alpha >= 0 && alpha <= 1) {
 			g2d.setColor(Color.BLACK);
-
-			float alpha = darkIndex * 0.0001f;
 			AlphaComposite alcom = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, alpha);
 			g2d.setComposite(alcom);
 			g2d.fill(nightOverlay);

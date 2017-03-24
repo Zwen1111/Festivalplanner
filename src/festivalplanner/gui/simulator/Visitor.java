@@ -127,7 +127,7 @@ public class Visitor implements Serializable {
 
 	private void drink() {
 		blather += 0.2;
-		hydration += 1.0;
+		hydration = 1.0;
 		changeAction(CurrentAction.IDLE);
 	}
 
@@ -293,11 +293,19 @@ public class Visitor implements Serializable {
 						changeAction(CurrentAction.GOING_TO_GRASS);
 						setTarget(Navigator.getRandomEmptyStage(time, preLookTime));
 					} else {
-						StageTarget stageToGo = wrapper.getTarget();
-						if (time.isAfter(wrapper.getPerformance().getStartTime()))
-							currentPerformance = wrapper.getPerformance();
-						changeAction(CurrentAction.GOING_TO_PERMORMANCE);
-						setTarget(stageToGo);
+						//A performance will start soon. Take a quick pee and/or buy a beverage
+						//if necessary.
+						if (hydration <= 0.8) {
+							changeAction(CurrentAction.GOING_TO_STAND);
+						} else if (blather >= 0.2) {
+							changeAction(CurrentAction.GOING_TO_TOILET);
+						} else {
+							StageTarget stageToGo = wrapper.getTarget();
+							if (time.isAfter(wrapper.getPerformance().getStartTime()))
+								currentPerformance = wrapper.getPerformance();
+							changeAction(CurrentAction.GOING_TO_PERMORMANCE);
+							setTarget(stageToGo);
+						}
 					}
 				}
 				searchTarget(null);
@@ -311,7 +319,7 @@ public class Visitor implements Serializable {
 				}
 				break;
 			case ATTENDING_PERFORMANCE:
-				if ((currentPerformance != null &&  time.isAfter(currentPerformance.getEndTime())) ||
+				if (currentPerformance != null ? time.isAfter(currentPerformance.getEndTime()) :
 						timeAtTarget >= 50) {
 					changeAction(CurrentAction.IDLE);
 					currentPerformance = null;

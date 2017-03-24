@@ -165,8 +165,14 @@ public class Simulator {
 				saveLocations.get(newIndex % MAX_SNAPSHOTS)))) {
 			state.visitors.forEach(Visitor::resetAction);
 			state = (SimulatorState) ois.readObject();
-			state.visitors.forEach(Visitor::replayAction);
-			for (Visitor v : state.visitors) v.setImage(images.get(v.getImageId()));
+			state.visitors.forEach(v -> {
+				v.setImage(images.get(v.getImageId()));
+				Navigator.getTargets().stream()
+						.filter(target -> target.equals(v.getTarget()))
+						.findFirst()
+						.ifPresent(v::setTarget);
+				v.replayAction();
+			});
 			currentStateIndex = newIndex;
 			lastSave = state.currentTime;
 			System.out.println("Back to " + lastSave + "(index: " + currentStateIndex + "/" + stateCounter + ")");

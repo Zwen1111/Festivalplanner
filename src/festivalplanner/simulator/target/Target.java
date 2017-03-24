@@ -200,6 +200,19 @@ public abstract class Target implements Serializable {
 		this.position = position;
 	}
 
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (o == null || getClass() != o.getClass()) return false;
+		Target target = (Target) o;
+		return capacity == target.capacity &&
+				Objects.equals(name, target.name);
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(name, capacity);
+	}
 
 	public class Distance {
 		private int x;

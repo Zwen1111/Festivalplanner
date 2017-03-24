@@ -237,6 +237,7 @@ public class SimulatorPanel extends JPanel implements MouseMotionListener, Mouse
 	}
 
     public void resetSimulator() {
+		simulator.clearAllVisitors();
 	    simulator = new Simulator(map);
     }
 }

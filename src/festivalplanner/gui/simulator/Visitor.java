@@ -64,6 +64,34 @@ public class Visitor implements Serializable {
 		hydration = Math.random();
 	}
 
+	/**
+	 * Manages proper registration into and out of targets.
+	 * WARNING: make sure the proper target is set before calling this method.
+	 *
+	 * @param newAction the new Action of this visitor.
+	 */
+	private void changeAction(CurrentAction newAction) {
+		switch (newAction) {
+			case IDLE:
+				switch (currentAction) {
+					case ATTENDING_PERFORMANCE:
+					case RESTING:
+					case PEEING:
+					case BUYING_DRINKS:
+						target.changeAttendency(-1);
+						break;
+				}
+				break;
+			case ATTENDING_PERFORMANCE:
+			case RESTING:
+			case PEEING:
+			case BUYING_DRINKS:
+				target.changeAttendency(+1);
+				break;
+		}
+		currentAction = newAction;
+	}
+
 	public void draw(Graphics2D g) {
 		g.setColor(Color.RED);
 		AffineTransform af = new AffineTransform();
@@ -98,7 +126,7 @@ public class Visitor implements Serializable {
 	private void drink() {
 		blather += 0.2;
 		hydration += 1.0;
-		currentAction = CurrentAction.IDLE;
+		changeAction(CurrentAction.IDLE);
 	}
 
 	public Point2D getDestination() {
@@ -140,10 +168,32 @@ public class Visitor implements Serializable {
 		blather -= peeSpeed;
 		newPosition = position;
 		if (blather <= 0) {
-			currentAction = CurrentAction.IDLE;
+			changeAction(CurrentAction.IDLE);
 			blather = 0;
 			currentToiletBlock.freeToilet((ToiletTarget) getTarget());
 		}
+	}
+
+	/**
+	 * Intended for use by Simulator only.
+	 *
+	 * Resets this Visitor's current action to IDLE. Causes this visitor to unregister from its previous
+	 * target if necessary.
+	 */
+	public void resetAction() {
+		changeAction(CurrentAction.IDLE);
+	}
+
+	/**
+	 * Intended for use by Simulator only.
+	 *
+	 * Replays this Visitor's current action as if it came from IDLE. Causes this visitor to re-register
+	 * to its current target if necessary.
+	 */
+	public void replayAction() {
+		CurrentAction action = currentAction;
+		currentAction = CurrentAction.IDLE;
+		changeAction(action);
 	}
 
 	public void setDestination(Point2D destination) {
@@ -204,26 +254,26 @@ public class Visitor implements Serializable {
 				//Decide next action, in order of priority:
 				if (time.getHour() < 6) {
 					target = Navigator.getTargets().get(Navigator.getTargets().size() - 1);
-					currentAction = CurrentAction.GOING_HOME;
+					changeAction(CurrentAction.GOING_HOME);
 					blather = 0;
 					hydration = 1.0;
 				} else if (blather >= 0.8) {
-					currentAction = CurrentAction.GOING_TO_TOILET;
+					changeAction(CurrentAction.GOING_TO_TOILET);
 					setTarget(Navigator.getNearestToilet(position));
 				} else if (hydration <= 0.2) {
-					currentAction = CurrentAction.GOING_TO_STAND;
+					changeAction(CurrentAction.GOING_TO_STAND);
 					setTarget(Navigator.getNearestStand(position));
 				} else {
 					PerformanceWrapper wrapper = Navigator.getPopularityBasedRandomStage(
 							performanceRandom, time, preLookTime);
 					if (wrapper == null) {
-						currentAction = CurrentAction.GOING_TO_GRASS;
+						changeAction(CurrentAction.GOING_TO_GRASS);
 						setTarget(Navigator.getRandomEmptyStage(time, preLookTime));
 					} else {
 						StageTarget stageToGo = wrapper.getTarget();
 						if (time.isAfter(wrapper.getPerformance().getStartTime()))
 							currentPerformance = wrapper.getPerformance();
-						currentAction = CurrentAction.GOING_TO_PERMORMANCE;
+						changeAction(CurrentAction.GOING_TO_PERMORMANCE);
 						setTarget(stageToGo);
 					}
 				}
@@ -233,40 +283,36 @@ public class Visitor implements Serializable {
 				break;
 			case RESTING:
 				if (timeAtTarget >= 300) {
-					currentAction = CurrentAction.IDLE;
-					target.changeAttendency(-1);
+					changeAction(CurrentAction.IDLE);
 				}
 				break;
 			case ATTENDING_PERFORMANCE:
 				if ((currentPerformance != null &&  time.isAfter(currentPerformance.getEndTime())) ||
 						timeAtTarget >= 50) {
-					currentAction = CurrentAction.IDLE;
+					changeAction(CurrentAction.IDLE);
 					currentPerformance = null;
-					target.changeAttendency(-1);
 				}
 				break;
 			case GOING_TO_GRASS:
 				if (timeAtTarget >= 1) {
-					currentAction = CurrentAction.RESTING;
-					target.changeAttendency(+1);
+					changeAction(CurrentAction.RESTING);
 				}
 				break;
 			case GOING_TO_PERMORMANCE:
 				if (timeAtTarget >= 1) {
-					currentAction = CurrentAction.ATTENDING_PERFORMANCE;
-					target.changeAttendency(+1);
+					changeAction(CurrentAction.ATTENDING_PERFORMANCE);
 				}
 				break;
 			case GOING_TO_STAND:
 				if (timeAtTarget >= 1) {
-					currentAction = CurrentAction.BUYING_DRINKS;
+					changeAction(CurrentAction.BUYING_DRINKS);
 				}
 				break;
 			case GOING_TO_TOILET:
 				if (timeAtTarget >= 1 && !target.isFull()) {
 					currentToiletBlock = (ToiletBlockTarget) target;
 					setTarget(((ToiletBlockTarget) target).useToilet());
-					currentAction = CurrentAction.PEEING;
+					changeAction(CurrentAction.PEEING);
 				}
 				break;
 			case BUYING_DRINKS:

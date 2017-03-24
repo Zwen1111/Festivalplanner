@@ -14,6 +14,7 @@ import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.ListIterator;
 
 /**
  * @author Coen Boelhouwers
@@ -74,6 +75,15 @@ public class Simulator {
 
 	private boolean canSpawn(Visitor visitor) {
 		return state.currentTime.getHour() >= 6 && !visitor.checkcollision(state.visitors);
+	}
+
+	public void clearAllVisitors() {
+		ListIterator<Visitor> it = state.visitors.listIterator();
+		while (it.hasNext()) {
+			Visitor v = it.next();
+			v.resetAction();
+			it.remove();
+		}
 	}
 
 	public void runSimulation(LocalTime time) {
@@ -153,7 +163,9 @@ public class Simulator {
 		}
 		try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(
 				saveLocations.get(newIndex % MAX_SNAPSHOTS)))) {
+			state.visitors.forEach(Visitor::resetAction);
 			state = (SimulatorState) ois.readObject();
+			state.visitors.forEach(Visitor::replayAction);
 			for (Visitor v : state.visitors) v.setImage(images.get(v.getImageId()));
 			currentStateIndex = newIndex;
 			lastSave = state.currentTime;

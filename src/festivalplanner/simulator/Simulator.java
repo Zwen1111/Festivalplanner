@@ -41,7 +41,6 @@ public class Simulator {
 		Navigator.addTarget(target);
 		state = new SimulatorState(START_TIME);
 		lastSave = START_TIME;
-		maxVisitors = 30;//200;
 		stateCounter = 0;
 		saveLocations = new ArrayList<>();
 		currentStateIndex = 0;

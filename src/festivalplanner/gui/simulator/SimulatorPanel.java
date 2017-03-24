@@ -93,8 +93,7 @@ public class SimulatorPanel extends JPanel implements MouseMotionListener, Mouse
 		}
 
 		if (debug) {
-			Navigator.getTargets().stream()
-					.filter(target1 -> target1 instanceof StageTarget)
+			Navigator.getTargets()
 					.forEach(t -> {
 						g2d.setColor(Color.BLACK);
 						g2d.fillRect((int) t.getPosition().getX(), (int) t.getPosition().getY(), 70, 22);

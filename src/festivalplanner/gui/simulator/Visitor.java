@@ -19,6 +19,8 @@ import java.util.List;
  */
 public class Visitor implements Serializable {
 
+	private static final int NEAR_DISTANCE = 5;
+
 	private double speed;
 	private double angle;
 	private Point2D position;
@@ -59,9 +61,9 @@ public class Visitor implements Serializable {
 		currentAction = CurrentAction.IDLE;
 
 		performanceRandom = Math.random() * 10;
-		blather = Math.random();
+		blather = 0;//Math.random();
 		peeSpeed = (Math.random() * 5 + 5) / 1000;
-		hydration = Math.random();
+		hydration = 0;//Math.random();
 	}
 
 	/**
@@ -149,15 +151,17 @@ public class Visitor implements Serializable {
 		return target;
 	}
 
-	private boolean isAtTarget(){
-		if (target instanceof StageTarget){
-			return target.getDistance(position) == 0;
-		}
-		return position.distance(target.getPosition()) < 20;
+	private boolean isAtTarget() {
+		return target.getDistance(position) == 0 ||
+				position.distance(target.getPosition()) < 20;
 	}
 
 	public boolean isDestinationSet() {
 		return destination != null;
+	}
+
+	private boolean isNearTarget() {
+		return target.getDistance(position) < NEAR_DISTANCE;
 	}
 
 	public boolean isTargetSet() {
@@ -194,6 +198,28 @@ public class Visitor implements Serializable {
 		CurrentAction action = currentAction;
 		currentAction = CurrentAction.IDLE;
 		changeAction(action);
+	}
+
+	private void searchTarget(Target ignore) {
+		switch (currentAction) {
+			case GOING_HOME:
+				setTarget(Navigator.getTargets().get(Navigator.getTargets().size() - 1));
+				break;
+			case GOING_TO_TOILET:
+				Target toilet = Navigator.getNearestToilet(position, ignore);
+				if (toilet == null) {
+					System.out.println("Could not find any toilet.");
+					changeAction(CurrentAction.IDLE);
+				} else setTarget(toilet);
+				break;
+			case GOING_TO_STAND:
+				Target stand = Navigator.getNearestStand(position, ignore);
+				if (stand == null) {
+					System.out.println("Could not find any stand.");
+					changeAction(CurrentAction.IDLE);
+				} else setTarget(stand);
+				break;
+		}
 	}
 
 	public void setDestination(Point2D destination) {
@@ -253,16 +279,13 @@ public class Visitor implements Serializable {
 				timeAtTarget = 0;
 				//Decide next action, in order of priority:
 				if (time.getHour() < 6) {
-					target = Navigator.getTargets().get(Navigator.getTargets().size() - 1);
 					changeAction(CurrentAction.GOING_HOME);
 					blather = 0;
 					hydration = 1.0;
 				} else if (blather >= 0.8) {
 					changeAction(CurrentAction.GOING_TO_TOILET);
-					setTarget(Navigator.getNearestToilet(position));
 				} else if (hydration <= 0.2) {
 					changeAction(CurrentAction.GOING_TO_STAND);
-					setTarget(Navigator.getNearestStand(position));
 				} else {
 					PerformanceWrapper wrapper = Navigator.getPopularityBasedRandomStage(
 							performanceRandom, time, preLookTime);
@@ -277,6 +300,7 @@ public class Visitor implements Serializable {
 						setTarget(stageToGo);
 					}
 				}
+				searchTarget(null);
 				break;
 			case PEEING:
 				if (position.distance(target.getPosition()) < 10) pee();
@@ -294,29 +318,38 @@ public class Visitor implements Serializable {
 				}
 				break;
 			case GOING_TO_GRASS:
-				if (timeAtTarget >= 1) {
+				if (isNearTarget() && target.isFull())
+					searchTarget(target);
+				else if (timeAtTarget >= 1) {
 					changeAction(CurrentAction.RESTING);
 				}
 				break;
 			case GOING_TO_PERMORMANCE:
-				if (timeAtTarget >= 1) {
+				//If the stage of his favorite artist is full, the visitor can't do much.
+				if (isNearTarget() && target.isFull())
+					changeAction(CurrentAction.IDLE);
+				else if (timeAtTarget >= 1) {
 					changeAction(CurrentAction.ATTENDING_PERFORMANCE);
 				}
 				break;
 			case GOING_TO_STAND:
-				if (timeAtTarget >= 1) {
+				if (isNearTarget() && target.isFull())
+					searchTarget(target);
+				else if (timeAtTarget >= 1) {
 					changeAction(CurrentAction.BUYING_DRINKS);
 				}
 				break;
 			case GOING_TO_TOILET:
-				if (timeAtTarget >= 1 && !target.isFull()) {
+				if (isNearTarget() && target.isFull())
+					searchTarget(target);
+				else if (timeAtTarget >= 1 && !target.isFull()) {
 					currentToiletBlock = (ToiletBlockTarget) target;
 					setTarget(((ToiletBlockTarget) target).useToilet());
 					changeAction(CurrentAction.PEEING);
 				}
 				break;
 			case BUYING_DRINKS:
-				if (timeAtTarget >= 12) drink();
+				if (timeAtTarget >= 24) drink();
 				break;
 			case GOING_HOME:
 				if (timeAtTarget >= 1) remove = true;

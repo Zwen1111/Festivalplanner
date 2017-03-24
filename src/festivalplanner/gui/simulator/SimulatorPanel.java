@@ -88,7 +88,8 @@ public class SimulatorPanel extends JPanel implements MouseMotionListener, Mouse
 		g2d.setFont(debugFont);
 		g2d.drawImage(map.getMapImage(), null, null);
 		for (Visitor v : simulator.getVisitors()) {
-			if (debug >= 2) v.drawDebugInfo(g2d);
+			if (debug == 2) v.drawDebugCircle(g2d);
+			if (debug == 3) v.drawDebugInfo(g2d);
 			v.draw(g2d);
 		}
 
@@ -98,6 +99,7 @@ public class SimulatorPanel extends JPanel implements MouseMotionListener, Mouse
 						g2d.setColor(Color.BLACK);
 						g2d.fillRect((int) t.getPosition().getX(), (int) t.getPosition().getY(), 70, 22);
 						g2d.setColor(Color.WHITE);
+						g2d.setStroke(new BasicStroke(2));
 						g2d.drawRect((int) t.getPosition().getX(), (int) t.getPosition().getY(), 70, 22);
 						g2d.drawString(String.format("%3d/%3d", t.getAttendants(), t.getCapacity()),
 								(int) t.getPosition().getX() + 5, (int) t.getPosition().getY() + 15);
@@ -148,7 +150,7 @@ public class SimulatorPanel extends JPanel implements MouseMotionListener, Mouse
 	}
 
 	public void setDebugLevel(int value) {
-		debug = value % 3;
+		debug = value % 4;
 	}
 
 	public void translateBy(Point2D position) {

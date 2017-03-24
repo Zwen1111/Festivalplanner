@@ -98,10 +98,40 @@ public class Visitor implements Serializable {
 		g.setColor(Color.RED);
 		AffineTransform af = new AffineTransform();
 		af.translate(position.getX(), position.getY());
-		af.translate(image.getWidth() / 2, image.getHeight() / 2);
 		af.rotate(angle);
 		af.translate(-image.getWidth() / 2, -image.getHeight() / 2);
 		g.drawImage(image, af, null);
+	}
+
+	public void drawDebugCircle(Graphics2D g) {
+		g.setStroke(new BasicStroke(4));
+		g.setColor(Color.WHITE);
+		switch (currentAction) {
+			case GOING_HOME:
+				g.setStroke(new BasicStroke(4, BasicStroke.CAP_BUTT, BasicStroke.JOIN_BEVEL,
+						1f, new float[]{10f, 10f}, 0f));
+				g.setColor(Color.BLACK);
+				break;
+			case GOING_TO_STAND:
+				g.setStroke(new BasicStroke(4, BasicStroke.CAP_BUTT, BasicStroke.JOIN_BEVEL,
+						1f, new float[]{10f, 10f}, 0f));
+			case BUYING_DRINKS:
+				g.setColor(Color.BLUE);
+				break;
+			case GOING_TO_TOILET:
+				g.setStroke(new BasicStroke(4, BasicStroke.CAP_BUTT, BasicStroke.JOIN_BEVEL,
+						1f, new float[]{10f, 10f}, 0f));
+			case PEEING:
+				g.setColor(Color.YELLOW);
+				break;
+			case GOING_TO_PERMORMANCE:
+				g.setStroke(new BasicStroke(4, BasicStroke.CAP_BUTT, BasicStroke.JOIN_BEVEL,
+						1f, new float[]{10f, 10f}, 0f));
+			case ATTENDING_PERFORMANCE:
+				g.setColor(Color.MAGENTA);
+				break;
+		}
+		g.drawOval((int) position.getX() - 15, (int) position.getY() - 15, 30, 30);
 	}
 
 	public void drawDebugInfo(Graphics2D g) {

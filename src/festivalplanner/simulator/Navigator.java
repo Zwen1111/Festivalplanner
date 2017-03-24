@@ -7,6 +7,7 @@ import festivalplanner.data.Stage;
 import festivalplanner.simulator.target.*;
 
 import java.awt.geom.Point2D;
+import java.time.Duration;
 import java.time.LocalTime;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -48,8 +49,8 @@ public class Navigator {
 	}
 
 	/**
-	 * @deprecated use {@link #getPopularityBasedRandomStage(double, LocalTime)} or
-	 * {@link #getRandomEmptyStage(LocalTime)} instead.
+	 * @deprecated use {@link #getPopularityBasedRandomStage(double, LocalTime, Duration)} or
+	 * {@link #getRandomEmptyStage(LocalTime, Duration)} instead.
 	 * @return
 	 */
 	@Deprecated
@@ -60,8 +61,8 @@ public class Navigator {
 		return (StageTarget) stages.get((int) (Math.random() * stages.size()));
 	}
 
-	public static StageTarget getRandomEmptyStage(LocalTime time) {
-		List<Performance> ps = Database.getNowPerforming(time);
+	public static StageTarget getRandomEmptyStage(LocalTime time, Duration preLook) {
+		List<Performance> ps = Database.getNowPerforming(time, preLook);
 		List<Stage> usedStages = new ArrayList<>();
 		ps.forEach(p -> usedStages.add(p.getStage()));
 		List<Target> stages =  TARGETS.stream()
@@ -71,16 +72,17 @@ public class Navigator {
 		return (StageTarget) stages.get((int) (Math.random() * stages.size()));
 	}
 
-	public static PerformanceTarget getPopularityBasedRandomStage(double visitorsRandom, LocalTime time) {
-		List<Performance> ps = Database.getNowPerforming(time);
+	public static PerformanceWrapper getPopularityBasedRandomStage(double visitorsRandom, LocalTime time,
+																   Duration preLook) {
+		List<Performance> ps = Database.getNowPerforming(time, preLook);
 		Performance chosen = null;
-		for (int i = 0;i < ps.size(); i++) {
-			double popularity = ps.get(i).generatePopularity();
+		for (Performance p : ps) {
+			double popularity = p.generatePopularity();
 			if (visitorsRandom <= popularity) {
-				chosen = ps.get(i);
+				chosen = p;
 				break;
 			}
-			visitorsRandom -= popularity;
+			visitorsRandom = (visitorsRandom - popularity) / (10 - popularity) * 10;
 		}
 		if (chosen == null) return null;
 		final Performance finalChosen = chosen;
@@ -88,7 +90,7 @@ public class Navigator {
 				.filter(target -> target instanceof StageTarget &&
 						((StageTarget) target).getStage().equals(finalChosen.getStage()))
 				.findFirst().orElse(null);
-		if (st != null) return new PerformanceTarget(st, finalChosen);
+		if (st != null) return new PerformanceWrapper(st, finalChosen);
 		else {
 			System.out.println("Unexpected: No target found for Stage!");
 			return null;
@@ -104,9 +106,9 @@ public class Navigator {
 	 * @param afterTime the time after which it should start.
 	 * @return a list of Targets matching preferences. Empty if no matches.
 	 */
-	public static List<PerformanceTarget> getArtistPerformances(Collection<Artist> artists, LocalTime afterTime) {
+	public static List<PerformanceWrapper> getArtistPerformances(Collection<Artist> artists, LocalTime afterTime) {
 		if (artists == null) return new ArrayList<>();
-		List<PerformanceTarget> targets = new ArrayList<>();
+		List<PerformanceWrapper> targets = new ArrayList<>();
 		List<Performance> performances = new ArrayList<>();
 		artists.forEach(e-> performances.addAll(Database.getPerformacesOfArtist(e)));
 		performances.stream()
@@ -115,7 +117,8 @@ public class Navigator {
 						.filter(target -> target instanceof StageTarget
 								&& ((StageTarget) target).getStage().equals(performance.getStage()))
 						.findFirst()
-						.ifPresent(target -> targets.add((PerformanceTarget) target)));
+						.ifPresent(target -> targets.add(new PerformanceWrapper((StageTarget) target, performance)))
+				);
 		return targets;
 	}
 

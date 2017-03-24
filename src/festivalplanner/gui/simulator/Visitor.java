@@ -8,6 +8,8 @@ import java.awt.*;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
+import java.io.Serializable;
+import java.time.Duration;
 import java.time.LocalTime;
 import java.util.List;
 
@@ -15,9 +17,7 @@ import java.util.List;
 /**
  * Created by Gebruiker on 6-3-2017.
  */
-public class Visitor {
-
-	private static boolean debug = true;
+public class Visitor implements Serializable {
 
 	private double speed;
 	private double angle;
@@ -28,8 +28,11 @@ public class Visitor {
 	private ToiletBlockTarget currentToiletBlock;
 	private Performance currentPerformance;
 	private double performanceRandom;
+	/**A random, visitor-specific time that the visitor will head towards a performance before it starts.*/
+	private Duration preLookTime;
 
-	private BufferedImage image;
+	private int imageId;
+	private transient BufferedImage image;
 	private int radius;
 
 
@@ -44,59 +47,94 @@ public class Visitor {
 
 	private CurrentAction currentAction;
 
-	public Visitor(double speed, Point2D position, BufferedImage image) {
+	public Visitor(double speed, Point2D position, int id) {
 		this.speed = speed;
 		angle = 0.0;
 		this.position = position;
 		newPosition = position;
-		//destination = new Point2D.Double(500, 500);
-		//setTarget(Navigator.getDummyStage());
+		preLookTime = Duration.ofMinutes((long) (Math.random() * 40 + 20));
 		radius = 10;
-		this.image = image;
+		imageId = id;
 
 		currentAction = CurrentAction.IDLE;
 
 		performanceRandom = Math.random() * 10;
 		blather = Math.random();
 		peeSpeed = (Math.random() * 5 + 5) / 1000;
-		hydration = 1.0;
-		//blather = maxBlather;
+		hydration = Math.random();
+	}
 
+	/**
+	 * Manages proper registration into and out of targets.
+	 * WARNING: make sure the proper target is set before calling this method.
+	 *
+	 * @param newAction the new Action of this visitor.
+	 */
+	private void changeAction(CurrentAction newAction) {
+		switch (newAction) {
+			case IDLE:
+				switch (currentAction) {
+					case ATTENDING_PERFORMANCE:
+					case RESTING:
+					case PEEING:
+					case BUYING_DRINKS:
+						target.changeAttendency(-1);
+						break;
+				}
+				break;
+			case ATTENDING_PERFORMANCE:
+			case RESTING:
+			case PEEING:
+			case BUYING_DRINKS:
+				target.changeAttendency(+1);
+				break;
+		}
+		currentAction = newAction;
 	}
 
 	public void draw(Graphics2D g) {
 		g.setColor(Color.RED);
 		AffineTransform af = new AffineTransform();
 		af.translate(position.getX(), position.getY());
-		af.translate(image.getWidth() / 2,image.getHeight() / 2);
+		af.translate(image.getWidth() / 2, image.getHeight() / 2);
 		af.rotate(angle);
-		af.translate(- image.getWidth() / 2, - image.getHeight() / 2);
-
-		if (debug) {
-			String targetString = "Target: " + target.getClass().getSimpleName() + ": " + target.getPosition();
-			int w = (int) g.getFontMetrics().getStringBounds(targetString, g).getWidth();
-			g.setColor(currentAction == CurrentAction.ATTENDING_PERFORMANCE ? Color.MAGENTA : Color.WHITE);
-			g.fillRect((int) position.getX() - 5, (int) position.getY() - 10, w + 10, 80);
-			g.setColor(currentAction == CurrentAction.ATTENDING_PERFORMANCE ? Color.WHITE : Color.BLACK);
-			g.drawString(targetString, (float) position.getX(), (float) position.getY());
-			g.drawString("Action: " + currentAction, (float) position.getX(), (float) position.getY() + 20);
-			if (currentAction == CurrentAction.ATTENDING_PERFORMANCE)
-				g.drawString("On stage: " + currentPerformance.getArtists(),
-						(float) position.getX(), (float) position.getY() + 40);
-			g.drawString(String.format("Blather: %.0f%%, Hydra: %.0f%%", blather * 100, hydration * 100),
-					(float) position.getX(), (float) position.getY() + 60);
-		}
+		af.translate(-image.getWidth() / 2, -image.getHeight() / 2);
 		g.drawImage(image, af, null);
+	}
+
+	public void drawDebugInfo(Graphics2D g) {
+		boolean attending = currentAction == CurrentAction.ATTENDING_PERFORMANCE;
+		String targetString = "Target: " + target.getClass().getSimpleName() + ": " + target.getPosition();
+		int w = (int) g.getFontMetrics().getStringBounds(targetString, g).getWidth();
+		g.setColor(attending ? (currentPerformance != null ? Color.MAGENTA : Color.WHITE) : Color.WHITE);
+		g.fillRect((int) position.getX() - 5, (int) position.getY() - 10, w + 10, 80);
+		if (currentAction == CurrentAction.GOING_TO_PERMORMANCE || attending) {
+			g.setColor(Color.MAGENTA);
+			g.setStroke(new BasicStroke(4));
+			g.drawRect((int) position.getX() - 5, (int) position.getY() - 10, w + 10, 80);
+		}
+		g.setColor(attending ? (currentPerformance != null ? Color.WHITE : Color.BLACK) : Color.BLACK);
+		g.drawString(targetString, (float) position.getX(), (float) position.getY());
+		g.drawString("Action: " + currentAction, (float) position.getX(), (float) position.getY() + 20);
+		if (currentAction == CurrentAction.ATTENDING_PERFORMANCE && currentPerformance != null)
+			g.drawString("On stage: " + currentPerformance.getArtists(),
+					(float) position.getX(), (float) position.getY() + 40);
+		g.drawString(String.format("Blather: %.0f%%, Hydra: %.0f%%", blather * 100, hydration * 100),
+				(float) position.getX(), (float) position.getY() + 60);
 	}
 
 	private void drink() {
 		blather += 0.2;
 		hydration += 1.0;
-		currentAction = CurrentAction.IDLE;
+		changeAction(CurrentAction.IDLE);
 	}
 
 	public Point2D getDestination() {
 		return destination;
+	}
+
+	public int getImageId() {
+		return imageId;
 	}
 
 	public Point2D getPosition() {
@@ -130,14 +168,40 @@ public class Visitor {
 		blather -= peeSpeed;
 		newPosition = position;
 		if (blather <= 0) {
-			currentAction = CurrentAction.IDLE;
+			changeAction(CurrentAction.IDLE);
 			blather = 0;
 			currentToiletBlock.freeToilet((ToiletTarget) getTarget());
 		}
 	}
 
+	/**
+	 * Intended for use by Simulator only.
+	 *
+	 * Resets this Visitor's current action to IDLE. Causes this visitor to unregister from its previous
+	 * target if necessary.
+	 */
+	public void resetAction() {
+		changeAction(CurrentAction.IDLE);
+	}
+
+	/**
+	 * Intended for use by Simulator only.
+	 *
+	 * Replays this Visitor's current action as if it came from IDLE. Causes this visitor to re-register
+	 * to its current target if necessary.
+	 */
+	public void replayAction() {
+		CurrentAction action = currentAction;
+		currentAction = CurrentAction.IDLE;
+		changeAction(action);
+	}
+
 	public void setDestination(Point2D destination) {
 		this.destination = destination;
+	}
+
+	public void setImage(BufferedImage image) {
+		this.image = image;
 	}
 
 	public void setPosition(Point2D position) {
@@ -181,7 +245,8 @@ public class Visitor {
 
 	private void updatePreferences(LocalTime time) {
 		if (isAtTarget()) timeAtTarget++;
-		hydration -= 0.00025;
+		hydration -= 0.00005;
+		blather += 0.00005;
 
 		switch (currentAction) {
 			case IDLE:
@@ -189,23 +254,26 @@ public class Visitor {
 				//Decide next action, in order of priority:
 				if (time.getHour() < 6) {
 					target = Navigator.getTargets().get(Navigator.getTargets().size() - 1);
-					currentAction = CurrentAction.GOING_HOME;
+					changeAction(CurrentAction.GOING_HOME);
 					blather = 0;
 					hydration = 1.0;
 				} else if (blather >= 0.8) {
-					currentAction = CurrentAction.GOING_TO_TOILET;
+					changeAction(CurrentAction.GOING_TO_TOILET);
 					setTarget(Navigator.getNearestToilet(position));
 				} else if (hydration <= 0.2) {
-					currentAction = CurrentAction.GOING_TO_STAND;
+					changeAction(CurrentAction.GOING_TO_STAND);
 					setTarget(Navigator.getNearestStand(position));
 				} else {
-					PerformanceTarget stageToGo = Navigator.getPopularityBasedRandomStage(performanceRandom, time);
-					if (stageToGo == null) {
-						currentAction = CurrentAction.GOING_TO_GRASS;
-						setTarget(Navigator.getRandomEmptyStage(time));
+					PerformanceWrapper wrapper = Navigator.getPopularityBasedRandomStage(
+							performanceRandom, time, preLookTime);
+					if (wrapper == null) {
+						changeAction(CurrentAction.GOING_TO_GRASS);
+						setTarget(Navigator.getRandomEmptyStage(time, preLookTime));
 					} else {
-						currentPerformance = stageToGo.getPerformance();
-						currentAction = CurrentAction.GOING_TO_PERMORMANCE;
+						StageTarget stageToGo = wrapper.getTarget();
+						if (time.isAfter(wrapper.getPerformance().getStartTime()))
+							currentPerformance = wrapper.getPerformance();
+						changeAction(CurrentAction.GOING_TO_PERMORMANCE);
 						setTarget(stageToGo);
 					}
 				}
@@ -214,32 +282,37 @@ public class Visitor {
 				if (position.distance(target.getPosition()) < 10) pee();
 				break;
 			case RESTING:
-				if (timeAtTarget >= 300) currentAction = CurrentAction.IDLE;
+				if (timeAtTarget >= 300) {
+					changeAction(CurrentAction.IDLE);
+				}
 				break;
 			case ATTENDING_PERFORMANCE:
-				if (time.isAfter(currentPerformance.getEndTime()))
-					currentAction = CurrentAction.IDLE;
+				if ((currentPerformance != null &&  time.isAfter(currentPerformance.getEndTime())) ||
+						timeAtTarget >= 50) {
+					changeAction(CurrentAction.IDLE);
+					currentPerformance = null;
+				}
 				break;
 			case GOING_TO_GRASS:
 				if (timeAtTarget >= 1) {
-					currentAction = CurrentAction.RESTING;
+					changeAction(CurrentAction.RESTING);
 				}
 				break;
 			case GOING_TO_PERMORMANCE:
 				if (timeAtTarget >= 1) {
-					currentAction = CurrentAction.ATTENDING_PERFORMANCE;
+					changeAction(CurrentAction.ATTENDING_PERFORMANCE);
 				}
 				break;
 			case GOING_TO_STAND:
 				if (timeAtTarget >= 1) {
-					currentAction = CurrentAction.BUYING_DRINKS;
+					changeAction(CurrentAction.BUYING_DRINKS);
 				}
 				break;
 			case GOING_TO_TOILET:
 				if (timeAtTarget >= 1 && !target.isFull()) {
 					currentToiletBlock = (ToiletBlockTarget) target;
 					setTarget(((ToiletBlockTarget) target).useToilet());
-					currentAction = CurrentAction.PEEING;
+					changeAction(CurrentAction.PEEING);
 				}
 				break;
 			case BUYING_DRINKS:

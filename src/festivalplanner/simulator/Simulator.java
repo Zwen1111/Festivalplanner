@@ -8,18 +8,29 @@ import festivalplanner.simulator.target.Target;
 import javax.imageio.ImageIO;
 import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
+import java.io.*;
+import java.time.Duration;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.ListIterator;
 
 /**
  * @author Coen Boelhouwers
  */
 public class Simulator {
 
-	private List<Visitor> visitors;
-	private int maxVisitors;
+	public static final LocalTime START_TIME = LocalTime.of(5, 45);
+	public static final int MAX_SNAPSHOTS = 40;
+
+	private SimulatorState state;
+	private static int maxVisitors;
+	private int stateCounter;
+	private int currentStateIndex;
+	private LocalTime lastSave;
+	private Duration saveInterval;
+	private List<File> saveLocations;
 
 	public static java.util.List<BufferedImage> images;
 
@@ -29,9 +40,23 @@ public class Simulator {
 		SimpleTarget target = new SimpleTarget(new Point2D.Double(1710,750));
 		target.setupDistances(map);
 		Navigator.addTarget(target);
-		visitors = new ArrayList<>();
-		maxVisitors = 30;//200;
+		state = new SimulatorState(START_TIME);
+		lastSave = START_TIME;
+		stateCounter = 0;
+		saveLocations = new ArrayList<>();
+		currentStateIndex = 0;
 		getImages();
+		for (int i = 0; i < MAX_SNAPSHOTS; i++) {
+			File location = null;
+			try {
+				location = File.createTempFile("simulator_state_", null);
+				location.deleteOnExit();
+				saveLocations.add(location);
+				System.out.println("New snapshot file: " + location);
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
 	}
 
 	public static void getImages() {
@@ -49,29 +74,44 @@ public class Simulator {
 	}
 
 	private boolean canSpawn(Visitor visitor) {
-		return !visitor.checkcollision(visitors);
+		return state.currentTime.getHour() >= 6 && !visitor.checkcollision(state.visitors);
+	}
+
+	public void clearAllVisitors() {
+		ListIterator<Visitor> it = state.visitors.listIterator();
+		while (it.hasNext()) {
+			Visitor v = it.next();
+			v.resetAction();
+			it.remove();
+		}
 	}
 
 	public void runSimulation(LocalTime time) {
-		if (visitors.size() < maxVisitors) {
+		state.currentTime = time;
+		stateCounter = currentStateIndex;
+		if (saveInterval != null && time.isAfter(lastSave.plus(saveInterval))) {
+			saveState();
+			lastSave = time;
+		}
+		if (state.visitors.size() < maxVisitors) {
 			Point2D.Double position = new  Point2D.Double(1710, 750);
-			Visitor visitor = new Visitor(3, position, images.get((int) (Math.random() * 8)));
+			Visitor visitor = new Visitor(3, position, (int) (Math.random() * 8));
+			visitor.setImage(images.get(visitor.getImageId()));
 			if(canSpawn(visitor)) {
-				visitors.add(visitor);
+				state.visitors.add(visitor);
 			}
 		}
 
-		Iterator<Visitor> visitorIterator = visitors.iterator();
+		Iterator<Visitor> visitorIterator = state.visitors.iterator();
 		while (visitorIterator.hasNext())
 		{
 			Visitor v = visitorIterator.next();
 			v.update(time);
 			if(v.getRemove()){
 				visitorIterator.remove();
-				maxVisitors--;
 				continue;
 			}
-			boolean collided = v.checkcollision(visitors);
+			boolean collided = v.checkcollision(state.visitors);
 			if (collided) {
 				Point2D newDest = getNextWayPoint(v.getPosition(), v.getTarget());
 				if (newDest != null) {
@@ -93,6 +133,71 @@ public class Simulator {
 				}
 			}
 		}
+	}
+
+	public void runSimulation(Duration duration) {
+		runSimulation(state.currentTime.plus(duration));
+	}
+
+	/**
+	 * Tries to restore a previous state of the simulator.
+	 * The future is unpredictable. Once the simulation is run from a point in the
+	 * past, you can't go back to the future. However, if the simulation stays halted while
+	 * you're in the past, this method does allow you to go back.
+	 *
+	 * @param amount the amount of snapshots the simulator should look back in the past.
+	 *               A negative number for past states, positive for future.
+	 * @return true if the previous state has successfully been restored, false otherwise.
+	 */
+	public boolean restoreState(int amount) {
+		int newIndex = currentStateIndex + amount;
+		int indexDiff = Math.abs(stateCounter - newIndex);
+		if (indexDiff > MAX_SNAPSHOTS) {
+			System.out.println("Can't restore state: snapshot bounds reached (max: " + MAX_SNAPSHOTS + ")");
+			return false;
+		}
+		if (newIndex >= stateCounter || newIndex < 0) {
+			System.out.println("Can't restore state: not (yet) existing snapshot (index: " + newIndex +
+					", size: " + stateCounter);
+			return false;
+		}
+		try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(
+				saveLocations.get(newIndex % MAX_SNAPSHOTS)))) {
+			state.visitors.forEach(Visitor::resetAction);
+			state = (SimulatorState) ois.readObject();
+			state.visitors.forEach(v -> {
+				v.setImage(images.get(v.getImageId()));
+				Navigator.getTargets().stream()
+						.filter(target -> target.equals(v.getTarget()))
+						.findFirst()
+						.ifPresent(v::setTarget);
+				v.replayAction();
+			});
+			currentStateIndex = newIndex;
+			lastSave = state.currentTime;
+			System.out.println("Back to " + lastSave + "(index: " + currentStateIndex + "/" + stateCounter + ")");
+			return true;
+		} catch (IOException | ClassNotFoundException e) {
+			e.printStackTrace();
+		}
+		return false;
+	}
+
+	public void saveState() {
+		File location = saveLocations.get(stateCounter % MAX_SNAPSHOTS);
+		System.out.println("Reused snapshot file: " + location);
+		try (FileOutputStream fos = new FileOutputStream(location);
+			 ObjectOutputStream oos = new ObjectOutputStream(fos)) {
+			oos.writeObject(this.state);
+			stateCounter++;
+			currentStateIndex = stateCounter;
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+
+	public void setSaveInterval(Duration duration) {
+		saveInterval = duration;
 	}
 
 	public Point2D getNextWayPoint(Point2D currentPosition, Target target) {
@@ -118,45 +223,25 @@ public class Simulator {
 		else return possibleDirections.get((int) Math.floor(Math.random() * possibleDirections.size()));
 	}
 
-	public List<Visitor> getVisitors() {
-		return visitors;
+	public LocalTime getSimulatedTime() {
+		return state.currentTime;
 	}
 
+	public List<Visitor> getVisitors() {
+		return state.visitors;
+	}
 
-//	public ToiletTarget getNearestToilet(Point2D position) {
-//		return (ToiletTarget) targets.stream()
-//				.filter(target -> target instanceof ToiletTarget)
-//				.sorted(Comparator.comparing(target -> target.getDistance(position)))
-//				.findFirst().orElse(null);
-//		ToiletTarget nearestTarget = null;
-//		for (ToiletTarget toiletTarget : toiletTargets) {
-//			int distance = (int) toiletTarget.getPosition().distance(position);
-//			if (nearestTarget == null || (nearestTarget.getPosition().distance(position) > distance)) {
-//				nearestTarget = toiletTarget;
-//			}
-//		}
-//		return nearestTarget;
-//	}
-//
-//	public ToiletTarget getNearestToiletExcept(Point2D position, List<ToiletTarget> fullToilets){
-//		ToiletTarget nearestTarget = null;
-//
-//		for (ToiletTarget fullToilet : fullToilets) {
-//			for (ToiletTarget toiletTarget : toiletTargets) {
-//				if(!fullToilet.equals(toiletTarget)) {
-//					int distance = toiletTarget.getDistances((int) position.getX(), (int) position.getY()).getCenter();
-//					if (nearestTarget == null || (nearestTarget.getDistances((int) position.getX(), (int) position.getY()).getCenter() < distance)) {
-//						nearestTarget = toiletTarget;
-//					}
-//				}
-//			}
-//		}
-//
-//		return nearestTarget;
-//	}
+	public static void setVisitorsAmount(int visitorsAmount) {
+	   maxVisitors = visitorsAmount;
+    }
 
-//	public int getToiletsSize() {
-//		return toiletTargets.size();
-//	}
+	private static class SimulatorState implements Serializable {
+		private List<Visitor> visitors;
+		private LocalTime currentTime;
 
+		SimulatorState(LocalTime startTime) {
+			visitors = new ArrayList<>();
+			currentTime = startTime;
+		}
+	}
 }

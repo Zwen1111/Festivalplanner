@@ -10,6 +10,8 @@ import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
 import java.io.*;
 import java.time.Duration;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -21,14 +23,14 @@ import java.util.ListIterator;
  */
 public class Simulator {
 
-	public static final LocalTime START_TIME = LocalTime.of(5, 45);
+	public static final LocalDateTime START_TIME = LocalDateTime.of(LocalDate.now(), LocalTime.of(5, 45));
 	public static final int MAX_SNAPSHOTS = 40;
 
 	private SimulatorState state;
 	private static int maxVisitors;
 	private int stateCounter;
 	private int currentStateIndex;
-	private LocalTime lastSave;
+	private LocalDateTime lastSave;
 	private Duration saveInterval;
 	private List<File> saveLocations;
 
@@ -52,7 +54,7 @@ public class Simulator {
 				location = File.createTempFile("simulator_state_", null);
 				location.deleteOnExit();
 				saveLocations.add(location);
-				System.out.println("New snapshot file: " + location);
+				System.out.println("New snapshot file: " + location + " [" + i + "]");
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
@@ -86,7 +88,7 @@ public class Simulator {
 		}
 	}
 
-	public void runSimulation(LocalTime time) {
+	public void runSimulation(LocalDateTime time) {
 		state.currentTime = time;
 		stateCounter = currentStateIndex;
 		if (saveInterval != null && time.isAfter(lastSave.plus(saveInterval))) {
@@ -106,7 +108,7 @@ public class Simulator {
 		while (visitorIterator.hasNext())
 		{
 			Visitor v = visitorIterator.next();
-			v.update(time);
+			v.update(time.toLocalTime());
 			if(v.getRemove()){
 				visitorIterator.remove();
 				continue;
@@ -185,7 +187,7 @@ public class Simulator {
 
 	public void saveState() {
 		File location = saveLocations.get(stateCounter % MAX_SNAPSHOTS);
-		System.out.println("Reused snapshot file: " + location);
+		System.out.println("Reused [" + stateCounter % MAX_SNAPSHOTS + "]");
 		try (FileOutputStream fos = new FileOutputStream(location);
 			 ObjectOutputStream oos = new ObjectOutputStream(fos)) {
 			oos.writeObject(this.state);
@@ -224,7 +226,7 @@ public class Simulator {
 	}
 
 	public LocalTime getSimulatedTime() {
-		return state.currentTime;
+		return state.currentTime.toLocalTime();
 	}
 
 	public List<Visitor> getVisitors() {
@@ -237,9 +239,9 @@ public class Simulator {
 
 	private static class SimulatorState implements Serializable {
 		private List<Visitor> visitors;
-		private LocalTime currentTime;
+		private LocalDateTime currentTime;
 
-		SimulatorState(LocalTime startTime) {
+		SimulatorState(LocalDateTime startTime) {
 			visitors = new ArrayList<>();
 			currentTime = startTime;
 		}

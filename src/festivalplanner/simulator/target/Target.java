@@ -22,6 +22,9 @@ public abstract class Target implements Serializable {
 	private CollisionLayer data;
 	private int startIndex;
 
+	private Queue<Integer> queue;
+	private Collection<Integer> checked;
+
 	public Target(Point2D position) {
 		this.position = position;
 	}
@@ -121,65 +124,67 @@ public abstract class Target implements Serializable {
 	}
 
 	private void bfs() {
-		Queue<Integer> queue = new LinkedList<>();
-		Collection<Integer> checked = new ArrayList<>();
+		queue = new LinkedList<>();
+		checked = new ArrayList<>();
 
-		logic(queue, checked, 0, startIndex, data.getData(startIndex));
-		bfs(queue, checked, startIndex);
+		logic(-1, 0, startIndex, data.getData(startIndex));
+		bfs(startIndex);
 
 		while (queue.size() > 0) {
-			bfs(queue, checked, queue.poll());
+			bfs(queue.poll());
 		}
 	}
 
-	private void bfs(Queue<Integer> q, Collection<Integer> checked, int cellIndex) {
-		int cellX = cellIndex % data.getWidth();
-		int cellY = Math.floorDiv(cellIndex, data.getWidth());
-		int cellDistance = destinations[cellX][cellY];
+	private void bfs(int centerIndex) {
+		int centerX = centerIndex % data.getWidth();
+		int centerY = Math.floorDiv(centerIndex, data.getWidth());
+		int centerDistance = destinations[centerX][centerY];
 
-		int northIndex = data.getIndex(cellX, cellY - 1);
-		int eastIndex = data.getIndex(cellX + 1, cellY);
-		int southIndex = data.getIndex(cellX, cellY + 1);
-		int westIndex = data.getIndex(cellX - 1, cellY);
+		int northIndex = data.getIndex(centerX, centerY - 1);
+		int eastIndex = data.getIndex(centerX + 1, centerY);
+		int southIndex = data.getIndex(centerX, centerY + 1);
+		int westIndex = data.getIndex(centerX - 1, centerY);
 
 		int dataSize = data.getData().size();
 
+		int centerData = data.getData(centerX, centerY);
 		int northData = northIndex < 0 || northIndex >= dataSize ? -1 : data.getData(northIndex);
 		int eastData = eastIndex < 0 || eastIndex >= dataSize ? -1 : data.getData(eastIndex);
 		int southData = southIndex < 0 || southIndex >= dataSize ? -1 : data.getData(southIndex);
 		int westData = westIndex < 0 || westIndex >= dataSize ? -1 : data.getData(westIndex);
 
-		logic(q, checked, cellDistance, northIndex, northData);
-		logic(q, checked, cellDistance, eastIndex, eastData);
-		logic(q, checked, cellDistance, southIndex, southData);
-		logic(q, checked, cellDistance, westIndex, westData);
-
-		//Integer nextIndex = q.poll();
-		//if (nextIndex != null) bfs(q, checked, nextIndex);
+		logic(centerData, centerDistance, northIndex, northData);
+		logic(centerData, centerDistance, eastIndex, eastData);
+		logic(centerData, centerDistance, southIndex, southData);
+		logic(centerData, centerDistance, westIndex, westData);
 	}
 
-	private void logic(Queue<Integer> q, Collection<Integer> checked, int fromDistance, int cellIndex, int cellData) {
-		if (checked.contains(cellIndex)) return;
-		//System.out.print("Check " + cellIndex + ": ");
-		checked.add(cellIndex);
-		switch (cellData) {
+	private void logic(int fromData, int fromDistance, int newIndex, int newData) {
+		if (checked.contains(newIndex)) return;
+		switch (newData) {
 			case CollisionLayer.TOILET_TILE:
+				setCell(newIndex, fromDistance + 1);
+				queue.offer(newIndex);
+				checked.add(newIndex);
+				break;
 			case CollisionLayer.PATH_TILE:
-				setCell(cellIndex, fromDistance + 1);
-				q.offer(cellIndex);
-				//System.out.println(fromDistance + 1);
+				//Prevent walking from a path over a stage (except when target).
+				//Keep it undiscovered to find a way around.
+				if (!(fromData == CollisionLayer.STAGE_TILE && fromDistance > 0)) {
+					setCell(newIndex, fromDistance + 1);
+					queue.offer(newIndex);
+					checked.add(newIndex);
+				}
 				break;
 			case CollisionLayer.WALL_TILE:
-				setCell(cellIndex, -1);
-				//System.out.println(-1);
+				setCell(newIndex, -1);
+				checked.add(newIndex);
 				break;
 			case CollisionLayer.STAGE_TILE:
-				if (fromDistance == 0) setCell(cellIndex, fromDistance);
-				else setCell(cellIndex, fromDistance + 1);
-				q.offer(cellIndex);
-				break;
-			default:
-				//System.out.println("x");
+				if (fromDistance == 0) setCell(newIndex, fromDistance);
+				else setCell(newIndex, fromDistance + 1);
+				queue.offer(newIndex);
+				checked.add(newIndex);
 				break;
 		}
 	}

@@ -1,11 +1,8 @@
 package festivalplanner.gui.simulator;
 
 import festivalplanner.simulator.Navigator;
-import festivalplanner.simulator.target.StageTarget;
-import festivalplanner.simulator.target.Target;
-import festivalplanner.simulator.target.SimpleTarget;
-import festivalplanner.simulator.map.TileMap;
 import festivalplanner.simulator.Simulator;
+import festivalplanner.simulator.map.TileMap;
 
 import javax.swing.*;
 import java.awt.*;
@@ -40,6 +37,8 @@ public class SimulatorPanel extends JPanel implements MouseMotionListener, Mouse
 	private int darkIndex;
 	private final Font debugFont = new Font("Monospaced", Font.PLAIN, 14);
 	private int debug;
+
+	private Visitor follow;
 
 	public SimulatorPanel() {
 		super(null);
@@ -80,10 +79,13 @@ public class SimulatorPanel extends JPanel implements MouseMotionListener, Mouse
 			init = true;
 		}
 
+		g2d.setColor(Color.WHITE);
 
 		//simulator.runSimulation();
 		g2d.translate(translateX, translateY);
 		g2d.scale(scale, scale);
+
+
 
 		g2d.setFont(debugFont);
 		g2d.drawImage(map.getMapImage(), null, null);
@@ -92,6 +94,10 @@ public class SimulatorPanel extends JPanel implements MouseMotionListener, Mouse
 			if (debug == 3) v.drawDebugInfo(g2d);
 			v.draw(g2d);
 		}
+		g2d.setStroke(new BasicStroke(3));
+		if(follow != null)
+		g2d.drawOval((int) follow.getPosition().getX() - follow.getRadius(),(int) follow.getPosition().getY() - follow.getRadius(),follow.getRadius()*2,follow.getRadius()*2);
+		g2d.setStroke(new BasicStroke(1));
 
 		if (debug >= 1) {
 			Navigator.getTargets()
@@ -124,6 +130,7 @@ public class SimulatorPanel extends JPanel implements MouseMotionListener, Mouse
 			g2d.setComposite(alcom);
 			g2d.fill(nightOverlay);
 		}
+
 	}
 
 	private void smartScale() {
@@ -191,6 +198,10 @@ public class SimulatorPanel extends JPanel implements MouseMotionListener, Mouse
 		translateBy(0, 0);
 	}
 
+	public void setfollow(Visitor visitor){
+		follow = visitor;
+	}
+
 	@Override
 	public void mouseDragged(MouseEvent e) {
 		translateBy(new Point2D.Double( e.getX() - mousePosition.getX()  ,  e.getY() - mousePosition.getY()));
@@ -204,7 +215,17 @@ public class SimulatorPanel extends JPanel implements MouseMotionListener, Mouse
 
 	@Override
 	public void mousePressed(MouseEvent e) {
-		mousePosition = new Point2D.Double(e.getX(), e.getY());
+		Point2D scalePoint = new Point2D.Double(e.getX() /scale - translateX/scale,e.getY()/scale - translateY/scale);
+		Visitor v = simulator.intersectsVisitors(scalePoint);
+		if(v == null) {
+			mousePosition = new Point2D.Double(e.getX(), e.getY());
+			if(follow != null){
+				smartScale();
+			}
+			setfollow(null);
+		}else {
+			setfollow(v);
+		}
 	}
 
 	@Override
@@ -241,4 +262,13 @@ public class SimulatorPanel extends JPanel implements MouseMotionListener, Mouse
 		simulator.clearAllVisitors();
 	    simulator = new Simulator(map);
     }
+
+	public void runSimulation() {
+		if(follow != null) {
+			translateX = -follow.getPosition().getX() * scale + getWidth()/(2);
+			translateY = -follow.getPosition().getY() * scale + getHeight()/(2);
+			scale = 4;
+		}
+		simulator.runSimulation(Duration.ofSeconds(2));
+	}
 }

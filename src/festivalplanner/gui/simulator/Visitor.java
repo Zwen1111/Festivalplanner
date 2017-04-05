@@ -419,6 +419,14 @@ public class Visitor implements Serializable {
 		return collision;
 	}
 
+	public boolean intersects(Point2D point) {
+		return point.distance(position) < radius;
+	}
+
+	public int getRadius() {
+		return radius;
+	}
+
 	public enum CurrentAction {
 		IDLE,
 		GOING_TO_PERMORMANCE,

@@ -237,7 +237,16 @@ public class Simulator {
 	   maxVisitors = visitorsAmount;
     }
 
-	private static class SimulatorState implements Serializable {
+    public Visitor intersectsVisitors(Point2D point) {
+		for (Visitor visitor : getVisitors()) {
+			if(visitor.intersects(point)){
+				return visitor;
+			}
+		}
+		return null;
+    }
+
+    private static class SimulatorState implements Serializable {
 		private List<Visitor> visitors;
 		private LocalDateTime currentTime;
 

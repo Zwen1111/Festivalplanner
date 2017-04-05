@@ -1,7 +1,6 @@
 package festivalplanner.simulator.map;
 
 import festivalplanner.data.Database;
-import festivalplanner.simulator.Navigator;
 import festivalplanner.simulator.target.StageTarget;
 import festivalplanner.simulator.target.Target;
 import festivalplanner.simulator.data.CollisionLayer;
@@ -14,6 +13,7 @@ import javax.json.JsonArray;
 import javax.json.JsonObject;
 import java.awt.*;
 import java.awt.geom.AffineTransform;
+import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
 import java.io.*;
 import java.util.ArrayList;
@@ -28,8 +28,10 @@ public class TileMap {
 	private TilesetManager tilesetManager;
 	private List<TileLayer> layers;
 	private List<Target> targets;
+	private List<Point2D> lights;
 	private CollisionLayer collisionLayer;
-	private BufferedImage currentMap;
+	private BufferedImage mapImage;
+	private BufferedImage nightImage;
 	private int mapHeight;
 	private int mapWidth;
 	private int tileHeight;
@@ -76,6 +78,10 @@ public class TileMap {
 			//This prevents a crash if the objectLayer is parsed before the collisionLayer is.
 			targets.forEach(target -> target.setupDistances(this));
 
+			lights = new ArrayList<>();
+			for (int i = 0; i < 10; i++) {
+				lights.add(new Point2D.Double(Math.random(), Math.random()));
+			}
 		} catch (FileNotFoundException e) {
 			System.err.println("Could not find file");
 			e.printStackTrace();
@@ -89,7 +95,7 @@ public class TileMap {
 			System.err.println("Could not build map: no layers.");
 			return;
 		}
-		currentMap = new BufferedImage(layers.get(0).getWidth() * tileWidth,
+		mapImage = new BufferedImage(layers.get(0).getWidth() * tileWidth,
 				layers.get(0).getHeight() * tileHeight,
 				BufferedImage.TYPE_INT_RGB);
 		mapHeight = mapWidth = 0;
@@ -98,8 +104,9 @@ public class TileMap {
 			TileLayer testLayer = layers.get(i);
 			if (mapHeight < testLayer.getHeight()) mapHeight = testLayer.getHeight();
 			if (mapWidth < testLayer.getWidth()) mapWidth = testLayer.getWidth();
-			buildMap(currentMap, testLayer);
+			buildMap(mapImage, testLayer);
 		}
+		buildNightMap();
 	}
 
 	private void buildMap(BufferedImage image, TileLayer layer) {
@@ -116,6 +123,20 @@ public class TileMap {
 		}
 	}
 
+	private void buildNightMap() {
+		nightImage = new BufferedImage(mapWidth * tileWidth, mapHeight * tileHeight,
+				BufferedImage.TYPE_INT_ARGB);
+		Graphics2D g = nightImage.createGraphics();
+		g.setColor(Color.BLACK);
+		g.fillRect(0, 0, mapWidth * tileWidth, mapHeight * tileHeight);
+		g.setColor(Color.ORANGE);
+		g.setComposite(AlphaComposite.getInstance(AlphaComposite.CLEAR, 1.0f));
+		lights.forEach(l -> {
+			g.fillOval((int) (l.getX() * mapWidth * tileWidth - 30),
+					(int) (l.getY() * mapHeight * tileHeight - 30), 60, 60);
+		});
+	}
+
 	public CollisionLayer getCollisionLayer() {
 		return collisionLayer;
 	}
@@ -125,7 +146,11 @@ public class TileMap {
 	}
 
 	public Image getMapImage() {
-		return currentMap;
+		return mapImage;
+	}
+
+	public Image getNightOverlayImage() {
+		return nightImage;
 	}
 
 	/**

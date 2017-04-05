@@ -37,7 +37,6 @@ public class SimulatorPanel extends JPanel implements MouseMotionListener, Mouse
 	private Rectangle2D nightOverlay;
 	private LocalTime time;
 	private int darkIndex;
-	private boolean active = false;
 
 	public SimulatorPanel(LocalTime time) {
 		super(null);
@@ -117,7 +116,6 @@ public class SimulatorPanel extends JPanel implements MouseMotionListener, Mouse
 
     public void update(LocalTime time) {
 	    this.time = time;
-		active = true;
 		simulator.runSimulation(time);
 	}
 

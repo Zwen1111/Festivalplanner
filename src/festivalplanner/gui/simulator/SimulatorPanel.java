@@ -7,6 +7,7 @@ import festivalplanner.simulator.map.TileMap;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
+import java.awt.geom.Ellipse2D;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.time.Duration;
@@ -94,10 +95,17 @@ public class SimulatorPanel extends JPanel implements MouseMotionListener, Mouse
 			if (debug == 3) v.drawDebugInfo(g2d);
 			v.draw(g2d);
 		}
-		g2d.setStroke(new BasicStroke(3));
-		if(follow != null)
-		g2d.drawOval((int) follow.getPosition().getX() - follow.getRadius(),(int) follow.getPosition().getY() - follow.getRadius(),follow.getRadius()*2,follow.getRadius()*2);
-		g2d.setStroke(new BasicStroke(1));
+
+		if(follow != null){
+			g2d.setStroke(new BasicStroke(3));
+			Ellipse2D ellipse2D = new Ellipse2D.Double( follow.getPosition().getX() - follow.getRadius()
+					,follow.getPosition().getY() - follow.getRadius(),
+					follow.getRadius()*2,follow.getRadius()*2);
+			g2d.draw(ellipse2D);
+			g2d.setStroke(new BasicStroke(1));
+		}
+
+
 
 		if (debug >= 1) {
 			Navigator.getTargets()

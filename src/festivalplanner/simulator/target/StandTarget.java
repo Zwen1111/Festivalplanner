@@ -10,5 +10,6 @@ import java.awt.geom.Point2D;
 public class StandTarget extends Target {
 	public StandTarget(Point2D position, int targetCapacity) {
 		super(position);
+		setCapacity(targetCapacity);
 	}
 }

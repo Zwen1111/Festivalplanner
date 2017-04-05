@@ -39,7 +39,7 @@ public class SimulatorPanel extends JPanel implements MouseMotionListener, Mouse
 	private Rectangle2D nightOverlay;
 	private int darkIndex;
 	private final Font debugFont = new Font("Monospaced", Font.PLAIN, 14);
-	private boolean debug;
+	private int debug;
 
 	public SimulatorPanel() {
 		super(null);
@@ -61,12 +61,12 @@ public class SimulatorPanel extends JPanel implements MouseMotionListener, Mouse
 		addMouseWheelListener(this);
 	}
 
-	public Simulator getSimulator() {
-		return simulator;
+	public int getDebugLevel() {
+		return debug;
 	}
 
-	public boolean isDebugShowing() {
-		return debug;
+	public Simulator getSimulator() {
+		return simulator;
 	}
 
 	public void paintComponent(Graphics g) {
@@ -88,17 +88,18 @@ public class SimulatorPanel extends JPanel implements MouseMotionListener, Mouse
 		g2d.setFont(debugFont);
 		g2d.drawImage(map.getMapImage(), null, null);
 		for (Visitor v : simulator.getVisitors()) {
-			if (debug) v.drawDebugInfo(g2d);
+			if (debug == 2) v.drawDebugCircle(g2d);
+			if (debug == 3) v.drawDebugInfo(g2d);
 			v.draw(g2d);
 		}
 
-		if (debug) {
-			Navigator.getTargets().stream()
-					.filter(target1 -> target1 instanceof StageTarget)
+		if (debug >= 1) {
+			Navigator.getTargets()
 					.forEach(t -> {
 						g2d.setColor(Color.BLACK);
 						g2d.fillRect((int) t.getPosition().getX(), (int) t.getPosition().getY(), 70, 22);
 						g2d.setColor(Color.WHITE);
+						g2d.setStroke(new BasicStroke(2));
 						g2d.drawRect((int) t.getPosition().getX(), (int) t.getPosition().getY(), 70, 22);
 						g2d.drawString(String.format("%3d/%3d", t.getAttendants(), t.getCapacity()),
 								(int) t.getPosition().getX() + 5, (int) t.getPosition().getY() + 15);
@@ -125,10 +126,6 @@ public class SimulatorPanel extends JPanel implements MouseMotionListener, Mouse
 		}
 	}
 
-	public void showDebug(boolean value) {
-		debug = value;
-	}
-
 	private void smartScale() {
 		//Scale until the map matches the screen's height and/or width.
 		//First, find the smallest distance to scale: either the height or width
@@ -150,6 +147,10 @@ public class SimulatorPanel extends JPanel implements MouseMotionListener, Mouse
 
 	public void scaleBy(double amount) {
 		setScale(scale + amount);
+	}
+
+	public void setDebugLevel(int value) {
+		debug = value % 4;
 	}
 
 	public void translateBy(Point2D position) {

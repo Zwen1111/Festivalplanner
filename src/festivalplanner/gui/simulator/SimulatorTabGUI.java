@@ -69,7 +69,7 @@ public class SimulatorTabGUI extends JPanel implements ActionListener {
 
         resetButton.addActionListener(e -> simulatorPanel.resetSimulator());
 
-        debugButton.addActionListener(e -> simulatorPanel.showDebug(!simulatorPanel.isDebugShowing()));
+        debugButton.addActionListener(e -> simulatorPanel.setDebugLevel(simulatorPanel.getDebugLevel() + 1));
 
         zoomInButton.addActionListener(e -> simulatorPanel.setScale(simulatorPanel.getScale() + 0.25));
 

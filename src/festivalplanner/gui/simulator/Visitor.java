@@ -78,9 +78,11 @@ public class Visitor implements Serializable {
 				switch (currentAction) {
 					case ATTENDING_PERFORMANCE:
 					case RESTING:
-					case PEEING:
 					case BUYING_DRINKS:
 						target.changeAttendency(-1);
+						break;
+					case PEEING:
+						currentToiletBlock.freeToilet((ToiletTarget) getTarget());
 						break;
 				}
 				break;
@@ -204,7 +206,6 @@ public class Visitor implements Serializable {
 		if (blather <= 0) {
 			changeAction(CurrentAction.IDLE);
 			blather = 0;
-			currentToiletBlock.freeToilet((ToiletTarget) getTarget());
 		}
 	}
 

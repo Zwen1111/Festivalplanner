@@ -206,7 +206,6 @@ public class Visitor implements Serializable {
 		if (blather <= 0) {
 			changeAction(CurrentAction.IDLE);
 			blather = 0;
-			currentToiletBlock.freeToilet((ToiletTarget) getTarget());
 		}
 	}
 

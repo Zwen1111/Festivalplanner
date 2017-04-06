@@ -2,13 +2,14 @@ package festivalplanner.simulator.data;
 
 import javax.json.JsonObject;
 import java.io.IOException;
+import java.io.Serializable;
 
 /**
  * Dataholder for layers of the map.
  *
  * @author Coen Boelhouwers, Zwen van Erkelens
  */
-public abstract class Layer {
+public abstract class Layer implements Serializable {
 
 	public static final String TILE_LAYER_TYPE = "tilelayer";
 	public static final String OBJECT_LAYER_TYPE = "objectgroup";

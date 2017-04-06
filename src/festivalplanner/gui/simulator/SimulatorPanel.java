@@ -1,5 +1,7 @@
 package festivalplanner.gui.simulator;
 
+import festivalplanner.simulator.Navigator;
+import festivalplanner.simulator.target.StageTarget;
 import festivalplanner.simulator.target.Target;
 import festivalplanner.simulator.target.SimpleTarget;
 import festivalplanner.simulator.map.TileMap;
@@ -10,6 +12,7 @@ import java.awt.*;
 import java.awt.event.*;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
+import java.time.Duration;
 import java.time.LocalTime;
 
 /**
@@ -37,6 +40,8 @@ public class SimulatorPanel extends JPanel implements MouseMotionListener, Mouse
 	private Rectangle2D nightOverlay;
 	private LocalTime time;
 	private int darkIndex;
+	private final Font debugFont = new Font("Monospaced", Font.PLAIN, 14);
+	private int debug;
 
 	public SimulatorPanel(LocalTime time) {
 		super(null);
@@ -47,6 +52,8 @@ public class SimulatorPanel extends JPanel implements MouseMotionListener, Mouse
 		map = new TileMap("/Map+Colliosion.json");
 		map.buildMap();
 		simulator = new Simulator(map);
+		Simulator.setVisitorsAmount(10);
+		simulator.setSaveInterval(Duration.ofMinutes(15));
 		scale = 0.65;
 		mousePosition = new Point2D.Double(0, 0);
 
@@ -58,6 +65,14 @@ public class SimulatorPanel extends JPanel implements MouseMotionListener, Mouse
 	}
 
 	AlphaComposite alcom;
+
+	public int getDebugLevel() {
+		return debug;
+	}
+
+	public Simulator getSimulator() {
+		return simulator;
+	}
 
 	public void paintComponent(Graphics g) {
 		super.paintComponent(g);
@@ -75,18 +90,11 @@ public class SimulatorPanel extends JPanel implements MouseMotionListener, Mouse
 		g2d.translate(translateX, translateY);
 		g2d.scale(scale, scale);
 
+		g2d.setFont(debugFont);
 		g2d.drawImage(map.getMapImage(), null, null);
-		if (target != null) {
-			for (int x = 0; x < target.getLayer().getWidth(); x++) {
-				for (int y = 0; y < target.getLayer().getHeight(); y++) {
-					int dist = target.getDistance(x, y);
-					g2d.drawString(String.valueOf(dist),
-							x * map.getTileWidth(),
-							y * map.getTileHeight() + 10);
-				}
-			}
-		}
 		for (Visitor v : simulator.getVisitors()) {
+			if (debug == 2) v.drawDebugCircle(g2d);
+			if (debug == 3) v.drawDebugInfo(g2d);
 			v.draw(g2d);
 		}
 
@@ -142,6 +150,10 @@ public class SimulatorPanel extends JPanel implements MouseMotionListener, Mouse
 		setScale(scale + amount);
 	}
 
+	public void setDebugLevel(int value) {
+		debug = value % 4;
+	}
+
 	public void translateBy(Point2D position) {
 		if (position == null) {
 			translateBy(0, 0);
@@ -188,14 +200,7 @@ public class SimulatorPanel extends JPanel implements MouseMotionListener, Mouse
 
 	@Override
 	public void mouseClicked(MouseEvent e) {
-		long mil = System.currentTimeMillis();
-		target = new SimpleTarget(new Point2D.Double(e.getX() / scale - translateX / scale,
-				e.getY() / scale - translateY / scale));
-		target.setupDistances(map);
-		System.out.println("took " + (System.currentTimeMillis() - mil) + " ms");
-		for (Visitor v : simulator.getVisitors()) {
-			v.setTarget(target);
-		}
+
 	}
 
 	@Override
@@ -232,4 +237,9 @@ public class SimulatorPanel extends JPanel implements MouseMotionListener, Mouse
 			//repaint();
 		}
 	}
+
+    public void resetSimulator() {
+		simulator.clearAllVisitors();
+	    simulator = new Simulator(map);
+    }
 }

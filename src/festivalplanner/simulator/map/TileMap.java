@@ -66,6 +66,8 @@ public class TileMap {
 								if (target instanceof StageTarget)
 									Database.addStage(((StageTarget) target).getStage());
 							});
+						} else if (layer.getTitle().equals("Light")) {
+							lights = ((ObjectLayer) layer).parseAsLights();
 						}
 					}
 				} catch (TileLayer.UnsupportedLayerTypeException e) {
@@ -77,11 +79,6 @@ public class TileMap {
 			//After parsing all layers, we can setup the targets using the collision-layer.
 			//This prevents a crash if the objectLayer is parsed before the collisionLayer is.
 			targets.forEach(target -> target.setupDistances(this));
-
-			lights = new ArrayList<>();
-			for (int i = 0; i < 10; i++) {
-				lights.add(new Point2D.Double(Math.random(), Math.random()));
-			}
 		} catch (FileNotFoundException e) {
 			System.err.println("Could not find file");
 			e.printStackTrace();
@@ -132,8 +129,8 @@ public class TileMap {
 		g.setColor(Color.ORANGE);
 		g.setComposite(AlphaComposite.getInstance(AlphaComposite.CLEAR, 1.0f));
 		lights.forEach(l -> {
-			g.fillOval((int) (l.getX() * mapWidth * tileWidth - 30),
-					(int) (l.getY() * mapHeight * tileHeight - 30), 60, 60);
+			g.fillOval((int) (l.getX() - 50),
+					(int) (l.getY() - 50), 100, 100);
 		});
 	}
 

@@ -48,6 +48,19 @@ public class ObjectLayer extends Layer {
 		return parsedStages;
 	}
 
+	public List<Point2D> parseAsLights() {
+		List<Point2D> lights = new ArrayList<>();
+		for (int i = 0; i < objectArray.size(); i++) {
+			JsonObject object = objectArray.getJsonObject(i);
+			int targetX = object.getInt("x");
+			int targetY = object.getInt("y");
+			int targetWidth = object.getInt("width");
+			int targetHeigth = object.getInt("height");
+			lights.add(new Point2D.Double(targetX + targetWidth / 2, targetY + targetHeigth / 2));
+		}
+		return lights;
+	}
+
 	/**
 	 * Parses this object-layer as a Target-layer and therefor tries to construct
 	 * specific Targets (Toilets, Stages, ...) from the objects.

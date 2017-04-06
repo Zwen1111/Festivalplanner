@@ -74,9 +74,15 @@ public class SimulatorPanel extends JPanel implements MouseMotionListener, Mouse
 		Graphics2D g2d = (Graphics2D) g;
 		//The width and height of the panel are only known on the first layout.
 		//The smart-scaling can only be done once panel size is known (= paintComponent being called).
+		if (follow != null) {
+			translateX = -follow.getPosition().getX() * this.scale + getWidth() / (2);
+			translateY = -follow.getPosition().getY() * this.scale + getHeight() / (2);
+		}
+
 
 		g2d.translate(translateX, translateY);
 		g2d.scale(scale, scale);
+
 
 		g2d.setFont(debugFont);
 		g2d.drawImage(map.getMapImage(), null, null);
@@ -274,10 +280,7 @@ public class SimulatorPanel extends JPanel implements MouseMotionListener, Mouse
 			lastWidth = getWidth();
 		}
 
-		if (follow != null) {
-			translateX = -follow.getPosition().getX() * this.scale + getWidth() / (2);
-			translateY = -follow.getPosition().getY() * this.scale + getHeight() / (2);
-		}
+
 		updateDayNightCycle();
 	}
 }

@@ -21,7 +21,8 @@ import java.time.LocalTime;
  *
  * @author Coen Boelhouwers
  */
-public class SimulatorPanel extends JPanel implements MouseMotionListener, MouseWheelListener, MouseListener{
+public class SimulatorPanel extends JPanel implements MouseMotionListener, MouseWheelListener, MouseListener,
+		ActionListener {
 
 	private static final double MIN_ZOOM = 0.65;
 	private static final double MAX_ZOOM = 5.65;
@@ -53,7 +54,7 @@ public class SimulatorPanel extends JPanel implements MouseMotionListener, Mouse
 		scale = 0.65;
 		mousePosition = new Point2D.Double(0, 0);
 
-		nightOverlay = new Rectangle2D.Double(0,0,map.getMapWidth(),map.getMapHeight());
+		updateDayNightCycle();
 
 		addMouseMotionListener(this);
 		addMouseListener(this);
@@ -73,18 +74,6 @@ public class SimulatorPanel extends JPanel implements MouseMotionListener, Mouse
 		Graphics2D g2d = (Graphics2D) g;
 		//The width and height of the panel are only known on the first layout.
 		//The smart-scaling can only be done once panel size is known (= paintComponent being called).
-
-		if (lastHeight != getHeight() || lastWidth != getWidth()) {
-			//Screen resized! Use smart-scale to display the whole map nicely.
-			smartScale();
-			lastHeight = getHeight();
-			lastWidth = getWidth();
-		}
-
-		if (follow != null) {
-			translateX = -follow.getPosition().getX() * this.scale + getWidth() / (2);
-			translateY = -follow.getPosition().getY() * this.scale + getHeight() / (2);
-		}
 
 		g2d.translate(translateX, translateY);
 		g2d.scale(scale, scale);
@@ -111,7 +100,6 @@ public class SimulatorPanel extends JPanel implements MouseMotionListener, Mouse
 					});
 		}
 
-		updateDayNightCycle();
 		g2d.setComposite(alcom);
 		g2d.drawImage(map.getNightOverlayImage(), null, null);
 	}
@@ -209,7 +197,7 @@ public class SimulatorPanel extends JPanel implements MouseMotionListener, Mouse
 	}
 
 	public void followVisitor(Visitor visitor){
-		if (visitor != null && follow == null) {
+		if (visitor == null && follow != null) {
 			//We move back from visitor-view, so lets display the whole map.
 			smartScale();
 		}
@@ -276,4 +264,20 @@ public class SimulatorPanel extends JPanel implements MouseMotionListener, Mouse
 		simulator.clearAllVisitors();
 	    simulator = new Simulator(map);
     }
+
+	@Override
+	public void actionPerformed(ActionEvent e) {
+		if (lastHeight != getHeight() || lastWidth != getWidth()) {
+			//Screen resized! Use smart-scale to display the whole map nicely.
+			smartScale();
+			lastHeight = getHeight();
+			lastWidth = getWidth();
+		}
+
+		if (follow != null) {
+			translateX = -follow.getPosition().getX() * this.scale + getWidth() / (2);
+			translateY = -follow.getPosition().getY() * this.scale + getHeight() / (2);
+		}
+		updateDayNightCycle();
+	}
 }

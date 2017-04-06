@@ -4,8 +4,6 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.time.Duration;
-import java.time.LocalTime;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 
@@ -56,18 +54,26 @@ public class SimulatorTabGUI extends JPanel implements ActionListener {
         });
 
         prevButton.addActionListener(e -> {
+            simulatorPanel.smartScale();
+            simulatorPanel.setfollow(null);
             if (!simulatorPanel.getSimulator().restoreState(-1))
 				JOptionPane.showMessageDialog(this,"Previous time hasn't been loaded",
 						"Could not Load",JOptionPane.WARNING_MESSAGE);
         });
 
         nextButton.addActionListener(e -> {
+            simulatorPanel.smartScale();
+            simulatorPanel.setfollow(null);
             if (!simulatorPanel.getSimulator().restoreState(+1))
 				JOptionPane.showMessageDialog(this,"next hour hasn't been loaded",
 						"Could not Load",JOptionPane.WARNING_MESSAGE);
         });
 
-        resetButton.addActionListener(e -> simulatorPanel.resetSimulator());
+        resetButton.addActionListener(e -> {
+            simulatorPanel.smartScale();
+            simulatorPanel.setfollow(null);
+            simulatorPanel.resetSimulator();
+        });
 
         debugButton.addActionListener(e -> simulatorPanel.setDebugLevel(simulatorPanel.getDebugLevel() + 1));
 

@@ -141,7 +141,7 @@ public class SimulatorPanel extends JPanel implements MouseMotionListener, Mouse
 
 	}
 
-	private void smartScale() {
+	public void smartScale() {
 		//Scale until the map matches the screen's height and/or width.
 		//First, find the smallest distance to scale: either the height or width
 		//of the screen. Then calculate the scale.
@@ -199,10 +199,19 @@ public class SimulatorPanel extends JPanel implements MouseMotionListener, Mouse
 	}
 
 	public void setScale(double scale) {
-		if (scale < MIN_ZOOM) this.scale = MIN_ZOOM;
+
+	    //this makes it so it wont flikker anymore
+
+
+
+        if (scale < MIN_ZOOM) this.scale = MIN_ZOOM;
 		else if (scale > MAX_ZOOM) this.scale = MAX_ZOOM;
 		else this.scale = scale;
 		//Check map position after zooming in/out.
+        if(follow != null) {
+            translateX = -follow.getPosition().getX() * this.scale + getWidth()/(2);
+            translateY = -follow.getPosition().getY() * this.scale + getHeight()/(2);
+        }
 		translateBy(0, 0);
 	}
 
@@ -232,6 +241,7 @@ public class SimulatorPanel extends JPanel implements MouseMotionListener, Mouse
 			}
 			setfollow(null);
 		}else {
+            scale = 4;
 			setfollow(v);
 		}
 	}
@@ -272,11 +282,12 @@ public class SimulatorPanel extends JPanel implements MouseMotionListener, Mouse
     }
 
 	public void runSimulation() {
+        simulator.runSimulation(Duration.ofSeconds(2));
+
 		if(follow != null) {
 			translateX = -follow.getPosition().getX() * scale + getWidth()/(2);
 			translateY = -follow.getPosition().getY() * scale + getHeight()/(2);
-			scale = 4;
 		}
-		simulator.runSimulation(Duration.ofSeconds(2));
+
 	}
 }

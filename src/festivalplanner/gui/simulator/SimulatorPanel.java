@@ -40,6 +40,7 @@ public class SimulatorPanel extends JPanel implements MouseMotionListener, Mouse
 	private int darkIndex;
 	private final Font debugFont = new Font("Monospaced", Font.PLAIN, 14);
 	private int debug;
+	private AlphaComposite alcom;
 
 	public SimulatorPanel() {
 		super(null);
@@ -52,7 +53,6 @@ public class SimulatorPanel extends JPanel implements MouseMotionListener, Mouse
 		simulator.setSaveInterval(Duration.ofMinutes(15));
 		scale = 0.65;
 		mousePosition = new Point2D.Double(0, 0);
-		darkIndex = -1;
 
 		nightOverlay = new Rectangle2D.Double(0,0,map.getMapWidth(),map.getMapHeight());
 
@@ -106,25 +106,28 @@ public class SimulatorPanel extends JPanel implements MouseMotionListener, Mouse
 					});
 		}
 
+		updateDayNightCycle();
+		g2d.setComposite(alcom);
+		g2d.drawImage(map.getNightOverlayImage(), null, null);
+	}
+
+	private void updateDayNightCycle() {
 		LocalTime time = simulator.getSimulatedTime();
-		if (time.getHour() >= 18 && time.getHour() < 23){
+		if (time.getHour() >= 18){
 			int seconds = (time.getHour() * 60 * 60 + time.getMinute() * 60 + time.getSecond()) - 64800;
-			darkIndex = (int) (seconds / 2.2);
-		}else if (time.getHour() >= 23 || time.getHour() < 3){
-			darkIndex = 8182;
-		}else if (time.getHour() >= 3 && darkIndex != 0 && time.getHour() <= 10) {
-			int seconds = (time.getHour() * 60 * 60 + time.getMinute() * 60 + time.getSecond()) - 10800;
-			darkIndex = (int) (8182 - seconds * 0.4);
-		}
+			darkIndex = (int) (seconds * 0.3);
+		}else if (time.getHour() >= 0 && time.getHour() < 2){
+			int seconds = (time.getHour() * 60 * 60 + time.getMinute() * 60 + time.getSecond());
+			darkIndex = (int) ((seconds + 21600) * 0.3);
+		}else if (time.getHour() >= 2 && time.getHour() < 10) {
+			int seconds = (time.getHour() * 60 * 60 + time.getMinute() * 60 + time.getSecond()) - 7200;
+			darkIndex = (int) (seconds * -0.3) + 8640;
+		}else
+			darkIndex = 0;
 
 		float alpha = darkIndex * 0.0001f;
-		if (alpha >= 0 && alpha <= 1) {
-			g2d.setColor(Color.BLACK);
-			AlphaComposite alcom = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, alpha);
-			g2d.setComposite(alcom);
-			g2d.drawImage(map.getNightOverlayImage(), null, null);
-			//g2d.fill(nightOverlay);
-		}
+		alcom = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, alpha);
+		System.out.println(darkIndex);
 	}
 
 	private void smartScale() {

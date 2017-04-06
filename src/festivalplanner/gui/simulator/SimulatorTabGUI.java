@@ -16,13 +16,16 @@ public class SimulatorTabGUI extends JPanel implements ActionListener {
 
     private ArrayList<JButton> buttonArrayList;
     private SimulatorPanel simulatorPanel;
+
+    private LocalTime time;
     private JLabel timeLabel;
     private boolean play;
 
     public SimulatorTabGUI() {
     	setName("SimulatorPanel");
+        time = LocalTime.of(17,30);
         buttonArrayList = new ArrayList<>();
-        simulatorPanel = new SimulatorPanel();
+        simulatorPanel = new SimulatorPanel(time);
         simulatorPanel.setBackground(Color.black);
 
 		timeLabel = new JLabel("--:--");
@@ -36,7 +39,18 @@ public class SimulatorTabGUI extends JPanel implements ActionListener {
         JButton prevButton = new JButton(new ImageIcon(getClass().getResource("/icon's/prevIcon.png")));
         JButton nextButton = new JButton(new ImageIcon(getClass().getResource("/icon's/nextIcon.png")));
         JButton resetButton = new JButton(new ImageIcon(getClass().getResource("/icon's/resetIcon.png")));
-		JButton debugButton = new JButton(new ImageIcon(getClass().getResource("/icon's/debugIcon.png")));
+        JButton debugButton = new JButton(new ImageIcon(getClass().getResource("/icon's/debugIcon.png")));
+		if (time.getHour() < 10)
+		    if (time.getMinute() < 10)
+		        timeLabel = new JLabel("0" + time.getHour() + ":0" + time.getMinute());
+		    else
+                timeLabel = new JLabel("0" + time.getHour() + ":" + time.getMinute());
+        else
+            if (time.getMinute() < 10)
+                timeLabel = new JLabel(time.getHour() + ":0" + time.getMinute());
+            else
+                timeLabel = new JLabel(time.getHour() + ":" + time.getMinute());
+
 
         buttonArrayList.add(playButton);
         buttonArrayList.add(zoomInButton);

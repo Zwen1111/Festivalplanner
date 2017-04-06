@@ -21,6 +21,7 @@ import java.util.List;
 public class Visitor implements Serializable {
 
 	private static final int NEAR_DISTANCE = 5;
+	private static final int CLICK_RADIUS = 30;
 
 	private double speed;
 	private double angle;
@@ -157,6 +158,14 @@ public class Visitor implements Serializable {
 					(float) position.getX(), (float) position.getY() + 40);
 		g.drawString(String.format("Blather: %.0f%%, Hydra: %.0f%%", blather * 100, hydration * 100),
 				(float) position.getX(), (float) position.getY() + 60);
+	}
+
+	public void drawFollowCircle(Graphics2D g) {
+		g.setStroke(new BasicStroke(3));
+		g.setColor(Color.RED);
+		Ellipse2D ellipse2D = new Ellipse2D.Double(getPosition().getX() - radius,
+				getPosition().getY() - radius, radius * 2, radius * 2);
+		g.draw(ellipse2D);
 	}
 
 	private void drink() {
@@ -422,7 +431,7 @@ public class Visitor implements Serializable {
 	}
 
 	public boolean intersects(Point2D point) {
-		return point.distance(position) < radius;
+		return point.distance(position) < CLICK_RADIUS;
 	}
 
 	public int getRadius() {

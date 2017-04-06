@@ -4,6 +4,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.time.Duration;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 
@@ -54,24 +55,21 @@ public class SimulatorTabGUI extends JPanel implements ActionListener {
         });
 
         prevButton.addActionListener(e -> {
-            simulatorPanel.smartScale();
-            simulatorPanel.setfollow(null);
+            simulatorPanel.followVisitor(null);
             if (!simulatorPanel.getSimulator().restoreState(-1))
 				JOptionPane.showMessageDialog(this,"Previous time hasn't been loaded",
 						"Could not Load",JOptionPane.WARNING_MESSAGE);
         });
 
         nextButton.addActionListener(e -> {
-            simulatorPanel.smartScale();
-            simulatorPanel.setfollow(null);
+            simulatorPanel.followVisitor(null);
             if (!simulatorPanel.getSimulator().restoreState(+1))
 				JOptionPane.showMessageDialog(this,"next hour hasn't been loaded",
 						"Could not Load",JOptionPane.WARNING_MESSAGE);
         });
 
         resetButton.addActionListener(e -> {
-            simulatorPanel.smartScale();
-            simulatorPanel.setfollow(null);
+            simulatorPanel.followVisitor(null);
             simulatorPanel.resetSimulator();
         });
 
@@ -143,7 +141,7 @@ public class SimulatorTabGUI extends JPanel implements ActionListener {
 	@Override
 	public void actionPerformed(ActionEvent e) {
         if (play) {
-			simulatorPanel.runSimulation();
+			simulatorPanel.getSimulator().runSimulation(Duration.ofSeconds(2));
 		}
         timeLabel.setText(simulatorPanel.getSimulator().getSimulatedTime()
                 .truncatedTo(ChronoUnit.MINUTES).toString());

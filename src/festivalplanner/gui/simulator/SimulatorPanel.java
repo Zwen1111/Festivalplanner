@@ -1,11 +1,8 @@
 package festivalplanner.gui.simulator;
 
 import festivalplanner.simulator.Navigator;
-import festivalplanner.simulator.target.StageTarget;
-import festivalplanner.simulator.target.Target;
-import festivalplanner.simulator.target.SimpleTarget;
-import festivalplanner.simulator.map.TileMap;
 import festivalplanner.simulator.Simulator;
+import festivalplanner.simulator.map.TileMap;
 
 import javax.swing.*;
 import java.awt.*;
@@ -35,7 +32,8 @@ public class SimulatorPanel extends JPanel implements MouseMotionListener, Mouse
 	private double scale;
 	private double translateX;
 	private double translateY;
-	private boolean init;
+	private double lastHeight;
+	private double lastWidth;
 	private Rectangle2D nightOverlay;
 	private int darkIndex;
 	private final Font debugFont = new Font("Monospaced", Font.PLAIN, 14);
@@ -46,7 +44,6 @@ public class SimulatorPanel extends JPanel implements MouseMotionListener, Mouse
 
 	public SimulatorPanel() {
 		super(null);
-		init = false;
 
 		map = new TileMap("/Map+Colliosion.json");
 		map.buildMap();
@@ -77,13 +74,18 @@ public class SimulatorPanel extends JPanel implements MouseMotionListener, Mouse
 		//The width and height of the panel are only known on the first layout.
 		//The smart-scaling can only be done once panel size is known (= paintComponent being called).
 
-		if (!init) {
+		if (lastHeight != getHeight() || lastWidth != getWidth()) {
+			//Screen resized! Use smart-scale to display the whole map nicely.
 			smartScale();
-			init = true;
+			lastHeight = getHeight();
+			lastWidth = getWidth();
 		}
 
+		if (follow != null) {
+			translateX = -follow.getPosition().getX() * this.scale + getWidth() / (2);
+			translateY = -follow.getPosition().getY() * this.scale + getHeight() / (2);
+		}
 
-		//simulator.runSimulation();
 		g2d.translate(translateX, translateY);
 		g2d.scale(scale, scale);
 
@@ -94,15 +96,7 @@ public class SimulatorPanel extends JPanel implements MouseMotionListener, Mouse
 			if (debug == 3) v.drawDebugInfo(g2d);
 			v.draw(g2d);
 		}
-
-		if(follow != null){
-			g2d.setStroke(new BasicStroke(3));
-			Ellipse2D ellipse2D = new Ellipse2D.Double( follow.getPosition().getX() - follow.getRadius()
-					,follow.getPosition().getY() - follow.getRadius(),
-					follow.getRadius()*2,follow.getRadius()*2);
-			g2d.draw(ellipse2D);
-			g2d.setStroke(new BasicStroke(1));
-		}
+		if (follow != null) follow.drawFollowCircle(g2d);
 
 		if (debug >= 1) {
 			Navigator.getTargets()
@@ -141,7 +135,7 @@ public class SimulatorPanel extends JPanel implements MouseMotionListener, Mouse
 		System.out.println(darkIndex);
 	}
 
-	public void smartScale() {
+	private void smartScale() {
 		//Scale until the map matches the screen's height and/or width.
 		//First, find the smallest distance to scale: either the height or width
 		//of the screen. Then calculate the scale.
@@ -177,8 +171,16 @@ public class SimulatorPanel extends JPanel implements MouseMotionListener, Mouse
 	}
 
 	public void translateBy(double deltaX, double deltaY) {
-		translateX += deltaX;
-		translateY += deltaY;
+		setTranslate(translateX + deltaX, translateY + deltaY);
+	}
+
+	public void setTranslate(Point2D position) {
+		setTranslate(position.getX(), position.getY());
+	}
+
+	public void setTranslate(double tx, double ty) {
+		translateX = tx;
+		translateY = ty;
 		if (map.getMapWidth() * scale < getWidth())
 			translateX = (getWidth() - map.getMapWidth() * scale)/2;
 		else if (translateX >= 0)
@@ -203,14 +205,14 @@ public class SimulatorPanel extends JPanel implements MouseMotionListener, Mouse
 		else if (scale > MAX_ZOOM) this.scale = MAX_ZOOM;
 		else this.scale = scale;
 		//Check map position after zooming in/out.
-        if(follow != null) {
-            translateX = -follow.getPosition().getX() * this.scale + getWidth()/(2);
-            translateY = -follow.getPosition().getY() * this.scale + getHeight()/(2);
-        }
 		translateBy(0, 0);
 	}
 
-	public void setfollow(Visitor visitor){
+	public void followVisitor(Visitor visitor){
+		if (visitor != null && follow == null) {
+			//We move back from visitor-view, so lets display the whole map.
+			smartScale();
+		}
 		follow = visitor;
 	}
 
@@ -222,23 +224,22 @@ public class SimulatorPanel extends JPanel implements MouseMotionListener, Mouse
 
 	@Override
 	public void mouseClicked(MouseEvent e) {
-
+		Point2D scalePoint = new Point2D.Double(e.getX() /scale - translateX/scale,e.getY()/scale - translateY/scale);
+		Visitor v = simulator.intersectsVisitors(scalePoint);
+		if (v == null) {
+			if (follow != null) {
+				smartScale();
+			}
+			followVisitor(null);
+		} else {
+			scale = 4;
+			followVisitor(v);
+		}
 	}
 
 	@Override
 	public void mousePressed(MouseEvent e) {
-		Point2D scalePoint = new Point2D.Double(e.getX() /scale - translateX/scale,e.getY()/scale - translateY/scale);
-		Visitor v = simulator.intersectsVisitors(scalePoint);
-		if (v == null) {
-			mousePosition = new Point2D.Double(e.getX(), e.getY());
-			if (follow != null) {
-				smartScale();
-			}
-			setfollow(null);
-		} else {
-            scale = 4;
-			setfollow(v);
-		}
+		mousePosition = new Point2D.Double(e.getX(), e.getY());
 	}
 
 	@Override

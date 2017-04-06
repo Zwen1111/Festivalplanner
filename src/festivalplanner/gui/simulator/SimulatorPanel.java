@@ -42,6 +42,8 @@ public class SimulatorPanel extends JPanel implements MouseMotionListener, Mouse
 	private int debug;
 	private AlphaComposite alcom;
 
+	private Visitor follow;
+
 	public SimulatorPanel() {
 		super(null);
 		init = false;
@@ -93,6 +95,15 @@ public class SimulatorPanel extends JPanel implements MouseMotionListener, Mouse
 			v.draw(g2d);
 		}
 
+		if(follow != null){
+			g2d.setStroke(new BasicStroke(3));
+			Ellipse2D ellipse2D = new Ellipse2D.Double( follow.getPosition().getX() - follow.getRadius()
+					,follow.getPosition().getY() - follow.getRadius(),
+					follow.getRadius()*2,follow.getRadius()*2);
+			g2d.draw(ellipse2D);
+			g2d.setStroke(new BasicStroke(1));
+		}
+
 		if (debug >= 1) {
 			Navigator.getTargets()
 					.forEach(t -> {
@@ -130,7 +141,7 @@ public class SimulatorPanel extends JPanel implements MouseMotionListener, Mouse
 		System.out.println(darkIndex);
 	}
 
-	private void smartScale() {
+	public void smartScale() {
 		//Scale until the map matches the screen's height and/or width.
 		//First, find the smallest distance to scale: either the height or width
 		//of the screen. Then calculate the scale.
@@ -192,7 +203,15 @@ public class SimulatorPanel extends JPanel implements MouseMotionListener, Mouse
 		else if (scale > MAX_ZOOM) this.scale = MAX_ZOOM;
 		else this.scale = scale;
 		//Check map position after zooming in/out.
+        if(follow != null) {
+            translateX = -follow.getPosition().getX() * this.scale + getWidth()/(2);
+            translateY = -follow.getPosition().getY() * this.scale + getHeight()/(2);
+        }
 		translateBy(0, 0);
+	}
+
+	public void setfollow(Visitor visitor){
+		follow = visitor;
 	}
 
 	@Override
@@ -208,7 +227,18 @@ public class SimulatorPanel extends JPanel implements MouseMotionListener, Mouse
 
 	@Override
 	public void mousePressed(MouseEvent e) {
-		mousePosition = new Point2D.Double(e.getX(), e.getY());
+		Point2D scalePoint = new Point2D.Double(e.getX() /scale - translateX/scale,e.getY()/scale - translateY/scale);
+		Visitor v = simulator.intersectsVisitors(scalePoint);
+		if (v == null) {
+			mousePosition = new Point2D.Double(e.getX(), e.getY());
+			if (follow != null) {
+				smartScale();
+			}
+			setfollow(null);
+		} else {
+            scale = 4;
+			setfollow(v);
+		}
 	}
 
 	@Override

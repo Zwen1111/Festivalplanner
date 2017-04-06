@@ -6,6 +6,7 @@ import festivalplanner.simulator.target.*;
 
 import java.awt.*;
 import java.awt.geom.AffineTransform;
+import java.awt.geom.Ellipse2D;
 import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
 import java.io.Serializable;
@@ -133,7 +134,8 @@ public class Visitor implements Serializable {
 				g.setColor(Color.MAGENTA);
 				break;
 		}
-		g.drawOval((int) position.getX() - 15, (int) position.getY() - 15, 30, 30);
+		Ellipse2D circle = new Ellipse2D.Double(position.getX() - 15,position.getY() - 15,30,30);
+		g.draw(circle);
 	}
 
 	public void drawDebugInfo(Graphics2D g) {
@@ -417,6 +419,14 @@ public class Visitor implements Serializable {
 			angle += 0.2;
 		}
 		return collision;
+	}
+
+	public boolean intersects(Point2D point) {
+		return point.distance(position) < radius;
+	}
+
+	public int getRadius() {
+		return radius;
 	}
 
 	public enum CurrentAction {

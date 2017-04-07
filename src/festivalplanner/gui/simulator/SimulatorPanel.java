@@ -9,7 +9,6 @@ import java.awt.*;
 import java.awt.event.*;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
-import java.time.Duration;
 import java.time.LocalTime;
 
 /**
@@ -49,7 +48,7 @@ public class SimulatorPanel extends JPanel implements MouseMotionListener, Mouse
 		map = new TileMap("/Map+Colliosion.json");
 		map.buildMap();
 		simulator = new Simulator(map);
-		Simulator.setVisitorsAmount(10);
+		Simulator.setMaxVisitors(10);
 		scale = 0.65;
 		mousePosition = new Point2D.Double(0, 0);
 

@@ -50,7 +50,6 @@ public class SimulatorPanel extends JPanel implements MouseMotionListener, Mouse
 		map.buildMap();
 		simulator = new Simulator(map);
 		Simulator.setVisitorsAmount(10);
-		simulator.setSaveInterval(Duration.ofMinutes(15));
 		scale = 0.65;
 		mousePosition = new Point2D.Double(0, 0);
 
@@ -126,7 +125,6 @@ public class SimulatorPanel extends JPanel implements MouseMotionListener, Mouse
 
 		float alpha = darkIndex * 0.0001f;
 		alcom = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, alpha);
-		System.out.println(darkIndex);
 	}
 
 	private void smartScale() {

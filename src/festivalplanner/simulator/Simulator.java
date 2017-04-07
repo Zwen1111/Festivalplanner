@@ -25,6 +25,7 @@ public class Simulator {
 
 	public static final LocalDateTime START_TIME = LocalDateTime.of(LocalDate.now(), LocalTime.of(5, 45));
 	public static final int MAX_SNAPSHOTS = 40;
+	public static final Duration DEFAULT_SNAPSHOT_INTERVAL = Duration.ofMinutes(15);
 
 	private SimulatorState state;
 	private static int maxVisitors;
@@ -37,6 +38,11 @@ public class Simulator {
 	public static java.util.List<BufferedImage> images;
 
 	public Simulator(TileMap map) {
+		this(map, DEFAULT_SNAPSHOT_INTERVAL);
+	}
+
+	public Simulator(TileMap map, Duration saveInterval) {
+		this.saveInterval = saveInterval;
 		Navigator.clearTargets();
 		Navigator.addTargets(map.getTargets());
 		SimpleTarget target = new SimpleTarget(new Point2D.Double(1710,750));
@@ -196,10 +202,6 @@ public class Simulator {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-	}
-
-	public void setSaveInterval(Duration duration) {
-		saveInterval = duration;
 	}
 
 	public Point2D getNextWayPoint(Point2D currentPosition, Target target) {

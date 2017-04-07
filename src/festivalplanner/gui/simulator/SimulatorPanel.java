@@ -277,9 +277,11 @@ public class SimulatorPanel extends JPanel implements MouseMotionListener, Mouse
 			lastWidth = getWidth();
 		}
 
-        if(follow != null)
-        	if(simulator.getVisitors().contains(follow))
-        		followVisitor(null);
+        if (follow != null && !simulator.getVisitors().contains(follow)) {
+			//The tracked visitor disappeared.
+			followVisitor(null);
+		}
+
 		updateDayNightCycle();
 	}
 }

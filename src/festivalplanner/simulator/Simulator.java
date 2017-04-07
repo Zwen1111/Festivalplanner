@@ -25,18 +25,25 @@ public class Simulator {
 
 	public static final LocalDateTime START_TIME = LocalDateTime.of(LocalDate.now(), LocalTime.of(5, 45));
 	public static final int MAX_SNAPSHOTS = 40;
+	public static final Duration DEFAULT_SNAPSHOT_INTERVAL = Duration.ofMinutes(15);
+
+	private static int maxVisitors;
+	private static Duration saveInterval;
 
 	private SimulatorState state;
-	private static int maxVisitors;
 	private int stateCounter;
 	private int currentStateIndex;
 	private LocalDateTime lastSave;
-	private Duration saveInterval;
 	private List<File> saveLocations;
 
 	public static java.util.List<BufferedImage> images;
 
 	public Simulator(TileMap map) {
+		this(map, DEFAULT_SNAPSHOT_INTERVAL);
+	}
+
+	public Simulator(TileMap map, Duration wantedSaveInterval) {
+		setSaveInterval(wantedSaveInterval);
 		Navigator.clearTargets();
 		Navigator.addTargets(map.getTargets());
 		SimpleTarget target = new SimpleTarget(new Point2D.Double(1710,750));
@@ -198,10 +205,6 @@ public class Simulator {
 		}
 	}
 
-	public void setSaveInterval(Duration duration) {
-		saveInterval = duration;
-	}
-
 	public Point2D getNextWayPoint(Point2D currentPosition, Target target) {
 		if (currentPosition == null || target == null) return null;
 		Target.Distance distance = target.getDistances(currentPosition);
@@ -233,9 +236,22 @@ public class Simulator {
 		return state.visitors;
 	}
 
-	public static void setVisitorsAmount(int visitorsAmount) {
+	public static int getMaxVisitors() {
+		return maxVisitors;
+	}
+
+	public static void setMaxVisitors(int visitorsAmount) {
 	   maxVisitors = visitorsAmount;
     }
+
+    public static Duration getSaveInterval() {
+		return saveInterval;
+	}
+
+    public static void setSaveInterval(Duration duration) {
+		saveInterval = duration;
+		System.out.println("Snapshot interval set to " + saveInterval);
+	}
 
     public Visitor intersectsVisitors(Point2D point) {
 		for (Visitor visitor : getVisitors()) {

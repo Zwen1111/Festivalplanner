@@ -9,6 +9,7 @@ import festivalplanner.util.FileSystem;
 
 import javax.swing.*;
 import java.awt.*;
+import java.time.Duration;
 
 /**
  * The main GUI handler.
@@ -73,10 +74,12 @@ public class GUIFrame extends JFrame implements Database.OnDataChangedListener{
 		JMenu options = new JMenu("Options");
 		menuBar.add(options);
 
-		JMenuItem visitorsAmount = new JMenuItem("Visitors amount");
+		JMenuItem visitorsAmount = new JMenuItem("Visitors Amount");
 		visitorsAmount.addActionListener(e ->{
 			try {
-				Simulator.setVisitorsAmount(Integer.parseInt(JOptionPane.showInputDialog(null, "Amount of visitors")));
+				Simulator.setMaxVisitors(Integer.parseInt(JOptionPane.showInputDialog(null,
+						"The maximum amount of visitors the simulator should simulate.",
+						Simulator.getMaxVisitors())));
 			}catch (NumberFormatException ex){
 					JOptionPane.showMessageDialog(null,"Please Insert a number","Warning",JOptionPane.WARNING_MESSAGE);
 			}catch (Exception e1){
@@ -85,6 +88,22 @@ public class GUIFrame extends JFrame implements Database.OnDataChangedListener{
 		});
 		options.add(visitorsAmount);
 
+		JMenuItem snapshotInterval = new JMenuItem("Save Interval");
+		snapshotInterval.addActionListener(e ->{
+			try {
+				Simulator.setSaveInterval(Duration.ofMinutes(Integer.parseInt(JOptionPane.showInputDialog(null,
+						"The targeted interval at which the simulator should make a snapshot of its current\n" +
+								"state. A lesser interval results in detailed jumping, but limits the maximum\n" +
+								"time you can revert. A bigger number results in more time, but greater steps.\n" +
+								"Time in simulated-minutes",
+						Simulator.getSaveInterval().getSeconds() / 60))));
+			}catch (NumberFormatException ex){
+				JOptionPane.showMessageDialog(null,"Please Insert a number","Warning",JOptionPane.WARNING_MESSAGE);
+			}catch (Exception e1){
+				e1.printStackTrace();
+			}
+		});
+		options.add(snapshotInterval);
 
 
 		mainPanel.add(menuBar,BorderLayout.NORTH);
